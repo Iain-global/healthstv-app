@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ORGANISER
+}
+
+model User {
+  id               Int               @id @default(autoincrement())
+  username         String?           @unique
+  email            String            @unique
+  password         String
+  role             Role              @default(ORGANISER)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  organiserProfile OrganiserProfile?
+}
+
+model OrganiserProfile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug           String   @unique
+  name           String
+  organization   String?
+  bio            String?  @db.Text
+  website        String?
+  avatarInitials String?
+  profilePhotoUrl String?
+  isVerified     Boolean  @default(false)
+  isFounding     Boolean  @default(false)
+  subscriptionPrice Float? @default(0)
+  events         Event[]
+  videos         Video[]
+}
+
+model Event {
+  id              Int              @id @default(autoincrement())
+  title           String
+  format          String?
+  description     String?          @db.Text
+  date            String
+  location        String?
+  imageUrl        String?
+  price           Decimal          @db.Decimal(10, 2)
+  ticketingMethod String?
+  ticketUrl       String?
+  livestreamUrl   String?
+  keynoteSpeakers String?
+  status          String           @default("ACTIVE")
+  isApproved      Boolean          @default(true)
+  pendingEdits    Json?
+  organiserId     Int
+  organiser       OrganiserProfile @relation(fields: [organiserId], references: [id], onDelete: Cascade)
+  createdAt       DateTime         @default(now())
+}
+
+model Video {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String?          @db.Text
+  thumbnailUrl String?
+  videoUrl    String
+  category    String?
+  isFree      Boolean          @default(true)
+  isApproved  Boolean          @default(true)
+  pendingEdits Json?
+  organiserId Int
+  organiser   OrganiserProfile @relation(fields: [organiserId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+}
+
+model SecurityLog {
+  id        Int      @id @default(autoincrement())
+  event     String
+  ipAddress String?
+  userId    Int?
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  id    String @id
+  value String
+}
