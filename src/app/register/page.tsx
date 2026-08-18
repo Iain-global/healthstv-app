@@ -44,7 +44,7 @@ export default function Register() {
       const data = await res.json();
 
       if (data.success) {
-        router.push('/');
+        router.push('/account');
         router.refresh();
       } else {
         setError(data.error || 'Failed to register');
