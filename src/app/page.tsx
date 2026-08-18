@@ -9,7 +9,7 @@ export default function Home() {
         {/* Background Overlay */}
         <div 
           className="absolute inset-0 opacity-40 bg-cover bg-center mix-blend-overlay"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2000')" }}
+          style={{ backgroundImage: "url('/banner.jpg')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0c1c10] to-transparent opacity-80"></div>
         
