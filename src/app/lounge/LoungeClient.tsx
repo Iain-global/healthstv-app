@@ -172,6 +172,13 @@ export default function LoungeClient() {
     }
   }, [activeTableId, hasGrantedPermission]);
 
+  // Ensure local video stream stays attached even if React re-renders
+  useEffect(() => {
+    if (localVideoRef.current && stream) {
+      localVideoRef.current.srcObject = stream;
+    }
+  }, [stream, activeTableId]);
+
   const startLocalStream = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -180,7 +187,6 @@ export default function LoungeClient() {
       
       let newStream: MediaStream;
       try {
-        // Try both video and audio
         newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       } catch (err: any) {
         if (err.name === 'NotFoundError' || err.message.includes('object can not be found')) {
@@ -199,9 +205,6 @@ export default function LoungeClient() {
       newStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
       newStream.getVideoTracks().forEach(track => track.enabled = !isCamMuted);
       setStream(newStream);
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = newStream;
-      }
     } catch (err: any) {
       console.warn("Camera/Mic access denied or unavailable", err);
       alert("Hardware access failed: " + err.message + "\n\nMake sure your webcam AND microphone are plugged in and not being used by another app (like Zoom).");
