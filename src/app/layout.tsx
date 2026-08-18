@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
 import MaintenanceGate from "@/components/MaintenanceGate";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "HealthSummits.tv",
   description: "Watch leading health summits live and on demand",
