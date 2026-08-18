@@ -8,7 +8,7 @@ async function main() {
   // 1. Create Main Admin
   const admin = await prisma.user.upsert({
     where: { email: 'admin@healthstv.com' },
-    update: {},
+    update: { password: 'admin' },
     create: {
       email: 'admin@healthstv.com',
       password: 'admin', // In a real app, this must be hashed!
@@ -20,7 +20,7 @@ async function main() {
   // 2. Create an Organiser (Dr. Sarah Jenkins)
   const sarahUser = await prisma.user.upsert({
     where: { email: 'sarah.jenkins@example.com' },
-    update: { username: 'sarah' },
+    update: { username: 'sarah', password: 'sarah' },
     create: {
       username: 'sarah',
       email: 'sarah.jenkins@example.com',
@@ -68,7 +68,7 @@ async function main() {
   // 3. Create another dummy Organiser
   const markUser = await prisma.user.upsert({
     where: { email: 'mark.davidson@example.com' },
-    update: { username: 'mark' },
+    update: { username: 'mark', password: 'mark' },
     create: {
       username: 'mark',
       email: 'mark.davidson@example.com',
