@@ -174,6 +174,9 @@ export default function LoungeClient() {
 
   const startLocalStream = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Your browser does not support camera access, or you are not using a secure HTTPS connection.");
+      }
       const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       newStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
       newStream.getVideoTracks().forEach(track => track.enabled = !isCamMuted);
@@ -181,8 +184,9 @@ export default function LoungeClient() {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = newStream;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn("Camera/Mic access denied or unavailable", err);
+      alert("Camera access failed: " + err.message);
     }
   };
 
