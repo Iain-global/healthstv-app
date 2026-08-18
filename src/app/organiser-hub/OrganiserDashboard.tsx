@@ -154,7 +154,7 @@ export default function OrganiserDashboard() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-[80vh] bg-[#fafcfb] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 md:p-8 max-w-md w-full">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black text-[#1f2e22] mb-2">Organiser Login</h2>
             <p className="text-gray-500 text-sm">Sign in to manage your virtual summits, tickets, and video library.</p>
@@ -192,7 +192,7 @@ export default function OrganiserDashboard() {
               <h1 className="text-3xl md:text-4xl font-black">{orgData?.name} Dashboard</h1>
               <p className="text-gray-300 mt-2">Manage your virtual events, ticket sales, and video library.</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Link href={`/organiser/${orgData?.slug}`} className="border border-white hover:bg-white hover:text-[#0c1c10] text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">
                 👁️ View Public Profile
               </Link>
@@ -389,7 +389,7 @@ export default function OrganiserDashboard() {
               <h3 className="font-bold text-lg">{editingVideoId ? 'Edit Video Session' : 'Upload Video Session'}</h3>
               <button onClick={() => {setIsVideoModalOpen(false); setEditingVideoId(null);}} className="text-white hover:text-gray-300">✕</button>
             </div>
-            <form onSubmit={submitVideo} className="p-6 space-y-4">
+            <form onSubmit={submitVideo} className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Video Title</label>
                 <input required type="text" value={newVideoForm.title} onChange={e => setNewVideoForm({...newVideoForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
@@ -429,7 +429,7 @@ export default function OrganiserDashboard() {
               <h3 className="font-bold text-lg">{editingEventId ? 'Edit Virtual Event' : 'Upload Virtual Event & Tickets'}</h3>
               <button onClick={() => {setIsEventModalOpen(false); setEditingEventId(null);}} className="text-white hover:text-orange-200">✕</button>
             </div>
-            <form onSubmit={submitEvent} className="p-6 space-y-4">
+            <form onSubmit={submitEvent} className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Event Title</label>
                 <input required type="text" value={newEventForm.title} onChange={e => setNewEventForm({...newEventForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />

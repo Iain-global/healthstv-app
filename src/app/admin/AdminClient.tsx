@@ -281,7 +281,7 @@ export default function AdminClient({
     return (
       <section className="bg-[#fafcfb] min-h-screen pt-20 pb-32">
         <div className="container mx-auto px-4 max-w-md">
-          <div className="bg-white p-10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border-t-[5px] border-[#d93025]">
+          <div className="bg-white p-6 md:p-10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border-t-[5px] border-[#d93025]">
             <div className="text-center mb-8">
               <div className="bg-[#fde8e8] text-[#c81e1e] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
@@ -344,7 +344,7 @@ export default function AdminClient({
               <h1 className="text-3xl font-black text-white m-0">Platform Governance & Moderation</h1>
               <p className="text-white/80 text-sm mt-2">Manage organiser authorisations, moderate video lecture submissions, and curate site-wide content.</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Link href="/free-videos" className="border border-white/30 text-white hover:bg-white/10 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">
                 👁️ View Live Video Vault
               </Link>

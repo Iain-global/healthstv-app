@@ -1,4 +1,4 @@
-﻿
+
 /* ==========================================================================
    Lounge Page specific styles
    ========================================================================== */
@@ -331,3 +331,60 @@
 }
 .table-action-btn:hover { background: rgba(255,255,255,0.1); }
 .table-action-btn.joined { color: #fff; }
+
+/* ==========================================================================
+   Mobile Responsiveness
+   ========================================================================== */
+@media (max-width: 768px) {
+    .lounge-top-nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    .lounge-nav-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .lounge-event-pill {
+        display: none; /* Hide on mobile to save space */
+    }
+    .lounge-nav-tabs {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .lounge-tab {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+    .lounge-nav-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .lounge-floor-nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        align-items: stretch;
+    }
+    .floor-nav-left, .floor-nav-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .lounge-search {
+        width: 100%;
+    }
+    .lounge-search input {
+        width: 100%;
+    }
+    .btn-start-table {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .lounge-tables-container {
+        grid-template-columns: 1fr;
+        padding: 0 15px 40px;
+    }
+}
