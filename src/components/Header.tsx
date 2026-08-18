@@ -1,13 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    fetch('/api/auth/update')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
 
   if (pathname === "/lounge") {
     return null;
@@ -78,12 +90,23 @@ export default function Header() {
         {/* Right Actions */}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/signin" className="font-semibold text-[0.95rem] text-[#1f2e22] hover:text-[#006818]">
-              Sign In
-            </Link>
-            <Link href="/register" className="px-5 py-2.5 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg hover:bg-[#006818] hover:text-white transition-all text-[0.9rem]">
-              Register
-            </Link>
+            {user ? (
+              <Link href="/account" className="flex items-center gap-2 font-semibold text-[0.95rem] text-[#006818] hover:text-[#005213] mr-2">
+                <div className="w-8 h-8 bg-[#e77a25] text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                Hello, {user.name ? user.name.split(' ')[0] : 'Member'}
+              </Link>
+            ) : (
+              <>
+                <Link href="/signin" className="font-semibold text-[0.95rem] text-[#1f2e22] hover:text-[#006818]">
+                  Sign In
+                </Link>
+                <Link href="/register" className="px-5 py-2.5 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg hover:bg-[#006818] hover:text-white transition-all text-[0.9rem]">
+                  Register
+                </Link>
+              </>
+            )}
             <button className="px-5 py-2.5 bg-[#ea8125] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] hover:bg-[#d3701a] hover:shadow-[0_6px_20px_rgba(234,129,37,0.6)] hover:-translate-y-0.5 transition-all text-[0.9rem]">
               Subscribe
             </button>
@@ -112,8 +135,16 @@ export default function Header() {
             </Link>
             <Link href="/organiser-hub" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">Organiser Dashboard</Link>
             <div className="flex flex-col gap-2 pt-2">
-              <Link href="/signin" className="text-center font-semibold text-[#1f2e22] py-2">Sign In</Link>
-              <Link href="/register" className="text-center px-4 py-2 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg">Register</Link>
+              {user ? (
+                <Link href="/account" className="text-center font-semibold text-[#006818] py-2 border-2 border-[#006818] rounded-lg">
+                  Hello, {user.name ? user.name.split(' ')[0] : 'Member'} (My Account)
+                </Link>
+              ) : (
+                <>
+                  <Link href="/signin" className="text-center font-semibold text-[#1f2e22] py-2">Sign In</Link>
+                  <Link href="/register" className="text-center px-4 py-2 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg">Register</Link>
+                </>
+              )}
             </div>
           </div>
         </div>
