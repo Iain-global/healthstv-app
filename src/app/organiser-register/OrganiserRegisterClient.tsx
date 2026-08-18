@@ -112,7 +112,7 @@ export default function OrganiserRegisterClient() {
                   <div className="bg-[#f8f9fa] p-6 rounded-xl text-left border border-gray-200 mb-8">
                     <h3 className="font-bold text-[#1f2e22] mb-2">How to log in:</h3>
                     <p className="text-sm text-gray-600 mb-2">While you await verification, you can log in to your dashboard to set up your profile.</p>
-                    <p className="text-sm text-gray-600"><strong>Username:</strong> Your First Name (e.g., if you entered "Dr. Sarah Jenkins", use "sarah")</p>
+                    <p className="text-sm text-gray-600"><strong>Username:</strong> Your First Name (e.g., if you entered "Dr. Jane Doe", use "jane")</p>
                     <p className="text-sm text-gray-600"><strong>Password:</strong> Same as your username (you can change this in Account Settings).</p>
                   </div>
                   <Link href="/organiser-hub" className="inline-block bg-[#00873a] hover:bg-[#006818] text-white font-bold py-4 px-8 rounded-xl transition-colors">
