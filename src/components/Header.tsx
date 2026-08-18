@@ -32,12 +32,7 @@ export default function Header() {
       <div className="mx-auto w-[90%] max-w-[1200px] px-[15px] flex items-center justify-between h-[90px]">
         {/* Logo */}
         <Link href="/" className="flex-shrink-0">
-          <div className="text-2xl font-black text-[#006818] tracking-tight flex items-center gap-2">
-            <span className="bg-gradient-to-br from-[#006818] to-[#004d11] text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
-              HTV
-            </span>
-            HealthSummits
-          </div>
+          <Image src="/logo.png" alt="HealthSummits.tv" width={250} height={60} className="h-12 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}

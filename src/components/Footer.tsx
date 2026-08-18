@@ -19,12 +19,7 @@ export default function Footer() {
           {/* Company Info */}
           <div className="md:col-span-1">
             <Link href="/" className="inline-block mb-5">
-              <div className="text-2xl font-black text-[#006818] tracking-tight flex items-center gap-2">
-                <span className="bg-gradient-to-br from-[#006818] to-[#004d11] text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
-                  HTV
-                </span>
-                HealthSummits
-              </div>
+              <Image src="/logo.png" alt="HealthSummits.tv" width={250} height={60} className="h-12 w-auto" />
             </Link>
             <p className="text-[#5e6d62] text-[0.95rem] leading-relaxed mb-6">
               Premium streaming platform dedicated to leading health and wellbeing summits, webinars, and expert talks.
