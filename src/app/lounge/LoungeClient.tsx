@@ -2,22 +2,166 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+
+let Peer: any;
+if (typeof window !== "undefined") {
+  Peer = require("simple-peer");
+}
+
+const VideoPlayer = ({ stream }: { stream: MediaStream }) => {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.srcObject = stream;
+  }, [stream]);
+  return <video ref={ref} autoPlay playsInline></video>;
+};
 
 export default function LoungeClient() {
-  const [activeTableId, setActiveTableId] = useState<number | null>(null); // Start with no table
+  const [activeTableId, setActiveTableId] = useState<number | null>(null);
   const [hasGrantedPermission, setHasGrantedPermission] = useState(false);
   const [isMicMuted, setIsMicMuted] = useState(true);
   const [isCamMuted, setIsCamMuted] = useState(false);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  
+  const [socketId, setSocketId] = useState("");
+  const [peers, setPeers] = useState<{ [id: string]: any }>({});
+  const [peerStreams, setPeerStreams] = useState<{ [id: string]: MediaStream }>({});
 
-  // Stop camera when component unmounts or leaves a table
+  const peersRef = useRef(peers);
+  useEffect(() => { peersRef.current = peers; }, [peers]);
+
   useEffect(() => {
+    setSocketId(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
     return () => {
       stopLocalStream();
     };
   }, []);
+
+  const removePeer = (peerId: string) => {
+    setPeers(prev => {
+      const newPeers = { ...prev };
+      if (newPeers[peerId]) {
+        try { newPeers[peerId].destroy(); } catch (e) {}
+        delete newPeers[peerId];
+      }
+      return newPeers;
+    });
+    setPeerStreams(prev => {
+      const newStreams = { ...prev };
+      delete newStreams[peerId];
+      return newStreams;
+    });
+  };
+
+  const leaveTable = () => {
+    setActiveTableId(null);
+    Object.values(peersRef.current).forEach((p: any) => {
+      try { p.destroy(); } catch(e){}
+    });
+    setPeers({});
+    setPeerStreams({});
+    if (socketId) {
+      fetch('/api/lounge/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ socketId })
+      });
+    }
+  };
+
+  const createPeer = (peerId: string, initiator: boolean, myStream: MediaStream) => {
+    if (peersRef.current[peerId]) return peersRef.current[peerId];
+
+    const peer = new Peer({
+      initiator,
+      stream: myStream,
+      trickle: false // Extremely important for DB signaling (one payload only)
+    });
+
+    peer.on("signal", (signal: any) => {
+      fetch('/api/lounge/signal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderId: socketId,
+          receiverId: peerId,
+          type: signal.type,
+          payload: signal
+        })
+      });
+    });
+
+    peer.on("stream", (remoteStream: MediaStream) => {
+      setPeerStreams(prev => ({ ...prev, [peerId]: remoteStream }));
+    });
+
+    peer.on("close", () => removePeer(peerId));
+    peer.on("error", () => removePeer(peerId));
+
+    setPeers(prev => ({ ...prev, [peerId]: peer }));
+    peersRef.current[peerId] = peer;
+    return peer;
+  };
+
+  const handleIncomingSignal = (senderId: string, type: string, payload: any, myStream: MediaStream) => {
+    let peer = peersRef.current[senderId];
+    
+    if (type === 'offer') {
+      if (!peer) {
+        peer = createPeer(senderId, false, myStream);
+      }
+      peer.signal(payload);
+    } else if (type === 'answer') {
+      if (peer) {
+        peer.signal(payload);
+      }
+    }
+  };
+
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+    
+    if (activeTableId && hasGrantedPermission && socketId && stream) {
+      // Join Table
+      fetch('/api/lounge/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tableId: activeTableId, socketId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.peers) {
+          data.peers.forEach((peerId: string) => {
+            createPeer(peerId, true, stream);
+          });
+        }
+      });
+
+      // Poll for signals and heartbeats
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch('/api/lounge/poll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tableId: activeTableId, socketId })
+          });
+          const data = await res.json();
+          if (data.signals) {
+            data.signals.forEach((sig: any) => {
+              handleIncomingSignal(sig.senderId, sig.type, sig.payload, stream);
+            });
+          }
+        } catch (e) {
+          console.error("Poll error", e);
+        }
+      }, 2000); // 2 second polling
+    }
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [activeTableId, hasGrantedPermission, socketId, stream]);
 
   // When activeTable changes, start/stop stream
   useEffect(() => {
@@ -31,11 +175,8 @@ export default function LoungeClient() {
   const startLocalStream = async () => {
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      
-      // Apply current mute state
       newStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
       newStream.getVideoTracks().forEach(track => track.enabled = !isCamMuted);
-      
       setStream(newStream);
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = newStream;
@@ -58,28 +199,65 @@ export default function LoungeClient() {
   const toggleMic = () => {
     setIsMicMuted(!isMicMuted);
     if (stream) {
-      stream.getAudioTracks().forEach(track => track.enabled = isMicMuted); // Enable if previously muted
+      stream.getAudioTracks().forEach(track => track.enabled = isMicMuted);
     }
   };
 
   const toggleCam = () => {
     setIsCamMuted(!isCamMuted);
     if (stream) {
-      stream.getVideoTracks().forEach(track => track.enabled = isCamMuted); // Enable if previously muted
+      stream.getVideoTracks().forEach(track => track.enabled = isCamMuted);
     }
   };
 
   const joinTable = (id: number) => {
+    leaveTable(); // clean up if already at a table
     setActiveTableId(id);
   };
 
-  const leaveTable = () => {
-    setActiveTableId(null);
+  // Render dynamic seats for the active table
+  const renderDynamicSeats = () => {
+    const remotePeers = Object.entries(peerStreams);
+    const maxSeats = 6;
+    const seats = [];
+
+    // 1. Render local user
+    seats.push(
+      <div key="local" className="seat seat-1 occupied my-seat">
+        <video ref={localVideoRef} autoPlay muted playsInline></video>
+        <div className="seat-badge">ME</div>
+        <div className="my-seat-controls">
+          <button type="button" className={`seat-ctrl-btn ${isMicMuted ? 'muted' : ''}`} onClick={toggleMic}>🎙️</button>
+          <button type="button" className={`seat-ctrl-btn ${isCamMuted ? 'muted' : ''}`} onClick={toggleCam}>📹</button>
+        </div>
+      </div>
+    );
+
+    // 2. Render connected remote peers
+    remotePeers.forEach(([peerId, peerStream], index) => {
+      seats.push(
+        <div key={peerId} className={`seat seat-${index + 2} occupied`}>
+          <VideoPlayer stream={peerStream} />
+          <div className="seat-badge">P{index + 1}</div>
+        </div>
+      );
+    });
+
+    // 3. Fill remaining with empty seats
+    const currentSeats = seats.length;
+    for (let i = currentSeats; i < maxSeats; i++) {
+      seats.push(
+        <div key={`empty-${i}`} className={`seat seat-${i + 1} empty`} onClick={() => {}}>
+          <span>+</span>
+        </div>
+      );
+    }
+
+    return seats;
   };
 
   return (
     <>
-      {/* Top Lounge Header */}
       <header className="lounge-top-nav font-sans">
         <div className="lounge-nav-left">
           <div className="lounge-logo">
@@ -111,7 +289,6 @@ export default function LoungeClient() {
         </div>
       </header>
 
-      {/* Floor Navigation Bar */}
       <div className="lounge-floor-nav font-sans">
         <div className="floor-nav-left">
           <span style={{ color: "#64748b", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.5px" }}>FLOOR:</span>
@@ -127,7 +304,6 @@ export default function LoungeClient() {
         </div>
       </div>
 
-      {/* Tables Container */}
       <div className="lounge-tables-container font-sans">
         
         {/* Table 1 */}
@@ -138,7 +314,7 @@ export default function LoungeClient() {
               <h3 className="table-title">Cellular Longevity & NAD+</h3>
               <span className="table-topic">Mitochondrial Health & Fasting</span>
             </div>
-            <div className="table-capacity">👥 {activeTableId === 1 ? '3/6' : '2/6'}</div>
+            <div className="table-capacity">👥 {activeTableId === 1 ? `${Object.keys(peerStreams).length + 1}/6` : '2/6'}</div>
           </div>
           
           <div className="table-arena">
@@ -154,32 +330,16 @@ export default function LoungeClient() {
               </button>
             )}
             
-            {/* Seats (6 positions) */}
-            <div className="seat seat-1 occupied">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&h=100&fit=crop" alt="User" />
-            </div>
-            
-            {activeTableId === 1 ? (
-              <div className="seat seat-2 occupied my-seat">
-                <video ref={localVideoRef} autoPlay muted playsInline></video>
-                <div className="seat-badge">D9</div>
-                <div className="my-seat-controls">
-                  <button type="button" className={`seat-ctrl-btn ${isMicMuted ? 'muted' : ''}`} onClick={toggleMic}>🎙️</button>
-                  <button type="button" className={`seat-ctrl-btn ${isCamMuted ? 'muted' : ''}`} onClick={toggleCam}>📹</button>
-                </div>
-              </div>
-            ) : (
-              <div className="seat seat-2 empty" onClick={() => joinTable(1)}><span>+</span></div>
+            {activeTableId === 1 ? renderDynamicSeats() : (
+              <>
+                <div className="seat seat-1 occupied"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&h=100&fit=crop" alt="User" /></div>
+                <div className="seat seat-2 empty" onClick={() => joinTable(1)}><span>+</span></div>
+                <div className="seat seat-3 empty" onClick={() => joinTable(1)}><span>+</span></div>
+                <div className="seat seat-4 occupied"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&h=100&fit=crop" alt="User" /></div>
+                <div className="seat seat-5 empty" onClick={() => joinTable(1)}><span>+</span></div>
+                <div className="seat seat-6 empty" onClick={() => joinTable(1)}><span>+</span></div>
+              </>
             )}
-            
-            <div className="seat seat-3 empty" onClick={() => { if(activeTableId !== 1) joinTable(1) }}>
-              <span>+</span>
-            </div>
-            <div className="seat seat-4 occupied">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&h=100&fit=crop" alt="User" />
-            </div>
-            <div className="seat seat-5 empty" onClick={() => { if(activeTableId !== 1) joinTable(1) }}><span>+</span></div>
-            <div className="seat seat-6 empty" onClick={() => { if(activeTableId !== 1) joinTable(1) }}><span>+</span></div>
           </div>
           
           {activeTableId === 1 ? (
@@ -197,7 +357,7 @@ export default function LoungeClient() {
               <h3 className="table-title">Gut-Brain Axis & Microbiome</h3>
               <span className="table-topic">Probiotics & Vagus Nerve Stimulation</span>
             </div>
-            <div className="table-capacity">👥 {activeTableId === 2 ? '2/4' : '1/4'}</div>
+            <div className="table-capacity">👥 {activeTableId === 2 ? `${Object.keys(peerStreams).length + 1}/6` : '1/4'}</div>
           </div>
           
           <div className="table-arena capacity-4">
@@ -213,25 +373,14 @@ export default function LoungeClient() {
               </button>
             )}
             
-            <div className="seat seat-pos-top occupied">
-              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&h=100&fit=crop" alt="User" />
-            </div>
-            
-            {activeTableId === 2 ? (
-              <div className="seat seat-pos-right occupied my-seat">
-                <video ref={localVideoRef} autoPlay muted playsInline></video>
-                <div className="seat-badge">D9</div>
-                <div className="my-seat-controls">
-                  <button type="button" className={`seat-ctrl-btn ${isMicMuted ? 'muted' : ''}`} onClick={toggleMic}>🎙️</button>
-                  <button type="button" className={`seat-ctrl-btn ${isCamMuted ? 'muted' : ''}`} onClick={toggleCam}>📹</button>
-                </div>
-              </div>
-            ) : (
-              <div className="seat seat-pos-right empty" onClick={() => joinTable(2)}><span>+</span></div>
+            {activeTableId === 2 ? renderDynamicSeats() : (
+              <>
+                <div className="seat seat-pos-top occupied"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&h=100&fit=crop" alt="User" /></div>
+                <div className="seat seat-pos-right empty" onClick={() => joinTable(2)}><span>+</span></div>
+                <div className="seat seat-pos-bottom empty" onClick={() => joinTable(2)}><span>+</span></div>
+                <div className="seat seat-pos-left empty" onClick={() => joinTable(2)}><span>+</span></div>
+              </>
             )}
-            
-            <div className="seat seat-pos-bottom empty" onClick={() => { if(activeTableId !== 2) joinTable(2) }}><span>+</span></div>
-            <div className="seat seat-pos-left empty" onClick={() => { if(activeTableId !== 2) joinTable(2) }}><span>+</span></div>
           </div>
           
           {activeTableId === 2 ? (
@@ -249,7 +398,7 @@ export default function LoungeClient() {
               <h3 className="table-title">Sleep Architecture & Circadian Rhythms</h3>
               <span className="table-topic">HRV Tracking & Light Therapy</span>
             </div>
-            <div className="table-capacity">👥 {activeTableId === 3 ? '3/6' : '2/6'}</div>
+            <div className="table-capacity">👥 {activeTableId === 3 ? `${Object.keys(peerStreams).length + 1}/6` : '2/6'}</div>
           </div>
           
           <div className="table-arena">
@@ -265,29 +414,16 @@ export default function LoungeClient() {
               </button>
             )}
             
-            <div className="seat seat-1 occupied">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&h=100&fit=crop" alt="User" />
-            </div>
-            <div className="seat seat-2 occupied">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&h=100&fit=crop" alt="User" />
-            </div>
-            
-            {activeTableId === 3 ? (
-              <div className="seat seat-3 occupied my-seat">
-                <video ref={localVideoRef} autoPlay muted playsInline></video>
-                <div className="seat-badge">D9</div>
-                <div className="my-seat-controls">
-                  <button type="button" className={`seat-ctrl-btn ${isMicMuted ? 'muted' : ''}`} onClick={toggleMic}>🎙️</button>
-                  <button type="button" className={`seat-ctrl-btn ${isCamMuted ? 'muted' : ''}`} onClick={toggleCam}>📹</button>
-                </div>
-              </div>
-            ) : (
-              <div className="seat seat-3 empty" onClick={() => joinTable(3)}><span>+</span></div>
+            {activeTableId === 3 ? renderDynamicSeats() : (
+              <>
+                <div className="seat seat-1 occupied"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&h=100&fit=crop" alt="User" /></div>
+                <div className="seat seat-2 occupied"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&h=100&fit=crop" alt="User" /></div>
+                <div className="seat seat-3 empty" onClick={() => joinTable(3)}><span>+</span></div>
+                <div className="seat seat-4 empty" onClick={() => joinTable(3)}><span>+</span></div>
+                <div className="seat seat-5 empty" onClick={() => joinTable(3)}><span>+</span></div>
+                <div className="seat seat-6 empty" onClick={() => joinTable(3)}><span>+</span></div>
+              </>
             )}
-            
-            <div className="seat seat-4 empty" onClick={() => { if(activeTableId !== 3) joinTable(3) }}><span>+</span></div>
-            <div className="seat seat-5 empty" onClick={() => { if(activeTableId !== 3) joinTable(3) }}><span>+</span></div>
-            <div className="seat seat-6 empty" onClick={() => { if(activeTableId !== 3) joinTable(3) }}><span>+</span></div>
           </div>
           
           {activeTableId === 3 ? (
@@ -313,7 +449,7 @@ export default function LoungeClient() {
             <button
               onClick={() => {
                 setHasGrantedPermission(true);
-                setActiveTableId(1);
+                // Don't auto-join table 1 anymore, wait for them to click a table
               }}
               className="w-full bg-[#00a469] text-white font-bold py-3.5 rounded-xl shadow-[0_4px_15px_rgba(0,164,105,0.4)] hover:bg-[#008f5b] transition-colors text-lg"
             >

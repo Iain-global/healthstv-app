@@ -96,3 +96,25 @@ model SystemSetting {
   id    String @id
   value String
 }
+
+model LoungeParticipant {
+  id        String   @id @default(uuid())
+  tableId   Int
+  socketId  String   @unique
+  updatedAt DateTime @default(now())
+
+  signalsSent     LoungeSignal[] @relation("SentSignals")
+  signalsReceived LoungeSignal[] @relation("ReceivedSignals")
+}
+
+model LoungeSignal {
+  id          Int      @id @default(autoincrement())
+  senderId    String
+  receiverId  String
+  type        String
+  payload     String   @db.Text
+  createdAt   DateTime @default(now())
+  
+  sender      LoungeParticipant @relation("SentSignals", fields: [senderId], references: [socketId], onDelete: Cascade)
+  receiver    LoungeParticipant @relation("ReceivedSignals", fields: [receiverId], references: [socketId], onDelete: Cascade)
+}
