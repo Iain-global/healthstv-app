@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       email: 'admin@healthstv.com',
-      password: 'password123', // In a real app, this must be hashed!
+      password: 'admin', // In a real app, this must be hashed!
       role: 'ADMIN',
     },
   })
@@ -23,7 +23,7 @@ async function main() {
     update: {},
     create: {
       email: 'sarah.jenkins@example.com',
-      password: 'password123',
+      password: 'sarah',
       role: 'ORGANISER',
       organiserProfile: {
         create: {
@@ -70,7 +70,7 @@ async function main() {
     update: {},
     create: {
       email: 'mark.davidson@example.com',
-      password: 'password123',
+      password: 'mark',
       role: 'ORGANISER',
       organiserProfile: {
         create: {

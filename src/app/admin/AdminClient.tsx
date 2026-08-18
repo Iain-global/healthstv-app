@@ -160,6 +160,13 @@ export default function AdminClient({
     }
   };
 
+  const handleLogout = () => {
+    document.cookie = 'adminAuth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/admin;';
+    setIsAuthenticated(false);
+    setUsername('');
+    setPassword('');
+  };
+
   const handleVideoApproval = async (id: number, isApproved: boolean) => {
     try {
       const res = await fetch('/api/admin/videos', {
@@ -341,6 +348,9 @@ export default function AdminClient({
               <Link href="/free-videos" className="border border-white/30 text-white hover:bg-white/10 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">
                 👁️ View Live Video Vault
               </Link>
+              <button onClick={handleLogout} className="bg-[#d93025] hover:bg-[#b91c1c] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">
+                Logout
+              </button>
             </div>
           </div>
         </div>
