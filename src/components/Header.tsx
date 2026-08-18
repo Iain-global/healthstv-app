@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileViewersOpen, setMobileViewersOpen] = useState(false);
+  const [mobileOrganisersOpen, setMobileOrganisersOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
 
@@ -126,23 +128,58 @@ export default function Header() {
 
       {/* Mobile Menu (simplified) */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-[#e0e8e2] py-4 px-[5%] shadow-lg absolute w-full left-0">
+        <div className="md:hidden bg-white border-t border-[#e0e8e2] py-4 px-[5%] shadow-lg absolute w-full left-0 max-h-[85vh] overflow-y-auto">
           <div className="flex flex-col space-y-3">
-            <Link href="/" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">Home</Link>
-            <Link href="/events" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">UK Events</Link>
-            <Link href="/player" className="font-bold text-[#00873a] py-2 border-b border-gray-100 flex items-center gap-2">
+            <Link onClick={() => setMobileMenuOpen(false)} href="/" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">Home</Link>
+            
+            {/* For Viewers Mobile Dropdown */}
+            <div className="border-b border-gray-100">
+              <button 
+                onClick={() => setMobileViewersOpen(!mobileViewersOpen)}
+                className="w-full text-left font-semibold text-[#1f2e22] py-2 flex justify-between items-center"
+              >
+                For Viewers <span className="text-xs">{mobileViewersOpen ? '▲' : '▼'}</span>
+              </button>
+              {mobileViewersOpen && (
+                <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/events" className="text-[0.95rem] text-[#1f2e22]">🇬🇧 UK Events & Tickets</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="text-[0.95rem] text-[#1f2e22]">🎟️ Live Event Player</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/free-videos" className="text-[0.95rem] text-[#1f2e22]">🎬 Free Video Vault</Link>
+                </div>
+              )}
+            </div>
+
+            <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="font-bold text-[#00873a] py-2 border-b border-gray-100 flex items-center gap-2">
               <span className="w-2 h-2 bg-red-500 rounded-full"></span> Live Player
             </Link>
-            <Link href="/organiser-hub" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">Organiser Dashboard</Link>
-            <div className="flex flex-col gap-2 pt-2">
+
+            {/* For Organisers Mobile Dropdown */}
+            <div className="border-b border-gray-100">
+              <button 
+                onClick={() => setMobileOrganisersOpen(!mobileOrganisersOpen)}
+                className="w-full text-left font-semibold text-[#1f2e22] py-2 flex justify-between items-center"
+              >
+                For Organisers <span className="text-xs">{mobileOrganisersOpen ? '▲' : '▼'}</span>
+              </button>
+              {mobileOrganisersOpen && (
+                <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-register" className="text-[0.95rem] text-[#1f2e22]">Register as Organiser</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-hub" className="text-[0.95rem] text-[#1f2e22]">Organiser Dashboard</Link>
+                </div>
+              )}
+            </div>
+
+            <Link onClick={() => setMobileMenuOpen(false)} href="/contact" className="font-semibold text-[#1f2e22] py-2 border-b border-gray-100">Contact</Link>
+
+            <div className="flex flex-col gap-2 pt-4">
               {user ? (
-                <Link href="/account" className="text-center font-semibold text-[#006818] py-2 border-2 border-[#006818] rounded-lg">
+                <Link onClick={() => setMobileMenuOpen(false)} href="/account" className="text-center font-semibold text-[#006818] py-2 border-2 border-[#006818] rounded-lg">
                   Hello, {user.name ? user.name.split(' ')[0] : 'Member'} (My Account)
                 </Link>
               ) : (
                 <>
-                  <Link href="/signin" className="text-center font-semibold text-[#1f2e22] py-2">Sign In</Link>
-                  <Link href="/register" className="text-center px-4 py-2 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg">Register</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/signin" className="text-center font-semibold text-[#1f2e22] py-2">Sign In</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/register" className="text-center px-4 py-2 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg">Register</Link>
                 </>
               )}
             </div>

@@ -43,7 +43,7 @@ export default function SignIn() {
   return (
     <div className="flex flex-col min-h-screen bg-[#eaf1ec]">
       <div className="flex-grow flex items-center justify-center py-16 px-4">
-        <div className="max-w-[480px] w-full bg-white rounded-2xl overflow-hidden shadow-xl p-10 md:p-12">
+        <div className="max-w-[480px] w-full bg-white rounded-2xl overflow-hidden shadow-xl p-6 md:p-12">
           
           <div className="text-center mb-8">
             <h3 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h3>

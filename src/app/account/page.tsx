@@ -129,7 +129,7 @@ export default function AccountPanel() {
 
           {/* Main Content */}
           <div className="w-full md:w-2/3">
-            <div className="bg-white rounded-xl shadow-md p-8">
+            <div className="bg-white rounded-xl shadow-md p-5 md:p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h3>
               
               {message.text && (

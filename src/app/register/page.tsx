@@ -62,7 +62,7 @@ export default function Register() {
           
           {/* Left Panel: Creative Inspiration */}
           <div 
-            className="md:w-5/12 p-10 text-white flex flex-col justify-between relative bg-cover bg-center"
+            className="hidden md:flex md:w-5/12 p-10 text-white flex-col justify-between relative bg-cover bg-center"
             style={{ 
               backgroundImage: "linear-gradient(135deg, rgba(12,28,16,0.9) 0%, rgba(0,104,24,0.7) 100%), url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop')" 
             }}
@@ -88,7 +88,7 @@ export default function Register() {
           </div>
 
           {/* Right Panel: Registration Form */}
-          <div className="md:w-7/12 p-8 md:p-12 flex flex-col justify-center max-h-[85vh] overflow-y-auto">
+          <div className="md:w-7/12 p-6 md:p-12 flex flex-col justify-center max-h-[85vh] overflow-y-auto">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Create Your Free Account</h3>
               <p className="text-gray-500 text-sm">Instant access to selected webinars, newsletters & events.</p>
