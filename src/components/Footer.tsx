@@ -19,7 +19,7 @@ export default function Footer() {
           {/* Company Info */}
           <div className="md:col-span-1">
             <Link href="/" className="inline-block mb-5">
-              <Image src="/logo.png" alt="HealthSummits.tv" width={250} height={60} className="h-12 w-auto" />
+              <Image src="/logo.png" alt="HealthSummits.tv" width={325} height={80} className="h-16 w-auto" />
             </Link>
             <p className="text-[#5e6d62] text-[0.95rem] leading-relaxed mb-6">
               Premium streaming platform dedicated to leading health and wellbeing summits, webinars, and expert talks.
