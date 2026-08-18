@@ -141,7 +141,7 @@ export default function OrganiserRegisterClient() {
                           required 
                           value={formData.name}
                           onChange={e => setFormData({...formData, name: e.target.value})}
-                          placeholder="e.g. Dr. Sarah Jenkins, ND"
+                          placeholder="e.g. Dr. Jane Doe"
                           className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
@@ -151,7 +151,7 @@ export default function OrganiserRegisterClient() {
                           type="text" 
                           value={formData.organization}
                           onChange={e => setFormData({...formData, organization: e.target.value})}
-                          placeholder="e.g. Wellness Institute Ltd."
+                          placeholder="e.g. Health Hub Inc."
                           className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
