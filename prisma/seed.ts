@@ -20,8 +20,9 @@ async function main() {
   // 2. Create an Organiser (Dr. Sarah Jenkins)
   const sarahUser = await prisma.user.upsert({
     where: { email: 'sarah.jenkins@example.com' },
-    update: {},
+    update: { username: 'sarah' },
     create: {
+      username: 'sarah',
       email: 'sarah.jenkins@example.com',
       password: 'sarah',
       role: 'ORGANISER',
@@ -67,8 +68,9 @@ async function main() {
   // 3. Create another dummy Organiser
   const markUser = await prisma.user.upsert({
     where: { email: 'mark.davidson@example.com' },
-    update: {},
+    update: { username: 'mark' },
     create: {
+      username: 'mark',
       email: 'mark.davidson@example.com',
       password: 'mark',
       role: 'ORGANISER',
