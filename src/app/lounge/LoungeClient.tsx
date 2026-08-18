@@ -177,7 +177,25 @@ export default function LoungeClient() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error("Your browser does not support camera access, or you are not using a secure HTTPS connection.");
       }
-      const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      
+      let newStream: MediaStream;
+      try {
+        // Try both video and audio
+        newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      } catch (err: any) {
+        if (err.name === 'NotFoundError' || err.message.includes('object can not be found')) {
+          console.warn("Could not find both camera and mic, trying video only...");
+          try {
+            newStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          } catch (vidErr) {
+            console.warn("Video failed, trying audio only...");
+            newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          }
+        } else {
+          throw err;
+        }
+      }
+
       newStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
       newStream.getVideoTracks().forEach(track => track.enabled = !isCamMuted);
       setStream(newStream);
@@ -186,7 +204,7 @@ export default function LoungeClient() {
       }
     } catch (err: any) {
       console.warn("Camera/Mic access denied or unavailable", err);
-      alert("Camera access failed: " + err.message);
+      alert("Hardware access failed: " + err.message + "\n\nMake sure your webcam AND microphone are plugged in and not being used by another app (like Zoom).");
     }
   };
 
