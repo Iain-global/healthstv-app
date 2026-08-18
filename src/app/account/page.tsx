@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 export default function AccountPanel() {
   const router = useRouter();
@@ -97,7 +95,6 @@ export default function AccountPanel() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#eaf1ec]">
-      <Header />
       
       <main className="flex-grow py-12 px-4">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-8">
@@ -254,7 +251,6 @@ export default function AccountPanel() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

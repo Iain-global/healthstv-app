@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Footer from '@/components/Footer';
 
 export default function Register() {
   const router = useRouter();
@@ -214,7 +213,6 @@ export default function Register() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
