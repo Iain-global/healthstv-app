@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma db push && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -31,3 +31,4 @@
     "seed": "tsx prisma/seed.ts"
   }
 }
+
