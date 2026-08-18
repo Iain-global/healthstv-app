@@ -13,8 +13,8 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     
-    // Check if it's just an approval toggle
-    if (data.id && Object.keys(data).length === 2 && 'isApproved' in data) {
+    // Check if it's an approval toggle
+    if (data.id && data.isApproved !== undefined) {
       const video = await prisma.video.update({
         where: { id: data.id },
         data: { isApproved: data.isApproved },

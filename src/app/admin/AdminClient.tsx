@@ -73,7 +73,7 @@ export default function AdminClient({
 
   const resetAuthCookie = () => {
     const expires = new Date(Date.now() + TIMEOUT_MS).toUTCString();
-    document.cookie = `adminAuth=true; expires=${expires}; path=/admin`;
+    document.cookie = `adminAuth=true; expires=${expires}; path=/`;
   };
 
   // Keep session alive on interaction
@@ -97,8 +97,21 @@ export default function AdminClient({
   // Fetch Settings and Logs
   useEffect(() => {
     if (activeTab === 'settings' && isAuthenticated) {
-      fetch('/api/admin/logs').then(r => r.json()).then(setLogs);
-      fetch('/api/admin/settings').then(r => r.json()).then(data => setIsMaintenance(!!data.maintenanceMode));
+      fetch('/api/admin/logs')
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data)) setLogs(data);
+          else setLogs([]);
+        })
+        .catch(() => setLogs([]));
+      fetch('/api/admin/settings')
+        .then(r => r.json())
+        .then(data => {
+          if (data && typeof data.isMaintenance === 'boolean') {
+            setIsMaintenance(data.isMaintenance);
+          }
+        })
+        .catch(console.error);
     }
   }, [activeTab, isAuthenticated]);
 
@@ -161,7 +174,7 @@ export default function AdminClient({
   };
 
   const handleLogout = () => {
-    document.cookie = 'adminAuth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/admin;';
+    document.cookie = 'adminAuth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     setIsAuthenticated(false);
     setUsername('');
     setPassword('');
@@ -175,7 +188,7 @@ export default function AdminClient({
         body: JSON.stringify({ id, isApproved })
       });
       if (res.ok) {
-        setVideos(videos.map(v => {
+        setVideos(prev => prev.map(v => {
           if (v.id === id) {
             // Merge pendingEdits back to the video object in state
             if (isApproved && v.pendingEdits) {
