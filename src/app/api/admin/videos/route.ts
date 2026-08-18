@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+
+async function verifyAdmin() {
+  const cookieStore = await cookies();
+  return cookieStore.get('adminAuth')?.value === 'true';
+}
 
 export async function POST(request: Request) {
+  if (!(await verifyAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const data = await request.json();
     
@@ -40,6 +48,8 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!(await verifyAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const data = await request.json();
     
@@ -67,6 +77,8 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!(await verifyAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
