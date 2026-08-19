@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -250,6 +250,9 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
             if (pData.user.purchasedVideoIds) {
               setPurchasedIds(pData.user.purchasedVideoIds);
             }
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new Event('auth-change'));
+            }
           }
         } else {
           setAuthError(data.error || "Login failed");
@@ -270,6 +273,9 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
           const pData = await pRes.json();
           if (pData.success) {
             setUser(pData.user);
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new Event('auth-change'));
+            }
           }
         } else {
           setAuthError(data.error || "Registration failed");
@@ -378,12 +384,20 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                             Logged in as <strong className="text-white">{user.name || user.email}</strong>
                           </div>
 
+                          {/* Developer Note */}
+                          <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[0.72rem] px-3 py-2 rounded-xl flex items-center justify-center gap-2">
+                            <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1.5 py-0.5 rounded text-[0.6rem]">
+                              DEV NOTE
+                            </span>
+                            <span>TODO: Wire up live payments (Stripe/Gateway)</span>
+                          </div>
+
                           <button
                             onClick={handlePurchase}
                             disabled={purchaseLoading}
                             className="w-full bg-[#ea8125] hover:bg-[#d4701a] text-white py-3 px-6 rounded-xl font-black text-base shadow-lg transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                           >
-                            {purchaseLoading ? "Processing..." : `💳 Unlock Now for £${activeVideo.price.toFixed(2)}`}
+                            {purchaseLoading ? "Unlocking Access..." : `Pay £${activeVideo.price.toFixed(2)} to Unlock`}
                           </button>
 
                           <button

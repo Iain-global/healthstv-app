@@ -13,19 +13,36 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    fetch('/api/auth/update')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.user) {
-          setUser(data.user);
-        }
-      })
-      .catch(err => console.error(err));
-  }, []);
+    const fetchUser = () => {
+      fetch('/api/auth/update')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          setUser(null);
+        });
+    };
+
+    fetchUser();
+
+    window.addEventListener('auth-change', fetchUser);
+    return () => {
+      window.removeEventListener('auth-change', fetchUser);
+    };
+  }, [pathname]);
 
   if (pathname === "/lounge") {
     return null;
   }
+
+  const displayName = user?.name?.trim() ? user.name.split(' ')[0] : (user?.email ? user.email.split('@')[0] : 'Member');
+  const avatarLetter = user?.name?.trim() ? user.name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U');
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e0e8e2] shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
@@ -90,9 +107,9 @@ export default function Header() {
             {user ? (
               <Link href="/account" className="flex items-center gap-2 font-semibold text-[0.95rem] text-[#006818] hover:text-[#005213] mr-2">
                 <div className="w-8 h-8 bg-[#e77a25] text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
-                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  {avatarLetter}
                 </div>
-                Hello, {user.name ? user.name.split(' ')[0] : 'Member'}
+                Hello, {displayName}
               </Link>
             ) : (
               <>
@@ -169,7 +186,7 @@ export default function Header() {
             <div className="flex flex-col gap-2 pt-4">
               {user ? (
                 <Link onClick={() => setMobileMenuOpen(false)} href="/account" className="text-center font-semibold text-[#006818] py-2 border-2 border-[#006818] rounded-lg">
-                  Hello, {user.name ? user.name.split(' ')[0] : 'Member'} (My Account)
+                  Hello, {displayName} (My Account)
                 </Link>
               ) : (
                 <>

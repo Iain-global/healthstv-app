@@ -85,6 +85,9 @@ export default function AccountPanel() {
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('auth-change'));
+    }
     router.push('/signin');
     router.refresh();
   };

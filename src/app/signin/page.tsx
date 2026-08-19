@@ -28,6 +28,9 @@ export default function SignIn() {
       const data = await res.json();
 
       if (data.success) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth-change'));
+        }
         router.push('/account');
         router.refresh();
       } else {
