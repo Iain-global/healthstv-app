@@ -32,6 +32,37 @@ export default function OrganiserDashboard() {
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleFileUpload = async (file: File, target: 'event' | 'video') => {
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        if (target === 'event') {
+          setNewEventForm(prev => ({ ...prev, imageUrl: data.url }));
+        } else {
+          setNewVideoForm(prev => ({ ...prev, thumbnailUrl: data.url }));
+        }
+        addToast('📷 Image Uploaded', 'Image uploaded successfully and attached to your event!', 'success');
+      } else {
+        alert(data.error || 'Failed to upload image');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Error uploading image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/organiser/auth').then(r => r.json()).then(data => {
@@ -597,14 +628,52 @@ export default function OrganiserDashboard() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
                   <input required type="text" placeholder="e.g. Longevity, Nutrition" value={newVideoForm.category} onChange={e => setNewVideoForm({...newVideoForm, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Thumbnail URL</label>
-                  <input type="text" placeholder="https://..." value={newVideoForm.thumbnailUrl} onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Thumbnail Image</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="https://... or upload" 
+                      value={newVideoForm.thumbnailUrl} 
+                      onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} 
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium text-xs focus:ring-1 focus:ring-[#00873a] outline-none" 
+                    />
+                    <label className="bg-[#00873a] hover:bg-[#006818] text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors shrink-0 shadow-xs">
+                      {uploadingImage ? (
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <span>📁 Upload</span>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        disabled={uploadingImage}
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(file, 'video');
+                        }} 
+                      />
+                    </label>
+                  </div>
+                  {newVideoForm.thumbnailUrl && (
+                    <div className="mt-2 relative w-full h-20 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+                      <img src={newVideoForm.thumbnailUrl} alt="Thumbnail Preview" className="w-full h-full object-cover" />
+                      <button 
+                        type="button" 
+                        onClick={() => setNewVideoForm(prev => ({ ...prev, thumbnailUrl: '' }))}
+                        className="absolute top-1 right-1 bg-black/70 hover:bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold"
+                        title="Remove image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               <div>
@@ -653,8 +722,51 @@ export default function OrganiserDashboard() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Banner Image URL</label>
-                <input type="text" placeholder="https://..." value={newEventForm.imageUrl} onChange={e => setNewEventForm({...newEventForm, imageUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Banner Image</label>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="https://... or click Upload Image" 
+                    value={newEventForm.imageUrl} 
+                    onChange={e => setNewEventForm({...newEventForm, imageUrl: e.target.value})} 
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none" 
+                  />
+                  <label className="bg-[#f6821f] hover:bg-[#e07015] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shrink-0 shadow-xs">
+                    {uploadingImage ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <span>📁</span> Upload Image
+                      </>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      disabled={uploadingImage}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file, 'event');
+                      }} 
+                    />
+                  </label>
+                </div>
+                {newEventForm.imageUrl && (
+                  <div className="mt-2 relative w-full h-32 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center">
+                    <img src={newEventForm.imageUrl} alt="Banner Preview" className="w-full h-full object-cover" />
+                    <button 
+                      type="button" 
+                      onClick={() => setNewEventForm(prev => ({ ...prev, imageUrl: '' }))}
+                      className="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold transition-colors"
+                      title="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
