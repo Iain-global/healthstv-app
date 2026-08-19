@@ -13,13 +13,14 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-[#006818] py-24 lg:py-32 overflow-hidden flex items-center justify-center min-h-[600px]">
-        {/* Background Overlay */}
+      <section className="relative bg-black py-24 lg:py-32 overflow-hidden flex items-center justify-center min-h-[600px]">
+        {/* Background Image (Natural colors without green overlay) */}
         <div 
-          className="absolute inset-0 opacity-40 bg-cover bg-center mix-blend-overlay"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/banner.jpg')" }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1c10] to-transparent opacity-80"></div>
+        {/* Dark contrast gradient for clear text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/40"></div>
         
         <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
           <div className="inline-block border border-[#ea8125] text-[#ea8125] font-bold px-6 py-2 rounded-full mb-6 tracking-wide text-sm bg-[#0c1c10]/50 backdrop-blur-sm">
