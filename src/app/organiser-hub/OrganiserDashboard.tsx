@@ -273,6 +273,40 @@ export default function OrganiserDashboard() {
     setIsEventModalOpen(true);
   };
 
+  const duplicateEvent = (event: any) => {
+    setEditingEventId(null);
+    const dataToCopy = event.pendingEdits || event;
+    setNewEventForm({
+      title: `${dataToCopy.title || ''} (Copy)`,
+      format: dataToCopy.format || 'Virtual Summit',
+      description: dataToCopy.description || '',
+      date: dataToCopy.date || '',
+      price: dataToCopy.price !== undefined ? dataToCopy.price.toString() : '0',
+      ticketingMethod: dataToCopy.ticketingMethod || 'Internal Platform',
+      ticketUrl: dataToCopy.ticketUrl || '',
+      livestreamUrl: dataToCopy.livestreamUrl || '',
+      imageUrl: dataToCopy.imageUrl || ''
+    });
+    setIsEventModalOpen(true);
+    addToast('📋 Event Cloned', `Copied details from "${event.title}". Adjust any fields and submit!`, 'info');
+  };
+
+  const duplicateVideo = (video: any) => {
+    setEditingVideoId(null);
+    const dataToCopy = video.pendingEdits || video;
+    setNewVideoForm({
+      title: `${dataToCopy.title || ''} (Copy)`,
+      description: dataToCopy.description || '',
+      thumbnailUrl: dataToCopy.thumbnailUrl || '',
+      videoUrl: dataToCopy.videoUrl || '',
+      category: dataToCopy.category || '',
+      isFree: dataToCopy.isFree !== undefined ? Boolean(dataToCopy.isFree) : true,
+      price: dataToCopy.price !== undefined ? dataToCopy.price.toString() : '4.99'
+    });
+    setIsVideoModalOpen(true);
+    addToast('📋 Video Cloned', `Copied details from "${video.title}". Make adjustments and submit!`, 'info');
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
@@ -449,9 +483,16 @@ export default function OrganiserDashboard() {
                       )}
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <div className="flex gap-2 justify-end">
-                        <button onClick={() => openEventModal(evt)} className="text-[#00873a] bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
-                        <button className="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
+                      <div className="flex gap-2 justify-end items-center">
+                        <button 
+                          onClick={() => duplicateEvent(evt)} 
+                          className="text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded text-xs font-bold transition-colors flex items-center gap-1"
+                          title="Duplicate Virtual Event"
+                        >
+                          📋 Duplicate
+                        </button>
+                        <button onClick={() => openEventModal(evt)} className="text-[#00873a] bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
+                        <button className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -527,9 +568,16 @@ export default function OrganiserDashboard() {
                       )}
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <div className="flex gap-2 justify-end">
-                        <button onClick={() => openVideoModal(vid)} className="text-[#00873a] bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
-                        <button className="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
+                      <div className="flex gap-2 justify-end items-center">
+                        <button 
+                          onClick={() => duplicateVideo(vid)} 
+                          className="text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded text-xs font-bold transition-colors flex items-center gap-1"
+                          title="Duplicate Video Session"
+                        >
+                          📋 Duplicate
+                        </button>
+                        <button onClick={() => openVideoModal(vid)} className="text-[#00873a] bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
+                        <button className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
                       </div>
                     </td>
                   </tr>
