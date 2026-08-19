@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { broadcastRealtimeEvent } from '@/lib/realtime';
 
-async function getOrganiserId() {
+async function getOrganiserProfile() {
   const cookieStore = await cookies();
   const auth = cookieStore.get('organiserAuth');
   if (!auth) return null;
-  const org = await prisma.organiserProfile.findUnique({ where: { slug: auth.value } });
-  return org?.id;
+  return prisma.organiserProfile.findUnique({ where: { slug: auth.value } });
 }
 
 export async function GET() {
-  const organiserId = await getOrganiserId();
-  if (!organiserId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const org = await getOrganiserProfile();
+  if (!org) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const videos = await prisma.video.findMany({
-    where: { organiserId },
+    where: { organiserId: org.id },
     orderBy: { createdAt: 'desc' }
   });
   return NextResponse.json(videos);
 }
 
 export async function POST(req: Request) {
-  const organiserId = await getOrganiserId();
-  if (!organiserId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const org = await getOrganiserProfile();
+  if (!org) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const data = await req.json();
@@ -40,9 +40,21 @@ export async function POST(req: Request) {
         isFree,
         price,
         isApproved: false,
-        organiserId
-      }
+        organiserId: org.id
+      },
+      include: { organiser: true }
     });
+
+    // Broadcast to Admin & Listeners
+    broadcastRealtimeEvent({
+      type: 'video:submitted',
+      videoId: video.id,
+      title: video.title,
+      organiserName: org.name,
+      isEdit: false,
+      video
+    });
+
     return NextResponse.json(video);
   } catch (err) {
     console.error('Error creating video:', err);
@@ -51,15 +63,15 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  const organiserId = await getOrganiserId();
-  if (!organiserId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const org = await getOrganiserProfile();
+  if (!org) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const data = await req.json();
     const { id, ...updates } = data;
 
     const existingVideo = await prisma.video.findFirst({
-      where: { id, organiserId }
+      where: { id, organiserId: org.id }
     });
 
     if (!existingVideo) {
@@ -76,23 +88,36 @@ export async function PUT(req: Request) {
       }
     }
 
+    let video;
     if (existingVideo.isApproved) {
       // It's a live video, save edits to pendingEdits
-      const video = await prisma.video.update({
+      video = await prisma.video.update({
         where: { id },
         data: {
           pendingEdits: formattedUpdates
-        }
+        },
+        include: { organiser: true }
       });
-      return NextResponse.json(video);
     } else {
       // It's still pending, update fields directly
-      const video = await prisma.video.update({
+      video = await prisma.video.update({
         where: { id },
-        data: formattedUpdates
+        data: formattedUpdates,
+        include: { organiser: true }
       });
-      return NextResponse.json(video);
     }
+
+    // Broadcast to Admin & Listeners
+    broadcastRealtimeEvent({
+      type: 'video:submitted',
+      videoId: video.id,
+      title: formattedUpdates.title || video.title,
+      organiserName: org.name,
+      isEdit: true,
+      video
+    });
+
+    return NextResponse.json(video);
   } catch (err) {
     console.error('Error updating video:', err);
     return NextResponse.json({ error: 'Server Error' }, { status: 500 });
@@ -100,13 +125,13 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const orgId = await getOrganiserId();
-  if (!orgId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const org = await getOrganiserProfile();
+  if (!org) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   
   const url = new URL(req.url);
   const id = Number(url.searchParams.get('id'));
   
-  const exists = await prisma.video.findFirst({ where: { id, organiserId: orgId } });
+  const exists = await prisma.video.findFirst({ where: { id, organiserId: org.id } });
   if (!exists) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   await prisma.video.delete({ where: { id } });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { broadcastRealtimeEvent } from '@/lib/realtime';
 
 async function verifyAdmin() {
   const cookieStore = await cookies();
@@ -34,12 +35,23 @@ export async function POST(req: Request) {
       const edits = existing.pendingEdits as any;
       Object.assign(updateData, edits);
       updateData.pendingEdits = null; // Clear pending edits
+    } else if (!isApproved) {
+      updateData.pendingEdits = null;
     }
 
     const event = await prisma.event.update({
       where: { id },
-      data: updateData
+      data: updateData,
+      include: { organiser: true }
     });
+
+    broadcastRealtimeEvent({
+      type: isApproved ? 'event:approved' : 'event:rejected',
+      eventId: event.id,
+      title: event.title,
+      event
+    });
+
     return NextResponse.json(event);
   } catch (err) {
     return NextResponse.json({ error: 'Failed to update event' }, { status: 500 });

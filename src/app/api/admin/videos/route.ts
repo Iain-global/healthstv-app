@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { broadcastRealtimeEvent } from '@/lib/realtime';
 
 async function verifyAdmin() {
   const cookieStore = await cookies();
@@ -46,6 +47,15 @@ export async function POST(request: Request) {
         data: updateData,
         include: { organiser: true }
       });
+
+      // Broadcast live event to Organiser Hub and Vault viewers
+      broadcastRealtimeEvent({
+        type: data.isApproved ? 'video:approved' : 'video:rejected',
+        videoId: video.id,
+        title: video.title,
+        video
+      });
+
       return NextResponse.json(video);
     }
     

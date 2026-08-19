@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { soundFx } from "@/lib/audio";
 
 type OrganiserProfile = any;
 type User = any;
@@ -60,6 +61,87 @@ export default function AdminClient({
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '' });
   const [passwordStatus, setPasswordStatus] = useState({ error: '', success: '' });
+
+  // Floating Toasts State
+  const [toasts, setToasts] = useState<{ id: string; title: string; message: string; type: 'info' | 'success' | 'warning' }[]>([]);
+
+  const addToast = (title: string, message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    const id = Date.now().toString() + Math.random().toString();
+    setToasts(prev => [...prev, { id, title, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 6500);
+  };
+
+  // Real-time EventSource Stream Listener
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource('/api/realtime/stream');
+
+      // Video Submitted by Organiser
+      eventSource.addEventListener('video:submitted', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          soundFx.playBing(); // Play "Bing" chime!
+          addToast(
+            data.isEdit ? '⚡ Video Edits Submitted' : '📹 New Video Uploaded',
+            `"${data.title}" by ${data.organiserName || 'Organiser'} is waiting in moderation.`,
+            'warning'
+          );
+
+          if (data.video) {
+            setVideos(prev => {
+              const idx = prev.findIndex(v => v.id === data.video.id);
+              if (idx >= 0) {
+                const next = [...prev];
+                next[idx] = data.video;
+                return next;
+              }
+              return [data.video, ...prev];
+            });
+          }
+        } catch (err) {
+          console.error('Error handling realtime video:submitted:', err);
+        }
+      });
+
+      // Event Submitted by Organiser
+      eventSource.addEventListener('event:submitted', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          soundFx.playBing(); // Play "Bing" chime!
+          addToast(
+            data.isEdit ? '⚡ Event Edits Submitted' : '📅 New Summit Event Submitted',
+            `"${data.title}" by ${data.organiserName || 'Organiser'} is waiting in moderation.`,
+            'warning'
+          );
+
+          if (data.event) {
+            setEvents(prev => {
+              const idx = prev.findIndex(ev => ev.id === data.event.id);
+              if (idx >= 0) {
+                const next = [...prev];
+                next[idx] = data.event;
+                return next;
+              }
+              return [data.event, ...prev];
+            });
+          }
+        } catch (err) {
+          console.error('Error handling realtime event:submitted:', err);
+        }
+      });
+    } catch (err) {
+      console.error('SSE connection error:', err);
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, [isAuthenticated]);
 
   const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
@@ -1027,6 +1109,34 @@ export default function AdminClient({
           </div>
         </div>
       )}
+
+      {/* Floating Real-Time Toast Notifications Container */}
+      <div className="fixed top-5 right-5 z-[99999] flex flex-col gap-3 max-w-sm pointer-events-none">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className="pointer-events-auto bg-[#1f2e22] text-white p-4 rounded-xl shadow-2xl border border-white/15 flex items-start gap-3 animate-in slide-in-from-top-5 duration-200"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#ea8125] text-white flex items-center justify-center font-bold text-sm shrink-0">
+              🔔
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-black uppercase tracking-wider text-orange-400 mb-0.5">
+                {toast.title}
+              </div>
+              <div className="text-xs text-gray-200 leading-snug">
+                {toast.message}
+              </div>
+            </div>
+            <button
+              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+              className="text-gray-400 hover:text-white text-xs font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
     </>
   );
 }

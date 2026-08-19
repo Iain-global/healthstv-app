@@ -86,7 +86,7 @@ const CATEGORIES = [
 
 export default function FreeVideosClient({ initialVideos = [] }: { initialVideos?: any[] }) {
   // Combine DB videos with fallback defaults
-  const vaultVideos: VideoData[] = initialVideos.length > 0 ? initialVideos.map(v => ({
+  const initialVaultVideos: VideoData[] = initialVideos.length > 0 ? initialVideos.map(v => ({
     id: v.id.toString(),
     dbId: v.id,
     title: v.title,
@@ -101,9 +101,65 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     price: Number(v.price || 0)
   })) : DEFAULT_VIDEOS;
 
-  const [activeVideo, setActiveVideo] = useState<VideoData>(vaultVideos[0] || DEFAULT_VIDEOS[0]);
+  const [videosList, setVideosList] = useState<VideoData[]>(initialVaultVideos);
+  const [activeVideo, setActiveVideo] = useState<VideoData>(initialVaultVideos[0] || DEFAULT_VIDEOS[0]);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Categories");
+
+  // Real-time EventSource Stream Listener for Viewer Vault
+  useEffect(() => {
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource('/api/realtime/stream');
+
+      eventSource.addEventListener('video:approved', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.video) {
+            const updatedVid: VideoData = {
+              id: data.video.id.toString(),
+              dbId: data.video.id,
+              title: data.video.title,
+              speaker: data.video.organiser?.name || "Platform Presenter",
+              category: data.video.category || "Uncategorized",
+              duration: data.video.isFree ? "Full Access" : "PPV Session",
+              views: "Recent",
+              description: data.video.description || "",
+              imageUrl: data.video.thumbnailUrl || "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800",
+              videoSrc: data.video.videoUrl,
+              isFree: Boolean(data.video.isFree),
+              price: Number(data.video.price || 0)
+            };
+
+            setVideosList(prev => {
+              const idx = prev.findIndex(v => v.dbId === data.video.id || v.id === data.video.id.toString());
+              if (idx >= 0) {
+                const next = [...prev];
+                next[idx] = updatedVid;
+                return next;
+              }
+              return [updatedVid, ...prev];
+            });
+
+            setActiveVideo(current => {
+              if (current.dbId === data.video.id || current.id === data.video.id.toString()) {
+                return updatedVid;
+              }
+              return current;
+            });
+          }
+        } catch (err) {
+          console.error('SSE error in FreeVideosClient:', err);
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, []);
 
   // User auth and purchased video state
   const [user, setUser] = useState<any>(null);
@@ -316,7 +372,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     }
   };
 
-  const filteredVideos = vaultVideos.filter(v => {
+  const filteredVideos = videosList.filter(v => {
     const matchesSearch = v.title.toLowerCase().includes(search.toLowerCase()) || v.speaker.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === "All Categories" || v.category === activeCategory;
     return matchesSearch && matchesCategory;

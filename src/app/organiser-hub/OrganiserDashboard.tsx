@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { soundFx } from '@/lib/audio';
 
 export default function OrganiserDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,6 +13,17 @@ export default function OrganiserDashboard() {
 
   const [videos, setVideos] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
+
+  // Floating Toasts State
+  const [toasts, setToasts] = useState<{ id: string; title: string; message: string; type: 'info' | 'success' | 'warning' }[]>([]);
+
+  const addToast = (title: string, message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    const id = Date.now().toString() + Math.random().toString();
+    setToasts(prev => [...prev, { id, title, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 6500);
+  };
 
   // Modals state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -30,6 +42,99 @@ export default function OrganiserDashboard() {
       }
     });
   }, []);
+
+  // Real-time EventSource Stream Listener
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let eventSource: EventSource | null = null;
+    try {
+      eventSource = new EventSource('/api/realtime/stream');
+
+      // Video Approved by Admin
+      eventSource.addEventListener('video:approved', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.video) {
+            setVideos(prev => {
+              const idx = prev.findIndex(v => v.id === data.video.id);
+              if (idx >= 0) {
+                soundFx.playSuccess(); // Uplifting chime!
+                addToast(
+                  '🎉 Video Approved & Live!',
+                  `"${data.video.title}" has been approved by admin and is now live on site.`,
+                  'success'
+                );
+                const next = [...prev];
+                next[idx] = data.video;
+                return next;
+              }
+              return prev;
+            });
+          }
+        } catch (err) {
+          console.error('Error handling video:approved:', err);
+        }
+      });
+
+      // Video Rejected by Admin
+      eventSource.addEventListener('video:rejected', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.video) {
+            setVideos(prev => {
+              const idx = prev.findIndex(v => v.id === data.video.id);
+              if (idx >= 0) {
+                addToast(
+                  'ℹ️ Video Edits Reviewed',
+                  `Pending edits for "${data.video.title}" were dismissed by admin.`,
+                  'warning'
+                );
+                const next = [...prev];
+                next[idx] = data.video;
+                return next;
+              }
+              return prev;
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      // Event Approved by Admin
+      eventSource.addEventListener('event:approved', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.event) {
+            setEvents(prev => {
+              const idx = prev.findIndex(ev => ev.id === data.event.id);
+              if (idx >= 0) {
+                soundFx.playSuccess();
+                addToast(
+                  '🎉 Event Approved & Live!',
+                  `"${data.event.title}" is now active on the summit schedule.`,
+                  'success'
+                );
+                const next = [...prev];
+                next[idx] = data.event;
+                return next;
+              }
+              return prev;
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    } catch (err) {
+      console.error('SSE error in OrganiserDashboard:', err);
+    }
+
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, [isAuthenticated]);
 
   const fetchData = () => {
     fetch('/api/organiser/videos').then(r => r.json()).then(setVideos);
@@ -571,6 +676,34 @@ export default function OrganiserDashboard() {
           </div>
         </div>
       )}
+
+      {/* Floating Real-Time Toast Notifications Container */}
+      <div className="fixed top-5 right-5 z-[99999] flex flex-col gap-3 max-w-sm pointer-events-none">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className="pointer-events-auto bg-[#1f2e22] text-white p-4 rounded-xl shadow-2xl border border-white/15 flex items-start gap-3 animate-in slide-in-from-top-5 duration-200"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#00873a] text-white flex items-center justify-center font-bold text-sm shrink-0">
+              ✓
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-black uppercase tracking-wider text-green-400 mb-0.5">
+                {toast.title}
+              </div>
+              <div className="text-xs text-gray-200 leading-snug">
+                {toast.message}
+              </div>
+            </div>
+            <button
+              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+              className="text-gray-400 hover:text-white text-xs font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
 
       </div>
     </div>
