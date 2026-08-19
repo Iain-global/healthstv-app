@@ -884,9 +884,37 @@ export default function OrganiserDashboard() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Ticket Purchase / Livestream URL</label>
-                  <input type="text" placeholder="https://..." value={newEventForm.ticketUrl} onChange={e => setNewEventForm({...newEventForm, ticketUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 bg-white font-medium" />
-                  <p className="text-xs text-gray-500 mt-1">If using external ticketing or a direct livestream link, provide it here.</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-bold text-gray-700">Ticket Purchase / Livestream URL</label>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="https://..." 
+                    value={newEventForm.ticketUrl} 
+                    onChange={e => setNewEventForm({...newEventForm, ticketUrl: e.target.value})} 
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none" 
+                  />
+                  
+                  {/* Tick Option for Default Player URL */}
+                  <label className="mt-2.5 flex items-center gap-2 cursor-pointer select-none bg-orange-50/70 hover:bg-orange-50 p-2.5 rounded-lg border border-orange-200/80 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      checked={newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player'}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setNewEventForm(prev => ({ ...prev, ticketUrl: 'https://healthv2.deploybox.uk/player' }));
+                        } else if (newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player') {
+                          setNewEventForm(prev => ({ ...prev, ticketUrl: '' }));
+                        }
+                      }}
+                      className="w-4 h-4 text-[#f6821f] rounded focus:ring-[#f6821f] cursor-pointer" 
+                    />
+                    <span className="text-xs font-bold text-[#1f2e22]">
+                      ✓ Use Default Live Player URL: <code className="text-[#f6821f] font-mono bg-white px-1.5 py-0.5 rounded border border-orange-200 font-bold">https://healthv2.deploybox.uk/player</code>
+                    </span>
+                  </label>
+
+                  <p className="text-xs text-gray-500 mt-1.5">If using external ticketing or a direct livestream link, provide it here.</p>
                 </div>
               </div>
               <div className="pt-4 flex justify-end gap-3 border-t border-gray-200">
