@@ -63,6 +63,7 @@ model Event {
   format          String?
   description     String?          @db.Text
   date            String
+  endDate         String?
   startTime       String?
   endTime         String?
   location        String?

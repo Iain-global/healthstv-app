@@ -31,7 +31,7 @@ export default function OrganiserDashboard() {
   const [newVideoForm, setNewVideoForm] = useState({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '', isFree: true, price: '4.99' });
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
-  const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+  const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleFileUpload = async (file: File, target: 'event' | 'video') => {
@@ -247,7 +247,7 @@ export default function OrganiserDashboard() {
       }
       setIsEventModalOpen(false);
       setEditingEventId(null);
-      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
     }
   };
 
@@ -260,6 +260,7 @@ export default function OrganiserDashboard() {
         format: dataToEdit.format || 'Virtual Summit',
         description: dataToEdit.description || '',
         date: dataToEdit.date || '',
+        endDate: dataToEdit.endDate || '',
         startTime: dataToEdit.startTime || '10:00',
         endTime: dataToEdit.endTime || '16:00',
         price: dataToEdit.price !== undefined ? dataToEdit.price.toString() : '0',
@@ -270,7 +271,7 @@ export default function OrganiserDashboard() {
       });
     } else {
       setEditingEventId(null);
-      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
     }
     setIsEventModalOpen(true);
   };
@@ -283,6 +284,7 @@ export default function OrganiserDashboard() {
       format: dataToCopy.format || 'Virtual Summit',
       description: dataToCopy.description || '',
       date: dataToCopy.date || '',
+      endDate: dataToCopy.endDate || '',
       startTime: dataToCopy.startTime || '10:00',
       endTime: dataToCopy.endTime || '16:00',
       price: dataToCopy.price !== undefined ? dataToCopy.price.toString() : '0',
@@ -474,7 +476,7 @@ export default function OrganiserDashboard() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 text-gray-900 font-bold text-sm">
-                        <span>📅</span> {evt.date}
+                        <span>📅</span> {evt.date} {evt.endDate && evt.endDate !== evt.date ? `– ${evt.endDate}` : ''}
                       </div>
                       {(evt.startTime || evt.endTime) && (
                         <div className="text-xs text-[#f6821f] font-bold mt-1 flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60 w-fit">
@@ -767,26 +769,40 @@ export default function OrganiserDashboard() {
                 <label className="block text-sm font-bold text-gray-700 mb-1">Event Title</label>
                 <input required type="text" value={newEventForm.title} onChange={e => setNewEventForm({...newEventForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none" />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Format</label>
+                <select value={newEventForm.format} onChange={e => setNewEventForm({...newEventForm, format: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none">
+                  <option value="Virtual Summit">Virtual Summit</option>
+                  <option value="Hybrid Summit">Hybrid Summit</option>
+                  <option value="Webinar">Webinar</option>
+                  <option value="Workshop">Workshop</option>
+                </select>
+              </div>
+
+              {/* Event Dates: Start Date & End Date */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-emerald-50/50 p-3.5 rounded-xl border border-emerald-200/70">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Format</label>
-                  <select value={newEventForm.format} onChange={e => setNewEventForm({...newEventForm, format: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium">
-                    <option value="Virtual Summit">Virtual Summit</option>
-                    <option value="Hybrid Summit">Hybrid Summit</option>
-                    <option value="Webinar">Webinar</option>
-                    <option value="Workshop">Workshop</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-1">
-                    <span>📅</span> Event Date (Calendar)
+                  <label className="block text-xs font-bold text-gray-800 mb-1 flex items-center gap-1">
+                    <span>📅</span> Start Date (Calendar)
                   </label>
                   <input 
                     required 
                     type="date" 
                     value={newEventForm.date} 
-                    onChange={e => setNewEventForm({...newEventForm, date: e.target.value})} 
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none" 
+                    onChange={e => setNewEventForm({...newEventForm, date: e.target.value, endDate: newEventForm.endDate || e.target.value})} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-semibold text-sm focus:ring-1 focus:ring-[#f6821f] outline-none" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-800 mb-1 flex items-center gap-1">
+                    <span>📅</span> End Date (Calendar)
+                  </label>
+                  <input 
+                    type="date" 
+                    value={newEventForm.endDate || newEventForm.date} 
+                    min={newEventForm.date}
+                    onChange={e => setNewEventForm({...newEventForm, endDate: e.target.value})} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-semibold text-sm focus:ring-1 focus:ring-[#f6821f] outline-none" 
                   />
                 </div>
               </div>

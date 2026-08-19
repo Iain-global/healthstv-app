@@ -8,6 +8,7 @@ type EventType = {
   title: string;
   description: string | null;
   date: string;
+  endDate?: string | null;
   startTime?: string | null;
   endTime?: string | null;
   location: string | null;
@@ -97,7 +98,7 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventTy
               <div className="p-6 flex-grow flex flex-col">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="text-[#ea8125] text-xs font-bold uppercase tracking-wider flex items-center gap-1">
-                    <span>📅</span> {event.date}
+                    <span>📅</span> {event.date} {event.endDate && event.endDate !== event.date ? `– ${event.endDate}` : ''}
                   </div>
                   {(event.startTime || event.endTime) && (
                     <div className="text-xs text-gray-700 font-bold bg-orange-50/90 border border-orange-200/70 px-2 py-0.5 rounded-md flex items-center gap-1">
