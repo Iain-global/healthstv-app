@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
@@ -32,7 +32,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: 'This video is free access.', alreadyUnlocked: true });
     }
 
-    // Upsert purchase record
+    // TODO: Wire up live payment gateway (Stripe Checkout / PayPal webhook)
+    // For now, record purchase directly in the database to grant access
     const purchase = await prisma.videoPurchase.upsert({
       where: {
         userId_videoId: {
