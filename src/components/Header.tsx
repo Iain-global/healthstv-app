@@ -124,10 +124,11 @@ export default function Header() {
               </>
             )}
             <button 
+              type="button"
               onClick={() => setIsSubModalOpen(true)}
-              className="px-5 py-2.5 bg-[#ea8125] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] hover:bg-[#d3701a] hover:shadow-[0_6px_20px_rgba(234,129,37,0.6)] hover:-translate-y-0.5 transition-all text-[0.9rem]"
+              className="px-5 py-2.5 bg-[#ea8125] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] hover:bg-[#d3701a] hover:shadow-[0_6px_20px_rgba(234,129,37,0.6)] hover:-translate-y-0.5 transition-all text-[0.9rem] cursor-pointer"
             >
-              Subscribe
+              {user?.isSubscriber ? "⭐ Subscriber Pass" : "Subscribe"}
             </button>
           </div>
 

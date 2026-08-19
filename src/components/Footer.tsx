@@ -3,10 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import SubscriptionModal from "./SubscriptionModal";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const pathname = usePathname();
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   if (pathname === "/lounge") {
     return null;
@@ -66,7 +69,14 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-[1.1rem] text-[#0c1c10] mb-5">Membership</h4>
             <ul className="space-y-3">
-              <li><button className="text-[#5e6d62] hover:text-[#006818] transition-colors">Subscribe (£1/mo)</button></li>
+              <li>
+                <button 
+                  onClick={() => setIsSubModalOpen(true)}
+                  className="text-[#5e6d62] hover:text-[#006818] transition-colors font-medium text-left"
+                >
+                  Subscribe (£1/mo)
+                </button>
+              </li>
               <li><Link href="/#pricing-table" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Compare Options</Link></li>
               <li><Link href="/faq" className="text-[#5e6d62] hover:text-[#006818] transition-colors">FAQ</Link></li>
             </ul>
@@ -91,6 +101,12 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Subscription Paywall Modal */}
+      <SubscriptionModal 
+        isOpen={isSubModalOpen} 
+        onClose={() => setIsSubModalOpen(false)} 
+      />
     </footer>
   );
 }
