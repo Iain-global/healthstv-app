@@ -278,11 +278,25 @@ export default function OrganiserDashboard() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Email or Username</label>
-              <input type="text" required value={username} onChange={e => setUsername(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50" />
+              <input 
+                type="text" 
+                required 
+                value={username} 
+                onChange={e => setUsername(e.target.value)} 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 bg-white font-semibold outline-none focus:border-[#f6821f] focus:ring-1 focus:ring-[#f6821f]" 
+                placeholder="e.g. your username or email"
+              />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Password</label>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50" />
+              <input 
+                type="password" 
+                required 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 bg-white font-semibold outline-none focus:border-[#f6821f] focus:ring-1 focus:ring-[#f6821f]" 
+                placeholder="••••••••"
+              />
             </div>
             {loginError && <div className="text-red-600 text-sm font-bold bg-red-50 p-3 rounded-lg">{loginError}</div>}
             <button type="submit" className="w-full bg-[#f6821f] hover:bg-[#e07015] text-white font-bold py-3 px-4 rounded-xl transition-colors">
@@ -524,7 +538,7 @@ export default function OrganiserDashboard() {
             <form onSubmit={submitVideo} className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Video Title</label>
-                <input required type="text" value={newVideoForm.title} onChange={e => setNewVideoForm({...newVideoForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
+                <input required type="text" value={newVideoForm.title} onChange={e => setNewVideoForm({...newVideoForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
               </div>
 
               {/* Access & Monetization Mode */}
@@ -586,20 +600,20 @@ export default function OrganiserDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
-                  <input required type="text" placeholder="e.g. Longevity, Nutrition" value={newVideoForm.category} onChange={e => setNewVideoForm({...newVideoForm, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
+                  <input required type="text" placeholder="e.g. Longevity, Nutrition" value={newVideoForm.category} onChange={e => setNewVideoForm({...newVideoForm, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Thumbnail URL</label>
-                  <input type="text" placeholder="https://..." value={newVideoForm.thumbnailUrl} onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
+                  <input type="text" placeholder="https://..." value={newVideoForm.thumbnailUrl} onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Direct Video URL (.mp4 or Embed)</label>
-                <input required type="text" placeholder="https://..." value={newVideoForm.videoUrl} onChange={e => setNewVideoForm({...newVideoForm, videoUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
+                <input required type="text" placeholder="https://..." value={newVideoForm.videoUrl} onChange={e => setNewVideoForm({...newVideoForm, videoUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#00873a] outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                <textarea rows={3} value={newVideoForm.description} onChange={e => setNewVideoForm({...newVideoForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-1 focus:ring-[#00873a] outline-none"></textarea>
+                <textarea rows={3} value={newVideoForm.description} onChange={e => setNewVideoForm({...newVideoForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium resize-none focus:ring-1 focus:ring-[#00873a] outline-none"></textarea>
               </div>
               <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
                 <button type="button" onClick={() => {setIsVideoModalOpen(false); setEditingVideoId(null);}} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Cancel</button>
@@ -621,12 +635,12 @@ export default function OrganiserDashboard() {
             <form onSubmit={submitEvent} className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Event Title</label>
-                <input required type="text" value={newEventForm.title} onChange={e => setNewEventForm({...newEventForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                <input required type="text" value={newEventForm.title} onChange={e => setNewEventForm({...newEventForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Format</label>
-                  <select value={newEventForm.format} onChange={e => setNewEventForm({...newEventForm, format: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                  <select value={newEventForm.format} onChange={e => setNewEventForm({...newEventForm, format: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium">
                     <option value="Virtual Summit">Virtual Summit</option>
                     <option value="Hybrid Summit">Hybrid Summit</option>
                     <option value="Webinar">Webinar</option>
@@ -635,23 +649,23 @@ export default function OrganiserDashboard() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Date Schedule</label>
-                  <input required type="text" placeholder="e.g. Oct 14-16, 2026" value={newEventForm.date} onChange={e => setNewEventForm({...newEventForm, date: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                  <input required type="text" placeholder="e.g. Oct 14-16, 2026" value={newEventForm.date} onChange={e => setNewEventForm({...newEventForm, date: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Banner Image URL</label>
-                <input type="text" placeholder="https://..." value={newEventForm.imageUrl} onChange={e => setNewEventForm({...newEventForm, imageUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                <input type="text" placeholder="https://..." value={newEventForm.imageUrl} onChange={e => setNewEventForm({...newEventForm, imageUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                <textarea rows={3} value={newEventForm.description} onChange={e => setNewEventForm({...newEventForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none"></textarea>
+                <textarea rows={3} value={newEventForm.description} onChange={e => setNewEventForm({...newEventForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 bg-white font-medium resize-none"></textarea>
               </div>
               <div className="border-t border-gray-200 pt-4 mt-2">
                 <h4 className="font-bold text-[#1f2e22] mb-3">Ticketing & Access</h4>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1">Ticketing Method</label>
-                    <select value={newEventForm.ticketingMethod} onChange={e => setNewEventForm({...newEventForm, ticketingMethod: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <select value={newEventForm.ticketingMethod} onChange={e => setNewEventForm({...newEventForm, ticketingMethod: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium">
                       <option value="Internal Platform">Internal Platform (HealthSummits)</option>
                       <option value="External Link">External Link</option>
                       <option value="Free Registration">Free Registration</option>
@@ -659,12 +673,12 @@ export default function OrganiserDashboard() {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1">Ticket Price (£)</label>
-                    <input type="number" min="0" step="0.01" value={newEventForm.price} onChange={e => setNewEventForm({...newEventForm, price: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                    <input type="number" min="0" step="0.01" value={newEventForm.price} onChange={e => setNewEventForm({...newEventForm, price: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Ticket Purchase / Livestream URL</label>
-                  <input type="text" placeholder="https://..." value={newEventForm.ticketUrl} onChange={e => setNewEventForm({...newEventForm, ticketUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <input type="text" placeholder="https://..." value={newEventForm.ticketUrl} onChange={e => setNewEventForm({...newEventForm, ticketUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 bg-white font-medium" />
                   <p className="text-xs text-gray-500 mt-1">If using external ticketing or a direct livestream link, provide it here.</p>
                 </div>
               </div>

@@ -387,9 +387,10 @@ export default function AdminClient({
                 <label className="block text-sm font-bold text-[#1f2e22] mb-2">Username</label>
                 <input 
                   type="text" 
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#d93025]"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-semibold focus:outline-none focus:border-[#d93025]"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
+                  placeholder="admin"
                   required
                 />
               </div>
@@ -397,9 +398,10 @@ export default function AdminClient({
                 <label className="block text-sm font-bold text-[#1f2e22] mb-2">Password</label>
                 <input 
                   type="password" 
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#d93025]"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-semibold focus:outline-none focus:border-[#d93025]"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
                   required
                 />
               </div>
