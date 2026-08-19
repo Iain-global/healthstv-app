@@ -8,6 +8,8 @@ type EventType = {
   title: string;
   description: string | null;
   date: string;
+  startTime?: string | null;
+  endTime?: string | null;
   location: string | null;
   imageUrl: string | null;
   price: number;
@@ -93,8 +95,15 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventTy
               
               {/* Card Body */}
               <div className="p-6 flex-grow flex flex-col">
-                <div className="text-[#ea8125] text-xs font-bold uppercase tracking-wider mb-2">
-                  {event.date}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="text-[#ea8125] text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span>📅</span> {event.date}
+                  </div>
+                  {(event.startTime || event.endTime) && (
+                    <div className="text-xs text-gray-700 font-bold bg-orange-50/90 border border-orange-200/70 px-2 py-0.5 rounded-md flex items-center gap-1">
+                      <span>⏰</span> {event.startTime || ''} {event.endTime ? `– ${event.endTime}` : ''}
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-[#0c1c10] mb-3 leading-tight line-clamp-2">
                   {event.title}

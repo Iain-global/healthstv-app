@@ -63,6 +63,8 @@ model Event {
   format          String?
   description     String?          @db.Text
   date            String
+  startTime       String?
+  endTime         String?
   location        String?
   imageUrl        String?
   price           Decimal          @db.Decimal(10, 2)
