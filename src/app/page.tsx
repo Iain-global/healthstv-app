@@ -135,7 +135,7 @@ export default function Home() {
               <div className="text-4xl font-black text-[#006818] mb-4">£1.00 <span className="text-base font-medium text-gray-500">/ month</span></div>
               <p className="text-[#5e6d62] text-sm mb-6 flex-grow">Get six months of premium membership. Regularly £4.99/mo.</p>
               <ul className="space-y-3 mb-8 text-sm font-medium text-[#1f2e22]">
-                <li className="flex gap-2"><span className="text-[#006818]">✓</span> <strong>Complete library access</strong></li>
+                <li className="flex gap-2"><span className="text-[#006818]">✓</span> <strong>Video library access</strong></li>
                 <li className="flex gap-2"><span className="text-[#006818]">✓</span> Live QA session integration</li>
                 <li className="flex gap-2"><span className="text-[#006818]">✓</span> Early-bird ticket discounts</li>
                 <li className="flex gap-2"><span className="text-[#006818]">✓</span> Cancel anytime</li>

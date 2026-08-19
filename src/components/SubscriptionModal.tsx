@@ -150,10 +150,10 @@ export default function SubscriptionModal({
             ⭐ Special Soft Launch Offer
           </div>
           <h3 className="text-2xl md:text-3xl font-black tracking-tight mb-1">
-            Activate All-Access Pass
+            Activate Access Pass
           </h3>
           <p className="text-green-100 text-xs md:text-sm font-medium">
-            Unlock wellness lectures, masterclasses & exclusive summit live streams.
+            Unlock access to our Free Video Library, wellness lectures, podcasts, masterclasses & much more!
           </p>
         </div>
 
@@ -165,7 +165,7 @@ export default function SubscriptionModal({
                 ✓
               </div>
               <h4 className="text-2xl font-black text-gray-900">
-                Welcome to HealthSummits.tv All-Access!
+                Welcome to HealthSummits.tv!
               </h4>
               <p className="text-gray-600 text-sm max-w-md mx-auto">
                 Your 6-month subscription is now active. All video vaults and virtual summit paywalls have been unlocked.
@@ -186,20 +186,24 @@ export default function SubscriptionModal({
                     £1.00 <span className="text-xs font-semibold text-gray-500">/ month</span>
                   </div>
                   <div className="text-xs text-[#006818] font-bold mt-0.5">
-                    Billed as a single payment of £6.00 (Reg. £29.94)
+                    Billed as a single payment of £6.00
                   </div>
                 </div>
 
-                <div className="bg-white px-3.5 py-2.5 rounded-xl border border-green-200 text-center shadow-sm shrink-0">
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Save</div>
-                  <div className="text-xl font-black text-[#ea8125]">80% OFF</div>
+                <div className="text-right bg-white/90 border border-[#006818]/25 px-4 py-2.5 rounded-xl shadow-sm shrink-0">
+                  <div className="text-sm md:text-[0.95rem] font-black text-[#0c1c10] leading-tight">
+                    £4.99 per Month
+                  </div>
+                  <div className="text-xs md:text-[0.8rem] text-gray-500 font-bold mt-0.5">
+                    after 6 Months
+                  </div>
                 </div>
               </div>
 
               {/* Perks list */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium text-gray-700">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold text-sm">✓</span> Complete Video Vault library access
+                  <span className="text-green-600 font-bold text-sm">✓</span> Video Vault library access
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-600 font-bold text-sm">✓</span> Live Q&A coach integration
