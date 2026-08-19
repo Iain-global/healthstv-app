@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Register() {
   const router = useRouter();
@@ -17,15 +18,10 @@ export default function Register() {
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
+    const city = formData.get('city') as string;
+    const telephone = formData.get('telephone') as string;
     const password = formData.get('password') as string;
     const terms = formData.get('terms');
-
-    const telephone = formData.get('telephone') as string;
-    const addressLine1 = formData.get('addressLine1') as string;
-    const addressLine2 = formData.get('addressLine2') as string;
-    const city = formData.get('city') as string;
-    const postcode = formData.get('postcode') as string;
-    const country = formData.get('country') as string;
 
     if (!terms) {
       setError('You must agree to the Terms of Service and Privacy Policy.');
@@ -37,7 +33,7 @@ export default function Register() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, telephone, addressLine1, addressLine2, city, postcode, country }),
+        body: JSON.stringify({ name, email, city, telephone, password }),
       });
 
       const data = await res.json();
@@ -61,32 +57,41 @@ export default function Register() {
   return (
     <div className="flex flex-col min-h-screen bg-[#eaf1ec]">
       <div className="flex-grow flex items-center justify-center py-16 px-4">
-        <div className="max-w-[1000px] w-full bg-white rounded-2xl overflow-hidden shadow-xl flex flex-col md:flex-row">
+        <div className="max-w-[1050px] w-full bg-white rounded-2xl overflow-hidden shadow-xl flex flex-col md:flex-row">
           
-          {/* Left Panel: Creative Inspiration */}
+          {/* Left Panel: Creative Inspiration & Promo */}
           <div 
-            className="hidden md:flex md:w-5/12 p-10 text-white flex-col justify-between relative bg-cover bg-center"
+            className="hidden md:flex md:w-5/12 p-8 text-white flex-col justify-between relative bg-cover bg-center"
             style={{ 
-              backgroundImage: "linear-gradient(135deg, rgba(12,28,16,0.9) 0%, rgba(0,104,24,0.7) 100%), url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop')" 
+              backgroundImage: "linear-gradient(135deg, rgba(12,28,16,0.92) 0%, rgba(0,104,24,0.85) 100%), url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop')" 
             }}
           >
             <div>
-              <span className="bg-[#e77a25] text-white py-1 px-3 rounded-full text-xs font-bold uppercase tracking-wider mb-6 inline-block">
-                Soft Launch 2026
-              </span>
-              <h2 className="text-3xl font-bold text-white mb-6 leading-tight">Elevate Your Vitality</h2>
-              <p className="text-white/85 text-lg leading-relaxed mb-6">
-                "The lectures on gut-biome healing changed how I approach daily cooking. Truly a goldmine of natural science."
-              </p>
-              <span className="font-semibold text-[0.95rem] block text-[#e77a25]">— Sarah L., HSTV Subscriber</span>
+              <div className="mb-4">
+                <span className="bg-[#e77a25] text-white py-1 px-3 rounded-full text-xs font-bold uppercase tracking-wider inline-block">
+                  Soft Launch 2026
+                </span>
+              </div>
+
+              {/* Promo Banner Graphic */}
+              <div className="bg-white rounded-2xl p-4 shadow-xl overflow-hidden my-3 border border-white/30 flex items-center justify-center">
+                <Image 
+                  src="/promo-6-months.png" 
+                  alt="6 Months for only £6 Subscription Offer" 
+                  width={500} 
+                  height={350} 
+                  className="w-full max-w-[280px] h-auto rounded-xl object-contain mx-auto"
+                  priority
+                />
+              </div>
             </div>
             
-            <div className="border-t border-white/10 pt-6 mt-10">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl font-bold text-white">10,000+</span>
+            <div className="border-t border-white/10 pt-4 mt-6">
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-2xl font-bold text-white">850</span>
                 <span className="text-sm text-white/70">Members Registered</span>
               </div>
-              <div className="text-sm text-white/50">Join live interactive Q&A sessions with certified wellness coaches.</div>
+              <div className="text-xs text-white/60">Join live interactive Q&A sessions with certified wellness coaches.</div>
             </div>
           </div>
 
@@ -122,6 +127,14 @@ export default function Register() {
                   />
                 </div>
                 <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="city">City</label>
+                  <input 
+                    type="text" id="city" name="city" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    placeholder="London" 
+                  />
+                </div>
+                <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="telephone">Telephone Number</label>
                   <input 
                     type="tel" id="telephone" name="telephone" 
@@ -129,62 +142,13 @@ export default function Register() {
                     placeholder="+44 7123 456789" 
                   />
                 </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="password">Password *</label>
                   <input 
                     type="password" id="password" name="password" 
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="••••••••" required 
                   />
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4 mt-2">
-                <h4 className="text-sm font-semibold text-gray-800 mb-3">Billing Address</h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="addressLine1">Address Line 1</label>
-                    <input 
-                      type="text" id="addressLine1" name="addressLine1" 
-                      className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
-                      placeholder="123 Wellness Ave" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="addressLine2">Address Line 2</label>
-                    <input 
-                      type="text" id="addressLine2" name="addressLine2" 
-                      className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
-                      placeholder="Apt 4B" 
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <div className="col-span-2 md:col-span-1">
-                      <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="city">City</label>
-                      <input 
-                        type="text" id="city" name="city" 
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
-                        placeholder="London" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="postcode">Postcode</label>
-                      <input 
-                        type="text" id="postcode" name="postcode" 
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
-                        placeholder="SW1A 1AA" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="country">Country</label>
-                      <input 
-                        type="text" id="country" name="country" 
-                        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
-                        placeholder="UK" defaultValue="UK"
-                      />
-                    </div>
-                  </div>
                 </div>
               </div>
 

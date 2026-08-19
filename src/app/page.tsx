@@ -31,13 +31,18 @@ export default function Home() {
           </p>
           {/* Quick Registration & Social Login Options */}
           <div className="flex flex-col items-center">
-            <div className="flex flex-wrap justify-center items-center gap-3 mb-3">
+            {/* Top: Register Button */}
+            <div className="mb-3.5">
               <Link 
                 href="/register" 
-                className="bg-[#006818] hover:bg-[#004d11] text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-0.5 text-center text-sm sm:text-base border border-white/20"
+                className="bg-[#006818] hover:bg-[#004d11] text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-0.5 text-center text-base inline-block border border-white/20"
               >
                 Register here to view!
               </Link>
+            </div>
+            
+            {/* Bottom: Social Login Buttons Side by Side */}
+            <div className="flex flex-wrap justify-center items-center gap-3 mb-3">
               <button 
                 onClick={() => setSocialModal("facebook")}
                 className="bg-[#1877f2] hover:bg-[#166fe5] text-white px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm"
@@ -47,9 +52,7 @@ export default function Home() {
                 </svg>
                 Continue with Facebook
               </button>
-            </div>
-            
-            <div className="flex justify-center items-center mb-3">
+
               <button 
                 onClick={() => setSocialModal("google")}
                 className="bg-white hover:bg-gray-100 text-gray-800 px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm"

@@ -24,16 +24,19 @@ export default function Footer() {
             <p className="text-[#5e6d62] text-[0.95rem] leading-relaxed mb-6">
               Premium streaming platform dedicated to leading health and wellbeing summits, webinars, and expert talks.
             </p>
-            {/* Social Links placeholder */}
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer">
+            {/* Social Links */}
+            <div className="flex gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer" title="Facebook">
                 <span className="font-bold">f</span>
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer">
+              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer" title="X (Twitter)">
                 <span className="font-bold">X</span>
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer">
+              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer" title="YouTube">
                 <span className="font-bold">yt</span>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-[#eaf5eb] flex items-center justify-center text-[#006818] hover:bg-[#006818] hover:text-white transition-colors cursor-pointer" title="LinkedIn">
+                <span className="font-bold">in</span>
               </div>
             </div>
           </div>
