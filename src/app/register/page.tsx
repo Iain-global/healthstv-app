@@ -63,24 +63,30 @@ export default function Register() {
           <div 
             className="hidden md:flex md:w-5/12 p-8 text-white flex-col justify-between relative bg-cover bg-center"
             style={{ 
-              backgroundImage: "linear-gradient(135deg, rgba(12,28,16,0.92) 0%, rgba(0,104,24,0.85) 100%), url('https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop')" 
+              backgroundImage: "url('/register-bg.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center"
             }}
           >
-            <div>
-              <div className="mb-4">
-                <span className="bg-[#e77a25] text-white py-1 px-3 rounded-full text-xs font-bold uppercase tracking-wider inline-block">
+            {/* Top spacer for background logo */}
+            <div className="h-12"></div>
+
+            {/* Middle Section: Centered Soft Launch Badge & Offer Card */}
+            <div className="my-auto flex flex-col items-center text-center">
+              <div className="mb-3">
+                <span className="bg-[#e77a25] text-white py-1 px-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md inline-block">
                   Soft Launch 2026
                 </span>
               </div>
 
-              {/* Promo Banner Graphic */}
-              <div className="bg-white rounded-2xl p-4 shadow-xl overflow-hidden my-3 border border-white/30 flex items-center justify-center">
+              {/* Offer Image */}
+              <div className="bg-white rounded-2xl p-4 shadow-2xl overflow-hidden border border-white/30 flex items-center justify-center w-full max-w-[280px]">
                 <Image 
-                  src="/promo-6-months.png" 
-                  alt="6 Months for only £6 Subscription Offer" 
+                  src="/offer-6for6.png" 
+                  alt="6 Months for Only £6 Subscription" 
                   width={500} 
                   height={350} 
-                  className="w-full max-w-[280px] h-auto rounded-xl object-contain mx-auto"
+                  className="w-full h-auto rounded-xl object-contain mx-auto"
                   priority
                 />
               </div>
@@ -99,7 +105,7 @@ export default function Register() {
           <div className="md:w-7/12 p-6 md:p-12 flex flex-col justify-center max-h-[85vh] overflow-y-auto">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Create Your Free Account</h3>
-              <p className="text-gray-500 text-sm">Instant access to selected webinars, newsletters & events.</p>
+              <p className="text-gray-500 text-sm">Instant access to selected webinars, newsletters, free video library & events.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
