@@ -15,9 +15,35 @@ export async function POST(request: Request) {
     
     // Check if it's an approval toggle
     if (data.id && data.isApproved !== undefined) {
+      const existing = await prisma.video.findUnique({ where: { id: data.id } });
+      if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+      let updateData: any = { isApproved: Boolean(data.isApproved) };
+
+      if (data.isApproved && existing.pendingEdits) {
+        const edits: any = typeof existing.pendingEdits === 'string'
+          ? JSON.parse(existing.pendingEdits)
+          : existing.pendingEdits;
+
+        updateData = {
+          ...updateData,
+          ...(edits.title !== undefined ? { title: edits.title } : {}),
+          ...(edits.category !== undefined ? { category: edits.category } : {}),
+          ...(edits.description !== undefined ? { description: edits.description } : {}),
+          ...(edits.videoUrl !== undefined ? { videoUrl: edits.videoUrl } : {}),
+          ...(edits.thumbnailUrl !== undefined ? { thumbnailUrl: edits.thumbnailUrl } : {}),
+          ...(edits.isFree !== undefined ? { isFree: Boolean(edits.isFree) } : {}),
+          ...(edits.price !== undefined ? { price: parseFloat(edits.price) || 0 } : {}),
+          pendingEdits: null // Clear pending edits once approved!
+        };
+      } else if (!data.isApproved) {
+        // If rejected, clear pending edits
+        updateData.pendingEdits = null;
+      }
+
       const video = await prisma.video.update({
         where: { id: data.id },
-        data: { isApproved: data.isApproved },
+        data: updateData,
         include: { organiser: true }
       });
       return NextResponse.json(video);

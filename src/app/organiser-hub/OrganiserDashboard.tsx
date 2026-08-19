@@ -362,12 +362,16 @@ export default function OrganiserDashboard() {
                     </td>
                     <td className="py-4 px-6 text-gray-500">{new Date(vid.createdAt).toISOString().split('T')[0]}</td>
                     <td className="py-4 px-6">
-                      {vid.isApproved ? (
-                        <span className="text-green-700 bg-green-100 border border-green-200 px-2 py-1 rounded text-xs font-bold flex inline-flex items-center gap-1">
+                      {vid.pendingEdits ? (
+                        <span className="text-orange-700 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded text-xs font-bold inline-flex items-center gap-1">
+                          ⏳ Edits Pending Moderation
+                        </span>
+                      ) : vid.isApproved ? (
+                        <span className="text-green-700 bg-green-100 border border-green-200 px-2.5 py-1 rounded text-xs font-bold inline-flex items-center gap-1">
                           ✓ Live on Site
                         </span>
                       ) : (
-                        <span className="text-orange-700 bg-orange-100 border border-orange-200 px-2 py-1 rounded text-xs font-bold flex inline-flex items-center gap-1">
+                        <span className="text-orange-700 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded text-xs font-bold inline-flex items-center gap-1">
                           ⏳ Pending Moderation
                         </span>
                       )}

@@ -146,9 +146,10 @@ export default function AdminClient({
     }
   };
 
-  // Video Modal State
+  // Video Modal & Moderation Preview State
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
   const [videoForm, setVideoForm] = useState({
     title: '', category: '', isFree: true, organiserId: '', videoUrl: '', thumbnailUrl: '', description: ''
   });
@@ -189,16 +190,8 @@ export default function AdminClient({
         body: JSON.stringify({ id, isApproved })
       });
       if (res.ok) {
-        setVideos(prev => prev.map(v => {
-          if (v.id === id) {
-            // Merge pendingEdits back to the video object in state
-            if (isApproved && v.pendingEdits) {
-              return { ...v, ...v.pendingEdits, isApproved: true, pendingEdits: null };
-            }
-            return { ...v, isApproved };
-          }
-          return v;
-        }));
+        const updatedVideo = await res.json();
+        setVideos(prev => prev.map(v => v.id === id ? updatedVideo : v));
         router.refresh();
       }
     } catch (err) {
@@ -577,7 +570,12 @@ export default function AdminClient({
                       </td>
                       <td className="py-4 px-4 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button className="text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Preview</button>
+                          <button 
+                            onClick={() => setPreviewVideo(video)} 
+                            className="text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-xs font-bold transition-colors flex items-center gap-1"
+                          >
+                            👁️ Preview
+                          </button>
                           <button 
                             onClick={() => handleVideoApproval(video.id, true)}
                             className="text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-colors"
@@ -879,6 +877,153 @@ export default function AdminClient({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Moderation Preview Modal */}
+      {previewVideo && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] border border-gray-200 animate-in fade-in zoom-in duration-150">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-800 bg-[#1f2e22] text-white">
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase tracking-wider font-black bg-[#ea8125] text-white px-2.5 py-0.5 rounded">
+                  Moderation Preview
+                </span>
+                <span className="font-bold text-sm text-gray-200">
+                  {previewVideo.organiser?.name || "Organiser Submission"}
+                </span>
+              </div>
+              <button 
+                onClick={() => setPreviewVideo(null)} 
+                className="text-gray-300 hover:text-white text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-5">
+              {/* Video Player */}
+              <div className="bg-black rounded-xl overflow-hidden aspect-video w-full relative shadow-md">
+                <iframe
+                  src={previewVideo.pendingEdits?.videoUrl || previewVideo.videoUrl}
+                  className="w-full h-full border-none"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              </div>
+
+              {/* Moderation Details / Changes Diff */}
+              {previewVideo.pendingEdits ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                  <div className="text-xs font-black uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                    <span>⚡</span> Proposed Changes Under Review:
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    {/* Access Tier Change */}
+                    <div className="bg-white p-3 rounded-lg border border-amber-100 shadow-xs">
+                      <div className="font-bold text-gray-500 mb-1">Access & Monetization</div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="line-through text-gray-400">
+                          {previewVideo.isFree ? "🟢 Free Access" : `🔒 PPV (£${Number(previewVideo.price || 0).toFixed(2)})`}
+                        </span>
+                        <span className="font-bold text-green-700">➔</span>
+                        <span className="font-black text-[#00873a]">
+                          {previewVideo.pendingEdits.isFree !== undefined 
+                            ? (previewVideo.pendingEdits.isFree ? "🟢 Free Access" : `🔒 PPV (£${Number(previewVideo.pendingEdits.price || 0).toFixed(2)})`)
+                            : (previewVideo.isFree ? "🟢 Free Access" : `🔒 PPV (£${Number(previewVideo.price || 0).toFixed(2)})`)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Title Change */}
+                    <div className="bg-white p-3 rounded-lg border border-amber-100 shadow-xs">
+                      <div className="font-bold text-gray-500 mb-1">Video Title</div>
+                      {previewVideo.pendingEdits.title && previewVideo.pendingEdits.title !== previewVideo.title ? (
+                        <div>
+                          <div className="line-through text-gray-400">{previewVideo.title}</div>
+                          <div className="font-bold text-gray-900">{previewVideo.pendingEdits.title}</div>
+                        </div>
+                      ) : (
+                        <div className="font-bold text-gray-800">{previewVideo.title} <span className="text-gray-400 text-[10px]">(Unchanged)</span></div>
+                      )}
+                    </div>
+
+                    {/* Category */}
+                    <div className="bg-white p-3 rounded-lg border border-amber-100 shadow-xs">
+                      <div className="font-bold text-gray-500 mb-1">Category</div>
+                      <div className="font-bold text-gray-800">
+                        {previewVideo.pendingEdits.category || previewVideo.category || "Uncategorized"}
+                      </div>
+                    </div>
+
+                    {/* Presenter */}
+                    <div className="bg-white p-3 rounded-lg border border-amber-100 shadow-xs">
+                      <div className="font-bold text-gray-500 mb-1">Presenter</div>
+                      <div className="font-bold text-gray-800">
+                        {previewVideo.organiser?.name || "Platform Organiser"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {(previewVideo.pendingEdits.description || previewVideo.description) && (
+                    <div className="bg-white p-3 rounded-lg border border-amber-100 text-xs">
+                      <div className="font-bold text-gray-500 mb-1">Description</div>
+                      <div className="text-gray-700 leading-relaxed">
+                        {previewVideo.pendingEdits.description || previewVideo.description}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs space-y-2">
+                  <div className="font-black text-sm text-gray-900">{previewVideo.title}</div>
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <span>Presenter: <strong>{previewVideo.organiser?.name || "Unknown"}</strong></span>
+                    <span>•</span>
+                    <span>Access: <strong>{previewVideo.isFree ? "🟢 Free Access" : `🔒 PPV (£${Number(previewVideo.price || 0).toFixed(2)})`}</strong></span>
+                  </div>
+                  <p className="text-gray-600">{previewVideo.description}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex justify-between items-center p-4 px-6 border-t border-gray-100 bg-gray-50">
+              <button
+                type="button"
+                onClick={() => setPreviewVideo(null)}
+                className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+              >
+                Close Preview
+              </button>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await handleVideoApproval(previewVideo.id, false);
+                    setPreviewVideo(null);
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
+                >
+                  ✗ Reject Edits
+                </button>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await handleVideoApproval(previewVideo.id, true);
+                    setPreviewVideo(null);
+                  }}
+                  className="px-5 py-2 text-xs font-black text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm transition-colors"
+                >
+                  ✓ Approve Changes
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
