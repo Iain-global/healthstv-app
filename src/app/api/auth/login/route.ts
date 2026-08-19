@@ -10,11 +10,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    // Check if user exists
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check if user exists (case-insensitive email)
     const user = await prisma.user.findFirst({
       where: { 
-        email,
-        role: 'USER'
+        email: cleanEmail
       }
     });
 

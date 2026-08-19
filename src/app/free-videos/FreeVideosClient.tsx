@@ -109,9 +109,9 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
   const [user, setUser] = useState<any>(null);
   const [purchasedIds, setPurchasedIds] = useState<number[]>([]);
 
-  // 30-Second Preview & Paywall state
-  const [previewSeconds, setPreviewSeconds] = useState(30);
+  // 30-Second Preview & Playback state (defaults to false so timer only runs when played)
   const [isPlaying, setIsPlaying] = useState(false);
+  const [previewSeconds, setPreviewSeconds] = useState(30);
   const [isPaywallTriggered, setIsPaywallTriggered] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
@@ -144,15 +144,16 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     Boolean(user?.isSubscriber) || 
     (activeVideo.dbId !== undefined && purchasedIds.includes(activeVideo.dbId));
 
-  // Reset preview timer when active video changes
+  // Reset preview timer and play state when active video changes
   useEffect(() => {
     setPreviewSeconds(30);
     setIsPaywallTriggered(false);
     setPurchaseSuccess(false);
-    setIsPlaying(true);
-  }, [activeVideo.id]);
+    // Only auto-play if it is free or already unlocked, otherwise wait for user to press play
+    setIsPlaying(hasFullAccess);
+  }, [activeVideo.id, hasFullAccess]);
 
-  // 30-Second countdown timer for PPV videos
+  // 30-Second countdown timer for PPV videos (only runs when isPlaying is true)
   useEffect(() => {
     if (hasFullAccess) {
       setIsPaywallTriggered(false);
@@ -179,6 +180,11 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     };
   }, [isPlaying, previewSeconds, hasFullAccess, isPaywallTriggered]);
 
+  // Handler to start the 30-second preview
+  const startPreview = () => {
+    setIsPlaying(true);
+  };
+
   // Purchase / Unlock handler
   const handlePurchase = async () => {
     if (!user) {
@@ -191,6 +197,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       setPurchasedIds(prev => [...prev, 999999]);
       setPurchaseSuccess(true);
       setIsPaywallTriggered(false);
+      setIsPlaying(true);
       return;
     }
 
@@ -207,6 +214,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
         setPurchaseSuccess(true);
         setTimeout(() => {
           setIsPaywallTriggered(false);
+          setIsPlaying(true);
         }, 1200);
       } else {
         alert(data.error || 'Failed to complete purchase.');
@@ -289,15 +297,44 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
           {/* Left Player Area */}
           <div className="bg-black relative w-full aspect-video md:col-span-3 overflow-hidden flex items-center justify-center">
             
-            {/* 30-Second Preview Countdown Indicator */}
-            {!hasFullAccess && !isPaywallTriggered && (
-              <div className="absolute top-3 left-3 z-30 bg-black/80 backdrop-blur-md border border-orange-500/50 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg animate-pulse">
-                <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-                <span>Preview Mode: <strong>{previewSeconds}s</strong> remaining</span>
+            {/* 1. Play Button / Start Preview Overlay (When not playing yet on PPV) */}
+            {!hasFullAccess && !isPlaying && !isPaywallTriggered && (
+              <div 
+                onClick={startPreview}
+                className="absolute inset-0 z-30 bg-cover bg-center cursor-pointer group flex flex-col items-center justify-center p-6 text-center"
+                style={{ backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url('${activeVideo.imageUrl}')` }}
+              >
+                <div className="w-20 h-20 rounded-full bg-[#ea8125] text-white flex items-center justify-center shadow-[0_0_30px_rgba(234,129,37,0.6)] group-hover:scale-110 transition-transform mb-4">
+                  <svg viewBox="0 0 24 24" className="w-9 h-9 fill-current ml-1"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs font-black text-white uppercase tracking-wider mb-2">
+                  🔒 Pay-Per-View Video (£{activeVideo.price.toFixed(2)})
+                </div>
+                <h3 className="text-xl md:text-2xl font-black text-white max-w-md mb-1 leading-snug">
+                  {activeVideo.title}
+                </h3>
+                <p className="text-orange-200 text-xs font-medium">
+                  Click to start your <strong>30-second free preview</strong>
+                </p>
               </div>
             )}
 
-            {/* Paywall Overlay */}
+            {/* 2. Active Preview Countdown Indicator (When playing during preview) */}
+            {!hasFullAccess && isPlaying && !isPaywallTriggered && (
+              <div className="absolute top-3 left-3 z-30 bg-black/85 backdrop-blur-md border border-orange-500/60 text-white px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2.5 shadow-xl animate-pulse">
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                <span>Preview Mode: <strong>{previewSeconds}s</strong> remaining</span>
+                <button 
+                  onClick={() => setIsPlaying(false)}
+                  className="ml-1 bg-white/20 hover:bg-white/30 text-[0.65rem] px-2 py-0.5 rounded text-slate-200"
+                >
+                  Pause
+                </button>
+              </div>
+            )}
+
+            {/* 3. In-Player Paywall Overlay (When 30s preview expires) */}
             {isPaywallTriggered && (
               <div className="absolute inset-0 z-40 bg-[#0c1c10]/95 backdrop-blur-md p-6 sm:p-8 flex flex-col items-center justify-center text-center text-white overflow-y-auto">
                 <div className="max-w-md w-full my-auto">
@@ -353,6 +390,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                             onClick={() => {
                               setPreviewSeconds(30);
                               setIsPaywallTriggered(false);
+                              setIsPlaying(true);
                             }}
                             className="text-xs text-slate-400 hover:text-white underline transition-colors"
                           >
@@ -432,8 +470,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
 
             {/* Video Iframe Player */}
             <iframe 
-              key={`${activeVideo.id}-${hasFullAccess ? 'full' : 'preview'}`}
-              src={activeVideo.videoSrc}
+              key={`${activeVideo.id}-${hasFullAccess ? 'full' : isPlaying ? 'playing' : 'paused'}`}
+              src={isPlaying || hasFullAccess ? activeVideo.videoSrc : "about:blank"}
               className="absolute top-0 left-0 w-full h-full border-none" 
               allow="autoplay; fullscreen; picture-in-picture" 
               allowFullScreen>
@@ -492,6 +530,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
               <span>•</span>
               {activeVideo.isFree ? (
                 <span className="text-[#00873a] font-bold">✓ Free Access</span>
+              ) : hasFullAccess ? (
+                <span className="text-green-700 font-bold">✓ Full Pass</span>
               ) : (
                 <span className="text-[#ea8125] font-bold">£{activeVideo.price.toFixed(2)} PPV</span>
               )}

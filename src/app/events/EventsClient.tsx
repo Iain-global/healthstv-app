@@ -6,17 +6,20 @@ import Image from "next/image";
 type EventType = {
   id: number;
   title: string;
-  description: string;
+  description: string | null;
   date: string;
-  location: string;
+  location: string | null;
   imageUrl: string | null;
   price: number;
   organiserId: number;
   createdAt: Date;
-  organiser: {
+  format?: string | null;
+  ticketingMethod?: string | null;
+  ticketUrl?: string | null;
+  organiser?: {
     name: string;
     organization: string | null;
-  };
+  } | null;
 };
 
 export default function EventsClient({ initialEvents }: { initialEvents: EventType[] }) {
@@ -26,7 +29,7 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventTy
   // Filter events based on search
   const filteredEvents = initialEvents.filter(event => 
     event.title.toLowerCase().includes(search.toLowerCase()) || 
-    event.description.toLowerCase().includes(search.toLowerCase())
+    (event.description ? event.description.toLowerCase().includes(search.toLowerCase()) : false)
   );
 
   // Sort events
@@ -100,7 +103,7 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventTy
                   {event.description}
                 </p>
                 <div className="text-xs text-gray-500 mt-auto font-medium">
-                  Organised by <span className="text-[#006818] font-bold">{event.organiser.organization || event.organiser.name}</span>
+                  Organised by <span className="text-[#006818] font-bold">{event.organiser?.organization || event.organiser?.name || "Platform Organiser"}</span>
                 </div>
               </div>
               

@@ -16,9 +16,10 @@ type Video = {
   videoUrl: string;
   thumbnailUrl: string | null;
   description: string | null;
+  price?: number | any;
   organiserId: number;
   organiser?: OrganiserProfile;
-  createdAt: string;
+  createdAt: string | Date;
   pendingEdits?: any;
 };
 

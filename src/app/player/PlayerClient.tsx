@@ -6,13 +6,16 @@ import Link from "next/link";
 type EventType = {
   id: number;
   title: string;
-  description: string;
+  description: string | null;
   date: string;
-  location: string;
+  location: string | null;
   imageUrl: string | null;
   price: number;
   organiserId: number;
   createdAt: Date;
+  format?: string | null;
+  ticketingMethod?: string | null;
+  ticketUrl?: string | null;
 };
 
 export default function PlayerClient({ event }: { event: EventType }) {
