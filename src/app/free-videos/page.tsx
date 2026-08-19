@@ -20,10 +20,7 @@ export default async function FreeVideosPage() {
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header Introduction */}
         <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-2">
-            <span className="bg-[#006818] text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wide">
-              Official Vault & Replays
-            </span>
+          <div className="mb-2">
             <span className="text-[#ea8125] font-bold text-sm">
               ★ Free & Premium Masterclasses
             </span>
