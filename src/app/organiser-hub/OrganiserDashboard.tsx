@@ -315,6 +315,44 @@ export default function OrganiserDashboard() {
     addToast('📋 Video Cloned', `Copied details from "${video.title}". Make adjustments and submit!`, 'info');
   };
 
+  const handleDeleteEvent = async (event: any) => {
+    if (!confirm(`Are you sure you want to delete "${event.title}"?`)) return;
+    try {
+      const res = await fetch(`/api/organiser/events?id=${event.id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setEvents(prev => prev.filter(e => e.id !== event.id));
+        addToast('🗑️ Event Deleted', `"${event.title}" has been deleted.`, 'info');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete event');
+      }
+    } catch (err) {
+      console.error('Delete event error:', err);
+      alert('Error deleting event');
+    }
+  };
+
+  const handleDeleteVideo = async (video: any) => {
+    if (!confirm(`Are you sure you want to delete "${video.title}"?`)) return;
+    try {
+      const res = await fetch(`/api/organiser/videos?id=${video.id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setVideos(prev => prev.filter(v => v.id !== video.id));
+        addToast('🗑️ Video Deleted', `"${video.title}" has been deleted.`, 'info');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete video');
+      }
+    } catch (err) {
+      console.error('Delete video error:', err);
+      alert('Error deleting video');
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
@@ -512,7 +550,7 @@ export default function OrganiserDashboard() {
                           📋 Duplicate
                         </button>
                         <button onClick={() => openEventModal(evt)} className="text-[#00873a] bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
-                        <button className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
+                        <button onClick={() => handleDeleteEvent(evt)} className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -597,7 +635,7 @@ export default function OrganiserDashboard() {
                           📋 Duplicate
                         </button>
                         <button onClick={() => openVideoModal(vid)} className="text-[#00873a] bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Edit</button>
-                        <button className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
+                        <button onClick={() => handleDeleteVideo(vid)} className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Delete</button>
                       </div>
                     </td>
                   </tr>
