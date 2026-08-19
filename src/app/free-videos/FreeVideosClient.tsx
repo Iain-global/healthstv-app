@@ -139,9 +139,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       .catch(err => console.error(err));
   }, []);
 
-  // Determine if viewer has full access to the active video (requires explicit purchase for PPV)
-  const hasFullAccess = activeVideo.isFree || 
-    (activeVideo.dbId !== undefined && purchasedIds.includes(activeVideo.dbId));
+  // Determine if viewer has full access to the active video (Free videos only; PPV requires live gateway)
+  const hasFullAccess = Boolean(activeVideo.isFree);
 
   // Reset preview timer and play state when active video changes
   useEffect(() => {
@@ -430,124 +429,38 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                         </div>
                       </div>
 
-                      {/* Case 1: User is Logged In -> Step 2: Pay Organiser Fee */}
-                      {user ? (
-                        <div className="space-y-3 text-left">
-                          <div className="text-xs font-black uppercase tracking-wider text-orange-400">
-                            Step 2 of 2: Confirm & Pay Organiser Fee
-                          </div>
-                          <div className="text-xs text-slate-300 bg-white/5 py-2 px-3 rounded-lg flex items-center justify-between">
-                            <span>Signed in as <strong className="text-white">{user.name || user.email}</strong></span>
-                            <button
-                              type="button"
-                              onClick={() => setUser(null)}
-                              className="text-[0.68rem] text-slate-400 hover:text-white underline ml-2"
-                            >
-                              Switch
-                            </button>
-                          </div>
+                      {/* Developer Note */}
+                      <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-xs px-3.5 py-2.5 rounded-xl flex items-center justify-center gap-2 mb-4">
+                        <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1.5 py-0.5 rounded text-[0.6rem]">
+                          DEV NOTE
+                        </span>
+                        <span>TODO: Wire up live payments (Stripe/Gateway)</span>
+                      </div>
 
-                          {/* Developer Note */}
-                          <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[0.72rem] px-3 py-2 rounded-xl flex items-center justify-center gap-2">
-                            <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1.5 py-0.5 rounded text-[0.6rem]">
-                              DEV NOTE
-                            </span>
-                            <span>TODO: Wire up live payments (Stripe/Gateway)</span>
-                          </div>
+                      {/* Disabled Pay Button */}
+                      <button
+                        type="button"
+                        disabled
+                        className="w-full bg-slate-700/60 text-slate-300 py-3.5 px-6 rounded-xl font-bold text-sm border border-white/10 cursor-not-allowed flex items-center justify-center gap-2 opacity-80 mb-3"
+                      >
+                        <span>🔒 Pay £{activeVideo.price.toFixed(2)} to Unlock (Payments Coming Soon)</span>
+                      </button>
 
-                          <button
-                            type="button"
-                            onClick={handlePurchase}
-                            disabled={purchaseLoading}
-                            className="w-full bg-[#ea8125] hover:bg-[#d4701a] text-white py-3 px-6 rounded-xl font-black text-base shadow-lg transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                          >
-                            {purchaseLoading ? "Unlocking Access..." : `Pay £${activeVideo.price.toFixed(2)} to Unlock`}
-                          </button>
+                      <p className="text-[0.75rem] text-slate-400 mb-4">
+                        Pay-per-view payment gateway integration is currently pending. Full video access will be available once payments are wired up.
+                      </p>
 
-                          <div className="text-center pt-1">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPreviewSeconds(30);
-                                setIsPaywallTriggered(false);
-                                setIsPlaying(true);
-                              }}
-                              className="text-xs text-slate-400 hover:text-white underline transition-colors"
-                            >
-                              Restart 30s Preview
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Case 2: User is NOT Logged In -> Step 1: Sign in or Register */
-                        <div className="bg-black/40 border border-white/10 rounded-xl p-4 text-left">
-                          <div className="text-xs font-black uppercase tracking-wider text-orange-400 mb-2">
-                            Step 1 of 2: Sign In / Create Account
-                          </div>
-                          <div className="flex border-b border-white/10 pb-2 mb-3 gap-4 text-xs font-bold">
-                            <button
-                              type="button"
-                              onClick={() => { setAuthMode("signin"); setAuthError(""); }}
-                              className={`pb-1 transition-colors ${authMode === "signin" ? "text-white border-b-2 border-[#00873a]" : "text-slate-400 hover:text-white"}`}
-                            >
-                              Sign In
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => { setAuthMode("register"); setAuthError(""); }}
-                              className={`pb-1 transition-colors ${authMode === "register" ? "text-white border-b-2 border-[#00873a]" : "text-slate-400 hover:text-white"}`}
-                            >
-                              Create Account
-                            </button>
-                          </div>
-
-                          {authError && (
-                            <div className="bg-red-500/20 border border-red-500 text-red-200 text-xs p-2 rounded mb-3">
-                              {authError}
-                            </div>
-                          )}
-
-                          <form onSubmit={handleQuickAuth} className="space-y-2.5">
-                            {authMode === "register" && (
-                              <input
-                                required
-                                type="text"
-                                placeholder="Your Name"
-                                value={authName}
-                                onChange={e => setAuthName(e.target.value)}
-                                className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
-                              />
-                            )}
-                            <input
-                              required
-                              type="email"
-                              placeholder="Email address"
-                              value={authEmail}
-                              onChange={e => setAuthEmail(e.target.value)}
-                              className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
-                            />
-                            <input
-                              required
-                              type="password"
-                              placeholder="Password"
-                              value={authPassword}
-                              onChange={e => setAuthPassword(e.target.value)}
-                              className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
-                            />
-
-                            <button
-                              type="submit"
-                              disabled={authLoading}
-                              className="w-full bg-[#00873a] hover:bg-[#00682d] text-white py-2.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
-                            >
-                              {authLoading ? "Authenticating..." : (authMode === "signin" ? "Sign In & Proceed to Payment →" : "Register & Proceed to Payment →")}
-                            </button>
-                          </form>
-                          <p className="text-[0.7rem] text-slate-400 mt-2.5 text-center">
-                            Sign in or register to link this pass to your account. You will confirm payment in Step 2.
-                          </p>
-                        </div>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewSeconds(30);
+                          setIsPaywallTriggered(false);
+                          setIsPlaying(true);
+                        }}
+                        className="text-xs text-slate-400 hover:text-white underline transition-colors"
+                      >
+                        Restart 30s Preview
+                      </button>
                     </>
                   )}
 
@@ -668,7 +581,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-12">
           {filteredVideos.map(video => {
-            const isUnlocked = video.isFree || (video.dbId !== undefined && purchasedIds.includes(video.dbId));
+            const isUnlocked = Boolean(video.isFree);
             return (
               <div 
                 key={video.id} 
