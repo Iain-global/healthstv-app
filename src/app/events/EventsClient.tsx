@@ -14,6 +14,7 @@ type EventType = {
   location: string | null;
   imageUrl: string | null;
   price: number;
+  isPriceFrom?: boolean | null;
   organiserId: number;
   createdAt: Date;
   format?: string | null;
@@ -119,7 +120,10 @@ export default function EventsClient({ initialEvents }: { initialEvents: EventTy
               
               {/* Card Footer */}
               <div className="px-6 py-5 border-t border-[#e0e8e2] bg-[#fafcfb] flex justify-between items-center">
-                <span className="text-xl font-bold text-[#006818]">£{event.price.toFixed(2)}</span>
+                <span className="text-xl font-bold text-[#006818]">
+                  {event.isPriceFrom ? <span className="text-sm font-semibold text-gray-600 mr-1">From</span> : null}
+                  £{event.price.toFixed(2)}
+                </span>
                 <button className="bg-[#ea8125] hover:bg-[#d3701a] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
                   Book Ticket
                 </button>

@@ -69,6 +69,7 @@ model Event {
   location        String?
   imageUrl        String?
   price           Decimal          @db.Decimal(10, 2)
+  isPriceFrom     Boolean          @default(false)
   ticketingMethod String?
   ticketUrl       String?
   livestreamUrl   String?

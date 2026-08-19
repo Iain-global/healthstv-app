@@ -31,7 +31,7 @@ export default function OrganiserDashboard() {
   const [newVideoForm, setNewVideoForm] = useState({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '', isFree: true, price: '4.99' });
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
-  const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+  const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', isPriceFrom: false, ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleFileUpload = async (file: File, target: 'event' | 'video') => {
@@ -247,7 +247,7 @@ export default function OrganiserDashboard() {
       }
       setIsEventModalOpen(false);
       setEditingEventId(null);
-      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', isPriceFrom: false, ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
     }
   };
 
@@ -264,6 +264,7 @@ export default function OrganiserDashboard() {
         startTime: dataToEdit.startTime || '10:00',
         endTime: dataToEdit.endTime || '16:00',
         price: dataToEdit.price !== undefined ? dataToEdit.price.toString() : '0',
+        isPriceFrom: dataToEdit.isPriceFrom !== undefined ? Boolean(dataToEdit.isPriceFrom) : false,
         ticketingMethod: dataToEdit.ticketingMethod || 'Internal Platform',
         ticketUrl: dataToEdit.ticketUrl || '',
         livestreamUrl: dataToEdit.livestreamUrl || '',
@@ -271,7 +272,7 @@ export default function OrganiserDashboard() {
       });
     } else {
       setEditingEventId(null);
-      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
+      setNewEventForm({ title: '', format: 'Virtual Summit', description: '', date: '', endDate: '', startTime: '10:00', endTime: '16:00', price: '0', isPriceFrom: false, ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
     }
     setIsEventModalOpen(true);
   };
@@ -288,6 +289,7 @@ export default function OrganiserDashboard() {
       startTime: dataToCopy.startTime || '10:00',
       endTime: dataToCopy.endTime || '16:00',
       price: dataToCopy.price !== undefined ? dataToCopy.price.toString() : '0',
+      isPriceFrom: dataToCopy.isPriceFrom !== undefined ? Boolean(dataToCopy.isPriceFrom) : false,
       ticketingMethod: dataToCopy.ticketingMethod || 'Internal Platform',
       ticketUrl: dataToCopy.ticketUrl || '',
       livestreamUrl: dataToCopy.livestreamUrl || '',
@@ -484,7 +486,10 @@ export default function OrganiserDashboard() {
                         </div>
                       )}
                     </td>
-                    <td className="py-4 px-6 font-black text-[#1f2e22]">£{Number(evt.price).toFixed(2)}</td>
+                    <td className="py-4 px-6 font-black text-[#1f2e22]">
+                      {evt.isPriceFrom ? <span className="text-xs font-bold text-gray-500 mr-1">From</span> : null}
+                      £{Number(evt.price).toFixed(2)}
+                    </td>
                     <td className="py-4 px-6">
                       <span className="text-[#00873a] bg-[#00873a]/10 px-2 py-1 rounded text-xs font-bold border border-[#00873a]/20">
                         {evt.ticketingMethod || 'Direct Checkout'}
@@ -895,8 +900,33 @@ export default function OrganiserDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">Ticket Price (£)</label>
-                    <input type="number" min="0" step="0.01" value={newEventForm.price} onChange={e => setNewEventForm({...newEventForm, price: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium" />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-bold text-gray-700">Ticket Price (£)</label>
+                      <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#f6821f] select-none hover:text-[#e07015] bg-orange-50 px-2 py-0.5 rounded border border-orange-200/70">
+                        <input 
+                          type="checkbox" 
+                          checked={newEventForm.isPriceFrom} 
+                          onChange={e => setNewEventForm({...newEventForm, isPriceFrom: e.target.checked})} 
+                          className="w-3.5 h-3.5 text-[#f6821f] rounded focus:ring-[#f6821f] cursor-pointer" 
+                        />
+                        <span>Prefix &ldquo;From&rdquo;</span>
+                      </label>
+                    </div>
+                    <div className="relative flex items-center">
+                      {newEventForm.isPriceFrom && (
+                        <span className="absolute left-3 text-xs font-bold text-gray-500 pointer-events-none">
+                          From £
+                        </span>
+                      )}
+                      <input 
+                        type="number" 
+                        min="0" 
+                        step="0.01" 
+                        value={newEventForm.price} 
+                        onChange={e => setNewEventForm({...newEventForm, price: e.target.value})} 
+                        className={`w-full py-2 border border-gray-300 rounded-lg text-gray-900 bg-white font-medium focus:ring-1 focus:ring-[#f6821f] outline-none ${newEventForm.isPriceFrom ? 'pl-16 pr-3' : 'px-4'}`} 
+                      />
+                    </div>
                   </div>
                 </div>
                 <div>
