@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import SubscriptionModal from "./SubscriptionModal";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileViewersOpen, setMobileViewersOpen] = useState(false);
   const [mobileOrganisersOpen, setMobileOrganisersOpen] = useState(false);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
 
@@ -121,7 +123,10 @@ export default function Header() {
                 </Link>
               </>
             )}
-            <button className="px-5 py-2.5 bg-[#ea8125] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] hover:bg-[#d3701a] hover:shadow-[0_6px_20px_rgba(234,129,37,0.6)] hover:-translate-y-0.5 transition-all text-[0.9rem]">
+            <button 
+              onClick={() => setIsSubModalOpen(true)}
+              className="px-5 py-2.5 bg-[#ea8125] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] hover:bg-[#d3701a] hover:shadow-[0_6px_20px_rgba(234,129,37,0.6)] hover:-translate-y-0.5 transition-all text-[0.9rem]"
+            >
               Subscribe
             </button>
           </div>
@@ -194,10 +199,26 @@ export default function Header() {
                   <Link onClick={() => setMobileMenuOpen(false)} href="/register" className="text-center px-4 py-2 border-2 border-[#006818] text-[#006818] font-semibold rounded-lg">Register</Link>
                 </>
               )}
+
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsSubModalOpen(true);
+                }}
+                className="w-full bg-[#ea8125] text-white font-bold py-2.5 rounded-lg shadow-md text-sm mt-2 hover:bg-[#d3701a] transition-colors"
+              >
+                ⭐ Subscribe (£1/mo)
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Subscription Paywall Modal */}
+      <SubscriptionModal 
+        isOpen={isSubModalOpen} 
+        onClose={() => setIsSubModalOpen(false)} 
+      />
     </header>
   );
 }

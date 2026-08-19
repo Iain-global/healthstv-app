@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 type VideoData = {
   id: string;
@@ -179,6 +180,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
   const [authName, setAuthName] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   // Fetch current user session
   useEffect(() => {
@@ -195,8 +197,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       .catch(err => console.error(err));
   }, []);
 
-  // Determine if viewer has full access to the active video (Free videos only; PPV requires live gateway)
-  const hasFullAccess = Boolean(activeVideo.isFree);
+  // Determine if viewer has full access to the active video (Free videos, active subscribers, or single PPV purchase)
+  const hasFullAccess = Boolean(activeVideo.isFree) || Boolean(user?.isSubscriber) || (activeVideo.dbId ? purchasedIds.includes(activeVideo.dbId) : purchasedIds.includes(999999));
 
   // Reset preview timer and play state when active video changes
   useEffect(() => {
@@ -475,7 +477,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                       </p>
 
                       {/* Price Badge */}
-                      <div className="bg-white/10 border border-white/15 rounded-xl p-3.5 mb-5 flex items-center justify-between">
+                      <div className="bg-white/10 border border-white/15 rounded-xl p-3.5 mb-4 flex items-center justify-between">
                         <div className="text-left">
                           <div className="text-xs text-slate-300 font-medium">One-Time Pay-Per-View Pass</div>
                           <div className="text-xs text-green-400 font-bold">✓ Unlimited Lifetime Replay</div>
@@ -485,27 +487,16 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                         </div>
                       </div>
 
-                      {/* Developer Note */}
-                      <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-xs px-3.5 py-2.5 rounded-xl flex items-center justify-center gap-2 mb-4">
-                        <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1.5 py-0.5 rounded text-[0.6rem]">
-                          DEV NOTE
-                        </span>
-                        <span>TODO: Wire up live payments (Stripe/Gateway)</span>
-                      </div>
-
-                      {/* Disabled Pay Button */}
+                      {/* Subscribe All-Access Button */}
                       <button
                         type="button"
-                        disabled
-                        className="w-full bg-slate-700/60 text-slate-300 py-3.5 px-6 rounded-xl font-bold text-sm border border-white/10 cursor-not-allowed flex items-center justify-center gap-2 opacity-80 mb-3"
+                        onClick={() => setIsSubModalOpen(true)}
+                        className="w-full bg-[#ea8125] hover:bg-[#d3701a] text-white py-3 px-4 rounded-xl font-black text-sm shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center gap-2 mb-3 cursor-pointer hover:-translate-y-0.5"
                       >
-                        <span>🔒 Pay £{activeVideo.price.toFixed(2)} to Unlock (Payments Coming Soon)</span>
+                        <span>⭐ Unlock All Lectures (£1/mo • £6 for 6 mos)</span>
                       </button>
 
-                      <p className="text-[0.75rem] text-slate-400 mb-4">
-                        Pay-per-view payment gateway integration is currently pending. Full video access will be available once payments are wired up.
-                      </p>
-
+                      {/* Restart Preview */}
                       <button
                         type="button"
                         onClick={() => {
@@ -708,6 +699,12 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
           </div>
         ))}
       </div>
+
+      {/* Subscription Paywall Modal */}
+      <SubscriptionModal 
+        isOpen={isSubModalOpen} 
+        onClose={() => setIsSubModalOpen(false)} 
+      />
     </>
   );
 }

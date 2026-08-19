@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SocialLoginModal from "@/components/SocialLoginModal";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 export default function Home() {
   const [socialModal, setSocialModal] = useState<"google" | "facebook" | null>(null);
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -138,7 +140,10 @@ export default function Home() {
                 <li className="flex gap-2"><span className="text-[#006818]">✓</span> Early-bird ticket discounts</li>
                 <li className="flex gap-2"><span className="text-[#006818]">✓</span> Cancel anytime</li>
               </ul>
-              <button className="w-full bg-[#ea8125] hover:bg-[#d3701a] text-white px-6 py-3 rounded-lg font-bold shadow-md transition-colors">
+              <button 
+                onClick={() => setIsSubModalOpen(true)}
+                className="w-full bg-[#ea8125] hover:bg-[#d3701a] text-white px-6 py-3 rounded-lg font-bold shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
                 Activate All-Access Membership
               </button>
             </div>
@@ -220,6 +225,12 @@ export default function Home() {
         isOpen={socialModal !== null} 
         onClose={() => setSocialModal(null)} 
         provider={socialModal} 
+      />
+
+      {/* Subscription Paywall Modal */}
+      <SubscriptionModal 
+        isOpen={isSubModalOpen} 
+        onClose={() => setIsSubModalOpen(false)} 
       />
     </div>
   );
