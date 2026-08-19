@@ -139,9 +139,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       .catch(err => console.error(err));
   }, []);
 
-  // Determine if viewer has full access to the active video
+  // Determine if viewer has full access to the active video (requires explicit purchase for PPV)
   const hasFullAccess = activeVideo.isFree || 
-    Boolean(user?.isSubscriber) || 
     (activeVideo.dbId !== undefined && purchasedIds.includes(activeVideo.dbId));
 
   // Reset preview timer and play state when active video changes
@@ -214,70 +213,11 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     setIsPlaying(true);
   };
 
-  // Purchase / Unlock handler
+  // Purchase / Unlock handler (Strictly called when clicking "Pay £X.XX" button)
   const handlePurchase = async () => {
-    let currentUser = user;
-
-    // If user is not yet signed in, check if they entered an email in the quick form
-    if (!currentUser) {
-      if (!authEmail.trim()) {
-        setAuthError("Please enter your email to receive your pass and unlock.");
-        return;
-      }
-
-      setPurchaseLoading(true);
-      setAuthError("");
-
-      try {
-        // Attempt login or register
-        const authRes = await fetch(authMode === "signin" ? '/api/auth/login' : '/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: authName.trim() || authEmail.trim().split('@')[0],
-            email: authEmail.trim(),
-            password: authPassword.trim() || 'password'
-          })
-        });
-
-        const authData = await authRes.json();
-        if (!authRes.ok) {
-          // If already registered, try login with provided password
-          if (authData.error && authData.error.includes("already registered")) {
-            const fallbackLogin = await fetch('/api/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: authEmail.trim(),
-                password: authPassword.trim() || 'password'
-              })
-            });
-            const fbData = await fallbackLogin.json();
-            if (!fallbackLogin.ok) {
-              setAuthError(fbData.error || "Please enter your password to sign in and unlock.");
-              setPurchaseLoading(false);
-              return;
-            }
-          } else {
-            setAuthError(authData.error || "Authentication failed.");
-            setPurchaseLoading(false);
-            return;
-          }
-        }
-
-        // Re-fetch user session
-        const pRes = await fetch('/api/auth/update');
-        const pData = await pRes.json();
-        if (pData.success && pData.user) {
-          currentUser = pData.user;
-          setUser(pData.user);
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new Event('auth-change'));
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
+    if (!user) {
+      setIsPaywallTriggered(true);
+      return;
     }
 
     setPurchaseLoading(true);
@@ -291,21 +231,23 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
         const data = await res.json();
         if (res.ok && data.success) {
           setPurchasedIds(prev => [...prev, activeVideo.dbId!]);
-        } else if (!res.ok && !data.alreadyUnlocked) {
+          setPurchaseSuccess(true);
+          setTimeout(() => {
+            setIsPaywallTriggered(false);
+            setIsPlaying(true);
+          }, 1000);
+        } else {
           alert(data.error || 'Failed to complete unlock.');
-          setPurchaseLoading(false);
-          return;
         }
       } else {
         // Fallback demo video
         setPurchasedIds(prev => [...prev, 999999]);
+        setPurchaseSuccess(true);
+        setTimeout(() => {
+          setIsPaywallTriggered(false);
+          setIsPlaying(true);
+        }, 1000);
       }
-
-      setPurchaseSuccess(true);
-      setTimeout(() => {
-        setIsPaywallTriggered(false);
-        setIsPlaying(true);
-      }, 1000);
     } catch (err) {
       console.error(err);
       alert('An unexpected error occurred.');
@@ -314,7 +256,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     }
   };
 
-  // Quick In-Paywall Login / Register
+  // Quick In-Paywall Login / Register (Step 1 of PPV)
   const handleQuickAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
@@ -342,16 +284,16 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
             }
           }
         } else {
-          setAuthError(data.error || "Login failed");
+          setAuthError(data.error || "Login failed. Please check your credentials.");
         }
       } else {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: authName,
-            email: authEmail,
-            password: authPassword
+            name: authName.trim() || authEmail.trim().split('@')[0],
+            email: authEmail.trim(),
+            password: authPassword.trim()
           })
         });
         const data = await res.json();
@@ -365,7 +307,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
             }
           }
         } else {
-          setAuthError(data.error || "Registration failed");
+          setAuthError(data.error || "Registration failed.");
         }
       }
     } catch (err) {
@@ -488,11 +430,21 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                         </div>
                       </div>
 
-                      {/* Case 1: User is Logged In */}
+                      {/* Case 1: User is Logged In -> Step 2: Pay Organiser Fee */}
                       {user ? (
-                        <div className="space-y-3">
-                          <div className="text-xs text-slate-300 bg-white/5 py-1.5 px-3 rounded-lg">
-                            Logged in as <strong className="text-white">{user.name || user.email}</strong>
+                        <div className="space-y-3 text-left">
+                          <div className="text-xs font-black uppercase tracking-wider text-orange-400">
+                            Step 2 of 2: Confirm & Pay Organiser Fee
+                          </div>
+                          <div className="text-xs text-slate-300 bg-white/5 py-2 px-3 rounded-lg flex items-center justify-between">
+                            <span>Signed in as <strong className="text-white">{user.name || user.email}</strong></span>
+                            <button
+                              type="button"
+                              onClick={() => setUser(null)}
+                              className="text-[0.68rem] text-slate-400 hover:text-white underline ml-2"
+                            >
+                              Switch
+                            </button>
                           </div>
 
                           {/* Developer Note */}
@@ -512,28 +464,33 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                             {purchaseLoading ? "Unlocking Access..." : `Pay £${activeVideo.price.toFixed(2)} to Unlock`}
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setPreviewSeconds(30);
-                              setIsPaywallTriggered(false);
-                              setIsPlaying(true);
-                            }}
-                            className="text-xs text-slate-400 hover:text-white underline transition-colors"
-                          >
-                            Restart 30s Preview
-                          </button>
+                          <div className="text-center pt-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPreviewSeconds(30);
+                                setIsPaywallTriggered(false);
+                                setIsPlaying(true);
+                              }}
+                              className="text-xs text-slate-400 hover:text-white underline transition-colors"
+                            >
+                              Restart 30s Preview
+                            </button>
+                          </div>
                         </div>
                       ) : (
-                        /* Case 2: User is NOT Logged In */
+                        /* Case 2: User is NOT Logged In -> Step 1: Sign in or Register */
                         <div className="bg-black/40 border border-white/10 rounded-xl p-4 text-left">
+                          <div className="text-xs font-black uppercase tracking-wider text-orange-400 mb-2">
+                            Step 1 of 2: Sign In / Create Account
+                          </div>
                           <div className="flex border-b border-white/10 pb-2 mb-3 gap-4 text-xs font-bold">
                             <button
                               type="button"
                               onClick={() => { setAuthMode("signin"); setAuthError(""); }}
                               className={`pb-1 transition-colors ${authMode === "signin" ? "text-white border-b-2 border-[#00873a]" : "text-slate-400 hover:text-white"}`}
                             >
-                              Sign In to Purchase
+                              Sign In
                             </button>
                             <button
                               type="button"
@@ -550,17 +507,10 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                             </div>
                           )}
 
-                          {/* Developer Note */}
-                          <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[0.7rem] px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 mb-3">
-                            <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1 py-0.5 rounded text-[0.55rem]">
-                              DEV NOTE
-                            </span>
-                            <span>TODO: Wire up live payments</span>
-                          </div>
-
-                          <form onSubmit={(e) => { e.preventDefault(); handlePurchase(); }} className="space-y-2.5">
+                          <form onSubmit={handleQuickAuth} className="space-y-2.5">
                             {authMode === "register" && (
                               <input
+                                required
                                 type="text"
                                 placeholder="Your Name"
                                 value={authName}
@@ -577,8 +527,9 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                               className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
                             />
                             <input
+                              required
                               type="password"
-                              placeholder={authMode === "register" ? "Password (optional for guest pass)" : "Password"}
+                              placeholder="Password"
                               value={authPassword}
                               onChange={e => setAuthPassword(e.target.value)}
                               className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
@@ -586,12 +537,15 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
 
                             <button
                               type="submit"
-                              disabled={purchaseLoading || authLoading}
-                              className="w-full bg-[#ea8125] hover:bg-[#d4701a] text-white py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg"
+                              disabled={authLoading}
+                              className="w-full bg-[#00873a] hover:bg-[#00682d] text-white py-2.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5"
                             >
-                              {purchaseLoading || authLoading ? "Unlocking Access..." : `Pay £${activeVideo.price.toFixed(2)} to Unlock`}
+                              {authLoading ? "Authenticating..." : (authMode === "signin" ? "Sign In & Proceed to Payment →" : "Register & Proceed to Payment →")}
                             </button>
                           </form>
+                          <p className="text-[0.7rem] text-slate-400 mt-2.5 text-center">
+                            Sign in or register to link this pass to your account. You will confirm payment in Step 2.
+                          </p>
                         </div>
                       )}
                     </>
@@ -714,7 +668,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-12">
           {filteredVideos.map(video => {
-            const isUnlocked = video.isFree || Boolean(user?.isSubscriber) || (video.dbId !== undefined && purchasedIds.includes(video.dbId));
+            const isUnlocked = video.isFree || (video.dbId !== undefined && purchasedIds.includes(video.dbId));
             return (
               <div 
                 key={video.id} 
