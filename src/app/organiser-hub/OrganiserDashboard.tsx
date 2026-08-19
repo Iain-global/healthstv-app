@@ -980,23 +980,44 @@ export default function OrganiserDashboard() {
                   />
                   
                   {/* Tick Option for Default Player URL */}
-                  <label className="mt-2.5 flex items-center gap-2 cursor-pointer select-none bg-orange-50/70 hover:bg-orange-50 p-2.5 rounded-lg border border-orange-200/80 transition-colors">
-                    <input 
-                      type="checkbox" 
-                      checked={newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player'}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setNewEventForm(prev => ({ ...prev, ticketUrl: 'https://healthv2.deploybox.uk/player' }));
-                        } else if (newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player') {
-                          setNewEventForm(prev => ({ ...prev, ticketUrl: '' }));
-                        }
-                      }}
-                      className="w-4 h-4 text-[#f6821f] rounded focus:ring-[#f6821f] cursor-pointer" 
-                    />
-                    <span className="text-xs font-bold text-[#1f2e22]">
-                      ✓ Use Default Live Player URL: <code className="text-[#f6821f] font-mono bg-white px-1.5 py-0.5 rounded border border-orange-200 font-bold">https://healthv2.deploybox.uk/player</code>
-                    </span>
-                  </label>
+                  <div className="flex flex-col gap-1.5 mt-2.5">
+                    <label className="flex items-center gap-2 cursor-pointer select-none bg-orange-50/70 hover:bg-orange-50 p-2.5 rounded-lg border border-orange-200/80 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player'}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setNewEventForm(prev => ({ ...prev, ticketUrl: 'https://healthv2.deploybox.uk/player' }));
+                          } else if (newEventForm.ticketUrl === 'https://healthv2.deploybox.uk/player') {
+                            setNewEventForm(prev => ({ ...prev, ticketUrl: '' }));
+                          }
+                        }}
+                        className="w-4 h-4 text-[#f6821f] rounded focus:ring-[#f6821f] cursor-pointer" 
+                      />
+                      <span className="text-xs font-bold text-[#1f2e22]">
+                        ✓ Use Platform Player URL: <code className="text-[#f6821f] font-mono bg-white px-1.5 py-0.5 rounded border border-orange-200 font-bold">https://healthv2.deploybox.uk/player</code>
+                      </span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer select-none bg-blue-50/70 hover:bg-blue-50 p-2.5 rounded-lg border border-blue-200/80 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        checked={newEventForm.ticketUrl.includes('it=ao1uksns7egw')}
+                        onChange={e => {
+                          const hstvUrl = 'https://play.webvideocore.net/popplayer.php?it=ao1uksns7egw&is_link=1&w=720&h=405&pause=1&title=HealthSummits.tv&skin=3&repeat=&brandNW=1&start_volume=100&bg_gradient1=%23ffffff&bg_gradient2=%23e9e9e9&fullscreen=1&fs_mode=2&skinAlpha=50&colorBase=%23250864&colorIcon=%23ffffff&colorHighlight=%237f54f8&direct=false&no_ctrl=&auto_hide=1&viewers_limit=0&cc_position=bottom&cc_positionOffset=70&cc_multiplier=0.03&cc_textColor=%23ffffff&cc_textOutlineColor=%23ffffff&cc_bkgColor=%23000000&cc_bkgAlpha=0.1&image=https%3A%2F%2Fmember.streamingvideoprovider.com%2Fpanel%2Fserver%2Fclip%3Fa%3DGenerateThumbnail%26clip_id%3D11838096%26size%3Dlarge&mainBg_Color=%23ffffff&aspect_ratio=16%3A9&play_button=1&play_button_style=pulsing&sleek_player=1&stretch=&auto_play=0&auto_play_type=unMute&floating_player=none&share_options=1';
+                          if (e.target.checked) {
+                            setNewEventForm(prev => ({ ...prev, ticketUrl: hstvUrl }));
+                          } else if (newEventForm.ticketUrl === hstvUrl) {
+                            setNewEventForm(prev => ({ ...prev, ticketUrl: '' }));
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer" 
+                      />
+                      <span className="text-xs font-bold text-blue-900">
+                        ✓ Use HealthSummits.tv Live Player URL (<span className="text-blue-700">Menopause Cafe 16:9 Stream</span>)
+                      </span>
+                    </label>
+                  </div>
 
                   <p className="text-xs text-gray-500 mt-1.5">If using external ticketing or a direct livestream link, provide it here.</p>
                 </div>
