@@ -1,0 +1,114 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   MEDIAZILLA CLONE - DESIGN SYSTEM TOKENS & BASE STYLES
+   ========================================================================== */
+
+:root {
+  --mz-font-title: 'Cinzel', serif;
+  --mz-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mz-font-serif: 'Cormorant Garamond', Georgia, serif;
+  --mz-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Theme Tokens (Dynamic via Preset) */
+  --mz-accent: #d4af37;
+  --mz-accent-hover: #f3e5ab;
+  --mz-accent-glow: rgba(212, 175, 55, 0.22);
+  --mz-bg-overlay: radial-gradient(ellipse at center, rgba(15, 17, 23, 0.45) 0%, rgba(8, 9, 13, 0.88) 100%);
+  --mz-card-bg: rgba(18, 20, 29, 0.65);
+  --mz-card-border: rgba(212, 175, 55, 0.22);
+  --mz-card-hover-border: rgba(212, 175, 55, 0.65);
+  --mz-text: #f8fafc;
+  --mz-text-muted: #94a3b8;
+  --mz-badge-bg: rgba(212, 175, 55, 0.15);
+  --mz-badge-text: #f3e5ab;
+
+  /* Universal Dark Canvas */
+  --mz-surface-deep: #07080b;
+  --mz-surface-base: #0f1117;
+  --mz-surface-elevated: #1a1d26;
+  --mz-surface-border: rgba(255, 255, 255, 0.10);
+  --mz-surface-glass: rgba(15, 17, 23, 0.75);
+
+  /* Transitions */
+  --mz-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --mz-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --mz-transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--mz-surface-deep);
+  color: var(--mz-text);
+  font-family: var(--mz-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+/* Presentation Container (16:9 Cinema Aspect or Responsive Fullscreen) */
+.mediazilla-app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #000000;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Generic Utility Classes */
+.glass-panel {
+  background: var(--mz-surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--mz-surface-border);
+}
+
+.glow-shadow {
+  box-shadow: 0 10px 30px -10px var(--mz-accent-glow);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--mz-text) 0%, var(--mz-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--mz-accent);
+  outline-offset: 2px;
+}
