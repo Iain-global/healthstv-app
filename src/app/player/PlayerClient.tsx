@@ -132,10 +132,10 @@ export default function PlayerClient({ event }: { event: EventType }) {
         <div className="mb-10">
           <div className="relative w-full aspect-video max-h-[540px] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-center">
             
-            {/* Blurred Backdrop */}
+            {/* Thumbnail Backdrop */}
             <div 
-              className="absolute inset-0 bg-cover bg-center blur-md brightness-50 scale-110"
-              style={{ backgroundImage: `url('${event.imageUrl || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200'}')` }}
+              className="absolute inset-0 bg-cover bg-center opacity-40 scale-105 transition-all"
+              style={{ backgroundImage: `url('${event.imageUrl || '/menopause-cafe.png'}')` }}
             ></div>
 
             {/* PIN Dialog */}
@@ -207,13 +207,8 @@ export default function PlayerClient({ event }: { event: EventType }) {
             
             {/* Left Column: Video */}
             <div className="lg:col-span-2 flex flex-col gap-4">
-              <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                <iframe 
-                  src="https://play.webvideocore.net/popplayer.php?it=g5tf7vci5y8g&is_link=1&w=720&h=405&pause=1&title=Timeline+1&skin=3&repeat=&brandNW=1&start_volume=100&bg_gradient1=%23ffffff&bg_gradient2=%23e9e9e9&fullscreen=1&fs_mode=2&skinAlpha=50&colorBase=%23250864&colorIcon=%23ffffff&colorHighlight=%237f54f8&direct=false&no_ctrl=&auto_hide=1&viewers_limit=0&cc_position=bottom&cc_positionOffset=70&cc_multiplier=0.03&cc_textColor=%23ffffff&cc_textOutlineColor=%23ffffff&cc_bkgColor=%23000000&cc_bkgAlpha=0.1&mainBg_Color=%23ffffff&aspect_ratio=16%3A9&play_button=1&play_button_style=pulsing&sleek_player=1&stretch=&auto_play=0&auto_play_type=unMute&floating_player=none&share_options=1"
-                  className="absolute top-0 left-0 w-full h-full border-none"
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+              <div className="relative w-full aspect-video min-h-[420px] bg-black rounded-xl overflow-hidden border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center justify-center">
+                <LivePlayerEmbed />
               </div>
               <Link href="/lounge" className="bg-[#ea8125] hover:bg-[#d3701a] text-white py-3.5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(234,129,37,0.4)] transition-all w-full">
                 <span className="text-xl">⚄</span> Enter Virtual Social Lounge
@@ -309,5 +304,78 @@ export default function PlayerClient({ event }: { event: EventType }) {
         </div>
       )}
     </>
+  );
+}
+
+function LivePlayerEmbed() {
+  useEffect(() => {
+    const initVapp = () => {
+      if (typeof window !== 'undefined' && (window as any).VappController) {
+        try {
+          new (window as any).VappController(
+            { use_div: "dplayer_flash_ao1uksns7egw", player_width: "100%", player_height: "100%" },
+            {
+              clip_id: "11838096",
+              player_id: "4GE35AGFE12D4C4",
+              playlist_id: "81923",
+              transparent: "1",
+              uk: "50c6f6de299d95b7eaa31a8c3b3ac1b0",
+              live_id: "ao1uksns7egw",
+              sel_playlist: "",
+              sel_multiplaylist: "",
+              use_html5: "true",
+              layout: "default",
+              theme: "light",
+              is_responsive: "1",
+              is_inversed: "",
+              is_vertical: "",
+              one_thumb_per_row: "1",
+              thumbs_size: "medium",
+              disable_hash: "",
+              widget_height_behavior: "0",
+              hide_playlist: "",
+              hide_live_chat: "1",
+              hide_description: "",
+              playlist_position: "",
+              chat_position: "",
+              description_position: "",
+              show_auto_play_next: "1",
+              auto_play_next: "1",
+              floating_player: "none",
+              share_options: "1"
+            }
+          );
+        } catch (err) {
+          console.error("VappController init error:", err);
+        }
+      }
+    };
+
+    let script = document.querySelector('script[src*="play.webvideocore.net/js/vapp.js"]') as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://play.webvideocore.net/js/vapp.js';
+      script.async = true;
+      script.onload = () => {
+        initVapp();
+      };
+      document.body.appendChild(script);
+    } else {
+      initVapp();
+    }
+  }, []);
+
+  return (
+    <div 
+      className="relative w-full h-full min-h-[440px] bg-black flex items-center justify-center overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: "url('/menopause-cafe.png')" }}
+    >
+      <div 
+        id="dplayer_flash_ao1uksns7egw" 
+        className="w-full h-full min-h-[440px] relative z-10"
+        style={{ width: "100%", height: "100%", minHeight: "440px", position: "relative" }}
+      ></div>
+    </div>
   );
 }
