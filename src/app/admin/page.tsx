@@ -14,7 +14,12 @@ export default async function AdminPage() {
     orderBy: { createdAt: 'desc' }
   });
 
-  const organisers = await prisma.organiserProfile.findMany();
+  const organisers = await prisma.organiserProfile.findMany({
+    include: {
+      user: true
+    },
+    orderBy: { id: 'desc' }
+  });
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },

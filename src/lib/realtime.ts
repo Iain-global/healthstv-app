@@ -1,4 +1,4 @@
-﻿import { EventEmitter } from 'events';
+import { EventEmitter } from 'events';
 
 export type RealtimeEventType = 
   | 'video:submitted'
@@ -6,13 +6,21 @@ export type RealtimeEventType =
   | 'video:rejected'
   | 'event:submitted'
   | 'event:approved'
-  | 'event:rejected';
+  | 'event:rejected'
+  | 'organiser:applied'
+  | 'organiser:verified'
+  | 'organiser:revoked';
 
 export interface RealtimeEventPayload {
   type: RealtimeEventType;
   videoId?: number;
   eventId?: number;
+  organiserId?: number;
   title?: string;
+  name?: string;
+  slug?: string;
+  email?: string;
+  organization?: string;
   organiserName?: string;
   isEdit?: boolean;
   video?: any;

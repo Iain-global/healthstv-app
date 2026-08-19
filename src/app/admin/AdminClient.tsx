@@ -38,7 +38,7 @@ type Event = {
 export default function AdminClient({ 
   initialVideos, 
   initialEvents,
-  organisers, 
+  organisers: initialOrganisers, 
   users 
 }: { 
   initialVideos: Video[], 
@@ -54,9 +54,11 @@ export default function AdminClient({
   const [password, setPassword] = useState("admin");
   const [loginError, setLoginError] = useState(false);
   
-  const [activeTab, setActiveTab] = useState("vault");
+  const [activeTab, setActiveTab] = useState("orgs");
   const [videos, setVideos] = useState(initialVideos);
   const [events, setEvents] = useState(initialEvents);
+  const [organisers, setOrganisers] = useState(initialOrganisers);
+  const [selectedOrganiser, setSelectedOrganiser] = useState<OrganiserProfile | null>(null);
   const [logs, setLogs] = useState<any[]>([]);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '' });
@@ -80,6 +82,30 @@ export default function AdminClient({
     let eventSource: EventSource | null = null;
     try {
       eventSource = new EventSource('/api/realtime/stream');
+
+      // Organiser Registered
+      eventSource.addEventListener('organiser:applied', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data);
+          soundFx.playBing();
+          addToast(
+            '📋 New Organiser Application',
+            `"${data.name}" (${data.organization || data.email}) submitted a host application.`,
+            'info'
+          );
+          // Refetch organisers
+          fetch('/api/admin/organisers')
+            .then(res => res.json())
+            .then(data => {
+              if (Array.isArray(data)) {
+                setOrganisers(data);
+              }
+            })
+            .catch(console.error);
+        } catch (err) {
+          console.error(err);
+        }
+      });
 
       // Video Submitted by Organiser
       eventSource.addEventListener('video:submitted', (e: MessageEvent) => {
@@ -302,6 +328,65 @@ export default function AdminClient({
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleOrganiserVerification = async (id: number, isVerified: boolean) => {
+    try {
+      const res = await fetch('/api/admin/organisers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isVerified })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setOrganisers(prev => prev.map(o => o.id === id ? { ...o, ...updated, isVerified } : o));
+        if (selectedOrganiser && selectedOrganiser.id === id) {
+          setSelectedOrganiser({ ...selectedOrganiser, ...updated, isVerified });
+        }
+        if (isVerified) {
+          soundFx.playSuccess();
+          addToast(
+            '🎉 Organiser Authorised!',
+            `"${updated.name}" has been approved and can now publish live summits & videos.`,
+            'success'
+          );
+        } else {
+          addToast(
+            'ℹ️ Organiser Status Updated',
+            `"${updated.name}" is now unverified.`,
+            'warning'
+          );
+        }
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error updating organiser status:', err);
+    }
+  };
+
+  const handleOrganiserDelete = async (id: number, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete the organiser account for "${name}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/organisers?id=${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setOrganisers(prev => prev.filter(o => o.id !== id));
+        if (selectedOrganiser && selectedOrganiser.id === id) {
+          setSelectedOrganiser(null);
+        }
+        addToast(
+          '🗑️ Organiser Removed',
+          `"${name}" application has been deleted.`,
+          'info'
+        );
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error deleting organiser:', err);
     }
   };
 
@@ -741,9 +826,19 @@ export default function AdminClient({
         {/* Tab Content: Organisers */}
         {activeTab === 'orgs' && (
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <div className="mb-6">
-              <h2 className="text-xl font-black text-[#1f2e22]">Health Organisers</h2>
-              <p className="text-gray-500 text-sm mt-1">Verify summit organizers and medical institutions to unlock uploading.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-black text-[#1f2e22]">Health Organisers & Applications</h2>
+                <p className="text-gray-500 text-sm mt-1">Review, authorize, and verify summit organizers and medical institutions to unlock their hosting privileges.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-orange-50 text-orange-700 border border-orange-200 px-3 py-1.5 rounded-lg text-xs font-bold">
+                  ⏳ {pendingOrganisers.length} Pending Approval
+                </span>
+                <span className="bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-bold">
+                  ✓ {organisers.filter(o => o.isVerified).length} Authorised
+                </span>
+              </div>
             </div>
             
             <div className="overflow-x-auto">
@@ -751,33 +846,118 @@ export default function AdminClient({
                 <thead>
                   <tr className="bg-gray-50 border-y border-gray-200">
                     <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Organiser / Host</th>
+                    <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Contact & Niche</th>
                     <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase">Status</th>
                     <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {organisers.map(org => (
-                    <tr key={org.id} className="hover:bg-gray-50">
+                    <tr key={org.id} className={`hover:bg-gray-50/80 transition-colors ${!org.isVerified ? 'bg-orange-50/20' : ''}`}>
                       <td className="py-4 px-4">
-                        <div className="font-bold text-[#1f2e22]">{org.name}</div>
-                        {org.organization && <div className="text-xs text-green-600 mt-1">{org.organization}</div>}
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#1f2e22] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                            {org.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-bold text-[#1f2e22] flex items-center gap-2">
+                              {org.name}
+                              {org.isFounding && (
+                                <span className="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                                  Founding Host
+                                </span>
+                              )}
+                            </div>
+                            {org.organization && <div className="text-xs font-medium text-[#00873a] mt-0.5">{org.organization}</div>}
+                            {org.user?.email && <div className="text-xs text-gray-400 mt-0.5">{org.user.email}</div>}
+                          </div>
+                        </div>
                       </td>
                       <td className="py-4 px-4">
-                        {org.isVerified ? 
-                          <span className="text-green-700 bg-green-100 px-2 py-1 rounded-full text-xs font-bold">✓ Authorised</span> : 
-                          <span className="text-orange-700 bg-orange-100 px-2 py-1 rounded-full text-xs font-bold">⏳ New Application</span>
-                        }
+                        <div className="text-xs text-gray-700 max-w-xs">
+                          {org.bio ? (
+                            <div className="line-clamp-2 italic text-gray-600">
+                              "{org.bio.split('\n')[0]}"
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">No summary provided</span>
+                          )}
+                          {org.website && (
+                            <a 
+                              href={org.website.startsWith('http') ? org.website : `https://${org.website}`} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="text-blue-600 hover:underline text-[11px] block mt-1 font-semibold"
+                            >
+                              🔗 {org.website.replace(/^https?:\/\//, '')}
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        {org.isVerified ? (
+                          <span className="inline-flex items-center gap-1 text-green-700 bg-green-100 px-2.5 py-1 rounded-full text-xs font-bold border border-green-200">
+                            ✓ Authorised
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-orange-700 bg-orange-100 px-2.5 py-1 rounded-full text-xs font-bold border border-orange-200 animate-pulse">
+                            ⏳ New Application
+                          </span>
+                        )}
                       </td>
                       <td className="py-4 px-4 text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Link href={`/organiser/${org.slug}`} className="text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded text-xs font-bold transition-colors">Profile</Link>
+                        <div className="flex gap-2 justify-end items-center">
+                          {!org.isVerified ? (
+                            <>
+                              <button 
+                                onClick={() => handleOrganiserVerification(org.id, true)}
+                                className="bg-[#00873a] hover:bg-[#006818] text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow-sm transition-colors flex items-center gap-1"
+                              >
+                                ✓ Authorise
+                              </button>
+                              <button 
+                                onClick={() => setSelectedOrganiser(org)}
+                                className="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                              >
+                                👁️ Review Application
+                              </button>
+                              <button 
+                                onClick={() => handleOrganiserDelete(org.id, org.name)}
+                                className="text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                                title="Reject Application"
+                              >
+                                ✕
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button 
+                                onClick={() => handleOrganiserVerification(org.id, false)}
+                                className="text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                              >
+                                Revoke
+                              </button>
+                              <button 
+                                onClick={() => setSelectedOrganiser(org)}
+                                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                              >
+                                👁️ Details
+                              </button>
+                              <Link 
+                                href={`/organiser/${org.slug}`} 
+                                className="text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                              >
+                                Profile →
+                              </Link>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
                   ))}
                   {organisers.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="py-8 text-center text-gray-500">No organisers found.</td>
+                      <td colSpan={4} className="py-8 text-center text-gray-500">No organisers found.</td>
                     </tr>
                   )}
                 </tbody>
@@ -1106,6 +1286,139 @@ export default function AdminClient({
                 >
                   ✓ Approve Changes
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Organiser Application Dossier Modal */}
+      {selectedOrganiser && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-[#1f2e22] px-6 py-4 flex justify-between items-center text-white sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📋</span>
+                <h3 className="font-bold text-lg">Organiser Application Dossier</h3>
+              </div>
+              <button 
+                onClick={() => setSelectedOrganiser(null)} 
+                className="text-white/80 hover:text-white text-lg font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Header card */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-[#00873a] text-white flex items-center justify-center font-black text-xl shadow-md">
+                    {selectedOrganiser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black text-gray-900">{selectedOrganiser.name}</h4>
+                    <p className="text-sm font-semibold text-[#00873a]">{selectedOrganiser.organization || 'Independent Presenter'}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Slug: <code className="bg-gray-200 px-1.5 py-0.5 rounded text-gray-800">/organiser/{selectedOrganiser.slug}</code></p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  {selectedOrganiser.isVerified ? (
+                    <span className="bg-green-100 text-green-800 border border-green-300 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider inline-block">
+                      ✓ Authorised Organiser
+                    </span>
+                  ) : (
+                    <span className="bg-orange-100 text-orange-800 border border-orange-300 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider inline-block animate-pulse">
+                      ⏳ Pending Moderation
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Grid details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Work Email</span>
+                  <span className="font-semibold text-gray-900">{selectedOrganiser.user?.email || 'N/A'}</span>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Dashboard Username</span>
+                  <span className="font-semibold text-gray-900 font-mono">{selectedOrganiser.user?.username || 'N/A'}</span>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Website</span>
+                  {selectedOrganiser.website ? (
+                    <a 
+                      href={selectedOrganiser.website.startsWith('http') ? selectedOrganiser.website : `https://${selectedOrganiser.website}`} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="font-semibold text-blue-600 hover:underline break-all"
+                    >
+                      {selectedOrganiser.website} ↗
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">None provided</span>
+                  )}
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Founding Host Status</span>
+                  <span className="font-semibold text-amber-700">{selectedOrganiser.isFounding ? '⭐ Founding Privileges Enabled' : 'Standard Organiser'}</span>
+                </div>
+              </div>
+
+              {/* Full Bio / Experience */}
+              <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Background, Clinic & Experience Statement</span>
+                <p className="text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">
+                  {selectedOrganiser.bio || 'No detailed background provided.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Actions footer */}
+            <div className="flex flex-wrap justify-between items-center p-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedOrganiser(null)}
+                className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+              >
+                Close Dossier
+              </button>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleOrganiserDelete(selectedOrganiser.id, selectedOrganiser.name)}
+                  className="px-4 py-2 text-xs font-bold text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
+                >
+                  🗑️ Delete / Reject
+                </button>
+
+                {!selectedOrganiser.isVerified ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleOrganiserVerification(selectedOrganiser.id, true);
+                    }}
+                    className="px-5 py-2 text-xs font-black text-white bg-[#00873a] hover:bg-[#006818] rounded-lg shadow-md transition-colors flex items-center gap-1.5"
+                  >
+                    ✓ Authorise & Approve Host
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleOrganiserVerification(selectedOrganiser.id, false);
+                    }}
+                    className="px-4 py-2 text-xs font-bold text-orange-800 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors"
+                  >
+                    Revoke Verification
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -60,6 +60,18 @@ export async function POST(req: Request) {
       return user;
     });
 
+    try {
+      const { broadcastRealtimeEvent } = await import('@/lib/realtime');
+      broadcastRealtimeEvent({
+        type: 'organiser:applied',
+        name,
+        organization: organization || undefined,
+        email
+      });
+    } catch (e) {
+      console.warn('Realtime broadcast warning:', e);
+    }
+
     return NextResponse.json({ success: true, userId: newUser.id });
   } catch (err) {
     console.error('Registration Error:', err);
