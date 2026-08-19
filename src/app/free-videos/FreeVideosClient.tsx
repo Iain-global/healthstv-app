@@ -180,6 +180,35 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
     };
   }, [isPlaying, previewSeconds, hasFullAccess, isPaywallTriggered]);
 
+  // Generate secure player URL based on access level
+  const getVideoEmbedUrl = (rawUrl: string, hasAccess: boolean, playing: boolean) => {
+    if (!rawUrl) return "about:blank";
+    if (!hasAccess && !playing) return "about:blank";
+
+    // Full access: regular playback with full controls
+    if (hasAccess) {
+      return rawUrl;
+    }
+
+    // Preview mode: Disable internal timeline controls with no_ctrl=1 so users cannot scrub/skip ahead
+    let url = rawUrl;
+    if (url.includes("no_ctrl=")) {
+      url = url.replace(/no_ctrl=[^&]*/, "no_ctrl=1");
+    } else if (url.includes("?")) {
+      url += "&no_ctrl=1";
+    }
+
+    if (playing) {
+      if (url.includes("auto_play=")) {
+        url = url.replace(/auto_play=[^&]*/, "auto_play=1");
+      } else if (url.includes("?")) {
+        url += "&auto_play=1";
+      }
+    }
+
+    return url;
+  };
+
   // Handler to start the 30-second preview
   const startPreview = () => {
     setIsPlaying(true);
@@ -187,38 +216,96 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
 
   // Purchase / Unlock handler
   const handlePurchase = async () => {
-    if (!user) {
-      setIsPaywallTriggered(true);
-      return;
-    }
+    let currentUser = user;
 
-    if (!activeVideo.dbId) {
-      // Demo fallback video
-      setPurchasedIds(prev => [...prev, 999999]);
-      setPurchaseSuccess(true);
-      setIsPaywallTriggered(false);
-      setIsPlaying(true);
-      return;
+    // If user is not yet signed in, check if they entered an email in the quick form
+    if (!currentUser) {
+      if (!authEmail.trim()) {
+        setAuthError("Please enter your email to receive your pass and unlock.");
+        return;
+      }
+
+      setPurchaseLoading(true);
+      setAuthError("");
+
+      try {
+        // Attempt login or register
+        const authRes = await fetch(authMode === "signin" ? '/api/auth/login' : '/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: authName.trim() || authEmail.trim().split('@')[0],
+            email: authEmail.trim(),
+            password: authPassword.trim() || 'password'
+          })
+        });
+
+        const authData = await authRes.json();
+        if (!authRes.ok) {
+          // If already registered, try login with provided password
+          if (authData.error && authData.error.includes("already registered")) {
+            const fallbackLogin = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: authEmail.trim(),
+                password: authPassword.trim() || 'password'
+              })
+            });
+            const fbData = await fallbackLogin.json();
+            if (!fallbackLogin.ok) {
+              setAuthError(fbData.error || "Please enter your password to sign in and unlock.");
+              setPurchaseLoading(false);
+              return;
+            }
+          } else {
+            setAuthError(authData.error || "Authentication failed.");
+            setPurchaseLoading(false);
+            return;
+          }
+        }
+
+        // Re-fetch user session
+        const pRes = await fetch('/api/auth/update');
+        const pData = await pRes.json();
+        if (pData.success && pData.user) {
+          currentUser = pData.user;
+          setUser(pData.user);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('auth-change'));
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     setPurchaseLoading(true);
     try {
-      const res = await fetch('/api/videos/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId: activeVideo.dbId })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setPurchasedIds(prev => [...prev, activeVideo.dbId!]);
-        setPurchaseSuccess(true);
-        setTimeout(() => {
-          setIsPaywallTriggered(false);
-          setIsPlaying(true);
-        }, 1200);
+      if (activeVideo.dbId) {
+        const res = await fetch('/api/videos/purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoId: activeVideo.dbId })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setPurchasedIds(prev => [...prev, activeVideo.dbId!]);
+        } else if (!res.ok && !data.alreadyUnlocked) {
+          alert(data.error || 'Failed to complete unlock.');
+          setPurchaseLoading(false);
+          return;
+        }
       } else {
-        alert(data.error || 'Failed to complete purchase.');
+        // Fallback demo video
+        setPurchasedIds(prev => [...prev, 999999]);
       }
+
+      setPurchaseSuccess(true);
+      setTimeout(() => {
+        setIsPaywallTriggered(false);
+        setIsPlaying(true);
+      }, 1000);
     } catch (err) {
       console.error(err);
       alert('An unexpected error occurred.');
@@ -340,6 +427,30 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
               </div>
             )}
 
+            {/* 3. Interactive Scrubbing Guard (Shields timeline and prevents skipping during 30s preview) */}
+            {!hasFullAccess && isPlaying && !isPaywallTriggered && (
+              <div 
+                onClick={() => setIsPaywallTriggered(true)}
+                className="absolute bottom-0 left-0 right-0 h-16 z-30 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between px-4 text-xs text-white/90 cursor-pointer hover:bg-black/90 transition-colors select-none"
+                title="Timeline scrubbing is disabled during the 30s preview. Click to unlock full video."
+              >
+                <div className="flex items-center gap-2">
+                  <span className="bg-orange-500 text-white text-[0.65rem] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+                    🔒 Timeline Locked
+                  </span>
+                  <span className="text-[0.75rem] text-slate-200 hidden sm:inline">
+                    Seeking disabled during 30s preview
+                  </span>
+                </div>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setIsPaywallTriggered(true); }}
+                  className="bg-[#ea8125] hover:bg-[#d4701a] text-white text-xs font-bold px-3 py-1 rounded shadow transition-transform hover:scale-105"
+                >
+                  Unlock Full (£{activeVideo.price.toFixed(2)})
+                </button>
+              </div>
+            )}
+
             {/* 3. In-Player Paywall Overlay (When 30s preview expires) */}
             {isPaywallTriggered && (
               <div className="absolute inset-0 z-40 bg-[#0c1c10]/95 backdrop-blur-md p-6 sm:p-8 flex flex-col items-center justify-center text-center text-white overflow-y-auto">
@@ -393,6 +504,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                           </div>
 
                           <button
+                            type="button"
                             onClick={handlePurchase}
                             disabled={purchaseLoading}
                             className="w-full bg-[#ea8125] hover:bg-[#d4701a] text-white py-3 px-6 rounded-xl font-black text-base shadow-lg transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -401,6 +513,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                           </button>
 
                           <button
+                            type="button"
                             onClick={() => {
                               setPreviewSeconds(30);
                               setIsPaywallTriggered(false);
@@ -437,10 +550,17 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                             </div>
                           )}
 
-                          <form onSubmit={handleQuickAuth} className="space-y-2.5">
+                          {/* Developer Note */}
+                          <div className="bg-amber-500/15 border border-amber-400/30 text-amber-200 text-[0.7rem] px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 mb-3">
+                            <span className="font-black uppercase tracking-wider bg-amber-400 text-amber-950 px-1 py-0.5 rounded text-[0.55rem]">
+                              DEV NOTE
+                            </span>
+                            <span>TODO: Wire up live payments</span>
+                          </div>
+
+                          <form onSubmit={(e) => { e.preventDefault(); handlePurchase(); }} className="space-y-2.5">
                             {authMode === "register" && (
                               <input
-                                required
                                 type="text"
                                 placeholder="Your Name"
                                 value={authName}
@@ -457,9 +577,8 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
                               className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
                             />
                             <input
-                              required
                               type="password"
-                              placeholder="Password"
+                              placeholder={authMode === "register" ? "Password (optional for guest pass)" : "Password"}
                               value={authPassword}
                               onChange={e => setAuthPassword(e.target.value)}
                               className="w-full px-3 py-2 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:border-green-400"
@@ -467,10 +586,10 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
 
                             <button
                               type="submit"
-                              disabled={authLoading}
-                              className="w-full bg-[#00873a] hover:bg-[#00682d] text-white py-2.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-60"
+                              disabled={purchaseLoading || authLoading}
+                              className="w-full bg-[#ea8125] hover:bg-[#d4701a] text-white py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg"
                             >
-                              {authLoading ? "Authenticating..." : (authMode === "signin" ? "Sign In & Continue" : "Register & Continue")}
+                              {purchaseLoading || authLoading ? "Unlocking Access..." : `Pay £${activeVideo.price.toFixed(2)} to Unlock`}
                             </button>
                           </form>
                         </div>
@@ -485,7 +604,7 @@ export default function FreeVideosClient({ initialVideos = [] }: { initialVideos
             {/* Video Iframe Player */}
             <iframe 
               key={`${activeVideo.id}-${hasFullAccess ? 'full' : isPlaying ? 'playing' : 'paused'}`}
-              src={isPlaying || hasFullAccess ? activeVideo.videoSrc : "about:blank"}
+              src={getVideoEmbedUrl(activeVideo.videoSrc, hasFullAccess, isPlaying)}
               className="absolute top-0 left-0 w-full h-full border-none" 
               allow="autoplay; fullscreen; picture-in-picture" 
               allowFullScreen>
