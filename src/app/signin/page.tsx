@@ -66,7 +66,7 @@ export default function SignIn() {
                 type="email" 
                 id="email" 
                 name="email" 
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none transition-colors" 
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none transition-colors" 
                 placeholder="name@example.com" 
                 required 
               />
@@ -83,7 +83,7 @@ export default function SignIn() {
                 type="password" 
                 id="password" 
                 name="password" 
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none transition-colors" 
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none transition-colors" 
                 placeholder="••••••••" 
                 required 
               />

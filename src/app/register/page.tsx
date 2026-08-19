@@ -68,11 +68,11 @@ export default function Register() {
               backgroundPosition: "center"
             }}
           >
-            {/* Top: Founding Supplier Badge */}
+            {/* Top: Founder Member Badge */}
             <div className="flex justify-center mb-1">
               <Image 
-                src="/founding-supplier-badge.png" 
-                alt="HealthSummits.tv Founding Supplier" 
+                src="/founder-member-badge.png" 
+                alt="HealthSummits.tv Founder Member" 
                 width={130} 
                 height={130} 
                 className="w-28 h-28 object-contain drop-shadow-xl"
@@ -123,7 +123,7 @@ export default function Register() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="name">Full Name *</label>
                   <input 
                     type="text" id="name" name="name" 
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="Aiden Gallagher" required 
                   />
                 </div>
@@ -131,7 +131,7 @@ export default function Register() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="email">Email Address *</label>
                   <input 
                     type="email" id="email" name="email" 
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="aiden@example.com" required 
                   />
                 </div>
@@ -139,7 +139,7 @@ export default function Register() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="city">City</label>
                   <input 
                     type="text" id="city" name="city" 
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="London" 
                   />
                 </div>
@@ -147,7 +147,7 @@ export default function Register() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="telephone">Telephone Number</label>
                   <input 
                     type="tel" id="telephone" name="telephone" 
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="+44 7123 456789" 
                   />
                 </div>
@@ -155,7 +155,7 @@ export default function Register() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1" htmlFor="password">Password *</label>
                   <input 
                     type="password" id="password" name="password" 
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#006818] focus:ring-1 focus:ring-[#006818] outline-none text-sm" 
                     placeholder="••••••••" required 
                   />
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function OrganiserRegisterClient() {
@@ -64,8 +65,15 @@ export default function OrganiserRegisterClient() {
           {/* Left Column: Privileges Card */}
           <div className="lg:w-1/3">
             <div className="bg-[#1f2e22] text-white p-8 rounded-3xl shadow-xl h-full border border-[#2d4031]">
-              <div className="bg-white/10 w-24 h-24 rounded-full flex items-center justify-center mb-8 mx-auto border-4 border-[#00873a]/30">
-                <span className="text-4xl">🏥</span>
+              <div className="flex justify-center mb-6">
+                <Image 
+                  src="/founding-supplier-badge.png" 
+                  alt="Founding Supplier" 
+                  width={140} 
+                  height={140} 
+                  className="w-32 h-32 object-contain drop-shadow-2xl"
+                  priority
+                />
               </div>
               <h2 className="text-2xl font-black text-center mb-8">Founding Organiser Privileges</h2>
               
@@ -142,7 +150,7 @@ export default function OrganiserRegisterClient() {
                           value={formData.name}
                           onChange={e => setFormData({...formData, name: e.target.value})}
                           placeholder="e.g. Dr. Jane Doe"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
                       <div>
@@ -152,7 +160,7 @@ export default function OrganiserRegisterClient() {
                           value={formData.organization}
                           onChange={e => setFormData({...formData, organization: e.target.value})}
                           placeholder="e.g. Health Hub Inc."
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
                       
@@ -163,7 +171,7 @@ export default function OrganiserRegisterClient() {
                           value={formData.website}
                           onChange={e => setFormData({...formData, website: e.target.value})}
                           placeholder="https://"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
                       <div>
@@ -172,7 +180,7 @@ export default function OrganiserRegisterClient() {
                           required
                           value={formData.niche}
                           onChange={e => setFormData({...formData, niche: e.target.value})}
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none bg-white"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         >
                           <option value="">Select a Niche...</option>
                           <option value="Functional Medicine">Functional Medicine</option>
@@ -193,7 +201,7 @@ export default function OrganiserRegisterClient() {
                           value={formData.email}
                           onChange={e => setFormData({...formData, email: e.target.value})}
                           placeholder="sarah@wellnessinstitute.com"
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none"
                         />
                       </div>
 
@@ -205,7 +213,7 @@ export default function OrganiserRegisterClient() {
                           value={formData.bio}
                           onChange={e => setFormData({...formData, bio: e.target.value})}
                           placeholder="Tell us about your medical background, clinic, or previous events you've hosted..."
-                          className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none resize-none"
+                          className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 bg-white font-medium focus:border-[#00873a] focus:ring-1 focus:ring-[#00873a] outline-none resize-none"
                         ></textarea>
                       </div>
                     </div>
