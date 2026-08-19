@@ -1,7 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import SocialLoginModal from "@/components/SocialLoginModal";
 
 export default function Home() {
+  const [socialModal, setSocialModal] = useState<"google" | "facebook" | null>(null);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -32,7 +38,10 @@ export default function Home() {
               >
                 Register here to view!
               </Link>
-              <button className="bg-[#1877f2] hover:bg-[#166fe5] text-white px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm">
+              <button 
+                onClick={() => setSocialModal("facebook")}
+                className="bg-[#1877f2] hover:bg-[#166fe5] text-white px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm"
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
@@ -41,7 +50,10 @@ export default function Home() {
             </div>
             
             <div className="flex justify-center items-center mb-3">
-              <button className="bg-white hover:bg-gray-100 text-gray-800 px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm">
+              <button 
+                onClick={() => setSocialModal("google")}
+                className="bg-white hover:bg-gray-100 text-gray-800 px-6 py-3 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg transition-transform hover:-translate-y-0.5 text-sm"
+              >
                 <svg width="18" height="18" viewBox="0 0 48 48">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
                   <path fill="#4285F4" d="M46.5 24c0-1.61-.15-3.16-.42-4.69H24v9.09h12.75c-.53 2.64-2.01 4.88-4.21 6.39l6.53 5.07C42.9 36.27 46.5 30.73 46.5 24z"></path>
@@ -84,13 +96,19 @@ export default function Home() {
                 <Link href="/register" className="bg-[#006818] hover:bg-[#004d11] text-white px-6 py-3 rounded-lg font-bold shadow-md transition-colors text-center">
                   Register here to view!
                 </Link>
-                <button className="bg-[#1877f2] hover:bg-[#166fe5] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-sm transition-transform hover:-translate-y-0.5 text-sm">
+                <button 
+                  onClick={() => setSocialModal("facebook")}
+                  className="bg-[#1877f2] hover:bg-[#166fe5] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-sm transition-transform hover:-translate-y-0.5 text-sm"
+                >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                   Continue with Facebook
                 </button>
-                <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-sm transition-transform hover:-translate-y-0.5 text-sm">
+                <button 
+                  onClick={() => setSocialModal("google")}
+                  className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-sm transition-transform hover:-translate-y-0.5 text-sm"
+                >
                   <svg width="18" height="18" viewBox="0 0 48 48">
                     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
                     <path fill="#4285F4" d="M46.5 24c0-1.61-.15-3.16-.42-4.69H24v9.09h12.75c-.53 2.64-2.01 4.88-4.21 6.39l6.53 5.07C42.9 36.27 46.5 30.73 46.5 24z"></path>
@@ -221,6 +239,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Social Login Modal */}
+      <SocialLoginModal 
+        isOpen={socialModal !== null} 
+        onClose={() => setSocialModal(null)} 
+        provider={socialModal} 
+      />
     </div>
   );
 }
