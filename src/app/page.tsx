@@ -23,17 +23,8 @@ export default function Home() {
           <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-body">
             Stream live health summits, connect with leading wellness experts, and access a premium video library on demand.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <button className="bg-[#ea8125] hover:bg-[#d3701a] text-white px-8 py-3.5 rounded-lg font-bold text-lg shadow-[0_4px_14px_rgba(234,129,37,0.4)] transition-all hover:-translate-y-1 w-full sm:w-auto">
-              Claim Soft-Launch Access (£1/mo)
-            </button>
-            <Link href="/events" className="border-2 border-white text-white hover:bg-white hover:text-[#006818] px-8 py-3.5 rounded-lg font-bold text-lg transition-all w-full sm:w-auto text-center">
-              Secure Live Tickets
-            </Link>
-          </div>
-
           {/* Quick Registration & Social Login Options */}
-          <div className="mt-8 pt-6 border-t border-white/10 flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <div className="flex flex-wrap justify-center items-center gap-3 mb-3">
               <Link 
                 href="/register" 
