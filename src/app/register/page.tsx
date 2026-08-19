@@ -68,17 +68,20 @@ export default function Register() {
               backgroundPosition: "center"
             }}
           >
-            {/* Top spacer for background logo */}
-            <div className="h-12"></div>
+            {/* Top: Founding Supplier Badge */}
+            <div className="flex justify-center mb-1">
+              <Image 
+                src="/founding-supplier-badge.png" 
+                alt="HealthSummits.tv Founding Supplier" 
+                width={130} 
+                height={130} 
+                className="w-28 h-28 object-contain drop-shadow-xl"
+                priority
+              />
+            </div>
 
-            {/* Middle Section: Centered Soft Launch Badge & Offer Card */}
+            {/* Middle Section: Centered Offer Card */}
             <div className="my-auto flex flex-col items-center text-center">
-              <div className="mb-3">
-                <span className="bg-[#e77a25] text-white py-1 px-3.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md inline-block">
-                  Soft Launch 2026
-                </span>
-              </div>
-
               {/* Offer Image */}
               <div className="bg-white rounded-2xl p-4 shadow-2xl overflow-hidden border border-white/30 flex items-center justify-center w-full max-w-[280px]">
                 <Image 
