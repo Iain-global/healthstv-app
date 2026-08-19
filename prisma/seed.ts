@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { PrismaClient } from '../src/generated/prisma/client.ts'
+import { PrismaClient } from '../src/generated/prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
@@ -11,11 +11,44 @@ async function main() {
     update: { password: 'admin' },
     create: {
       email: 'admin@healthstv.com',
+      username: 'admin',
+      name: 'Platform Administrator',
       password: 'admin', // In a real app, this must be hashed!
       role: 'ADMIN',
     },
   })
   console.log('Created Admin:', admin.email)
+
+  // 1b. Create Test Regular Customer Users
+  const freeCustomer = await prisma.user.upsert({
+    where: { email: 'customer@example.com' },
+    update: { password: 'password', role: 'USER' },
+    create: {
+      email: 'customer@example.com',
+      username: 'customer',
+      name: 'Jane Doe',
+      password: 'password',
+      role: 'USER',
+      city: 'London',
+      country: 'United Kingdom',
+    },
+  })
+  console.log('Created Test Customer (Free User):', freeCustomer.email)
+
+  const payingCustomer = await prisma.user.upsert({
+    where: { email: 'subscriber@example.com' },
+    update: { password: 'password', role: 'USER' },
+    create: {
+      email: 'subscriber@example.com',
+      username: 'subscriber',
+      name: 'John Smith (Subscriber)',
+      password: 'password',
+      role: 'USER',
+      city: 'Manchester',
+      country: 'United Kingdom',
+    },
+  })
+  console.log('Created Test Customer (Paying Member):', payingCustomer.email)
 
   // 2. Create an Organiser (Dr. Sarah Jenkins)
   const sarahUser = await prisma.user.upsert({
@@ -98,8 +131,9 @@ async function main() {
     { name: "Jeanette Cole", org: "Herbal Health UK", slug: "jeanette-cole" }
   ];
 
+  const sarahOrgProfile = await prisma.organiserProfile.findUnique({ where: { slug: 'sarah-jenkins' } });
   const createdOrgs: Record<string, any> = {
-    'sarah-jenkins': sarahUser.organiserProfile ? sarahUser.organiserProfile[0] || (await prisma.organiserProfile.findUnique({where: {slug: 'sarah-jenkins'}})) : await prisma.organiserProfile.findUnique({where: {slug: 'sarah-jenkins'}})
+    'sarah-jenkins': sarahOrgProfile
   };
 
   for (const o of orgsData) {
@@ -193,7 +227,18 @@ async function main() {
       videoUrl: "https://play.webvideocore.net/popplayer.php?it=71l483wh19ss&is_link=1&w=720&h=405&pause=1",
       category: "Natural Medicine",
       isFree: true,
+      price: 0.00,
       organiserId: createdOrgs['jeanette-cole'].id
+    },
+    {
+      title: "Advanced Metabolic & Mitochondrial Masterclass (PPV)",
+      description: "Exclusive deep-dive lecture exploring mitochondrial dynamics, NAD+ metabolism, and fasting protocols for metabolic longevity.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800",
+      videoUrl: "https://play.webvideocore.net/popplayer.php?it=g5tf7vci5y8g&is_link=1&w=720&h=405&pause=1",
+      category: "Functional Medicine",
+      isFree: false,
+      price: 4.99,
+      organiserId: createdOrgs['sarah-jenkins'].id
     }
   ];
 

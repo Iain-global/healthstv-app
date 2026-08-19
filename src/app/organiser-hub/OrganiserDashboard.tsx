@@ -16,7 +16,7 @@ export default function OrganiserDashboard() {
   // Modals state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
-  const [newVideoForm, setNewVideoForm] = useState({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '' });
+  const [newVideoForm, setNewVideoForm] = useState({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '', isFree: true, price: '4.99' });
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [newEventForm, setNewEventForm] = useState({ title: '', format: 'Virtual Summit', description: '', date: '', price: '0', ticketingMethod: 'Internal Platform', ticketUrl: '', livestreamUrl: '', imageUrl: '' });
@@ -39,10 +39,19 @@ export default function OrganiserDashboard() {
   const submitVideo = async (e: React.FormEvent) => {
     e.preventDefault();
     const isEdit = editingVideoId !== null;
+    const payload = {
+      title: newVideoForm.title,
+      description: newVideoForm.description,
+      thumbnailUrl: newVideoForm.thumbnailUrl,
+      videoUrl: newVideoForm.videoUrl,
+      category: newVideoForm.category,
+      isFree: newVideoForm.isFree,
+      price: newVideoForm.isFree ? 0 : (parseFloat(newVideoForm.price) || 0)
+    };
     const res = await fetch('/api/organiser/videos', {
       method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(isEdit ? { id: editingVideoId, ...newVideoForm } : newVideoForm)
+      body: JSON.stringify(isEdit ? { id: editingVideoId, ...payload } : payload)
     });
     if (res.ok) {
       const saved = await res.json();
@@ -57,7 +66,7 @@ export default function OrganiserDashboard() {
       }
       setIsVideoModalOpen(false);
       setEditingVideoId(null);
-      setNewVideoForm({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '' });
+      setNewVideoForm({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '', isFree: true, price: '4.99' });
     }
   };
 
@@ -71,11 +80,13 @@ export default function OrganiserDashboard() {
         description: dataToEdit.description || '',
         thumbnailUrl: dataToEdit.thumbnailUrl || '',
         videoUrl: dataToEdit.videoUrl || '',
-        category: dataToEdit.category || ''
+        category: dataToEdit.category || '',
+        isFree: dataToEdit.isFree !== undefined ? Boolean(dataToEdit.isFree) : true,
+        price: dataToEdit.price !== undefined ? dataToEdit.price.toString() : '4.99'
       });
     } else {
       setEditingVideoId(null);
-      setNewVideoForm({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '' });
+      setNewVideoForm({ title: '', description: '', thumbnailUrl: '', videoUrl: '', category: '', isFree: true, price: '4.99' });
     }
     setIsVideoModalOpen(true);
   };
@@ -320,6 +331,7 @@ export default function OrganiserDashboard() {
               <thead>
                 <tr className="bg-white border-b border-gray-200">
                   <th className="py-4 px-6 font-bold text-gray-600">VIDEO SESSION</th>
+                  <th className="py-4 px-6 font-bold text-gray-600">ACCESS & PRICING</th>
                   <th className="py-4 px-6 font-bold text-gray-600">CATEGORY</th>
                   <th className="py-4 px-6 font-bold text-gray-600">SUBMITTED</th>
                   <th className="py-4 px-6 font-bold text-gray-600">MODERATION STATUS</th>
@@ -331,6 +343,17 @@ export default function OrganiserDashboard() {
                   <tr key={vid.id} className="hover:bg-gray-50">
                     <td className="py-4 px-6">
                       <div className="font-bold text-[#1f2e22] text-base">{vid.title}</div>
+                    </td>
+                    <td className="py-4 px-6">
+                      {vid.isFree ? (
+                        <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+                          🟢 Free Access
+                        </span>
+                      ) : (
+                        <span className="text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+                          🔒 PPV (£{Number(vid.price || 0).toFixed(2)})
+                        </span>
+                      )}
                     </td>
                     <td className="py-4 px-6">
                       <span className="text-[#00873a] bg-[#00873a]/10 px-2 py-1 rounded-full text-xs font-bold">
@@ -359,7 +382,7 @@ export default function OrganiserDashboard() {
                 ))}
                 {videos.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-gray-500 bg-gray-50">
+                    <td colSpan={6} className="py-8 text-center text-gray-500 bg-gray-50">
                       No videos found. Upload a video session to submit it for moderation.
                     </td>
                   </tr>
@@ -384,37 +407,94 @@ export default function OrganiserDashboard() {
       {/* Upload Video Modal */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div className="bg-[#1f2e22] px-6 py-4 flex justify-between items-center text-white">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="bg-[#1f2e22] px-6 py-4 flex justify-between items-center text-white sticky top-0 z-10">
               <h3 className="font-bold text-lg">{editingVideoId ? 'Edit Video Session' : 'Upload Video Session'}</h3>
               <button onClick={() => {setIsVideoModalOpen(false); setEditingVideoId(null);}} className="text-white hover:text-gray-300">✕</button>
             </div>
             <form onSubmit={submitVideo} className="p-4 md:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Video Title</label>
-                <input required type="text" value={newVideoForm.title} onChange={e => setNewVideoForm({...newVideoForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                <input required type="text" value={newVideoForm.title} onChange={e => setNewVideoForm({...newVideoForm, title: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
               </div>
+
+              {/* Access & Monetization Mode */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Access & Monetization Type</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className={`cursor-pointer border rounded-xl p-3.5 flex items-center gap-3 transition-all ${newVideoForm.isFree ? 'border-[#00873a] bg-green-50/60 ring-2 ring-[#00873a]/30' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <input 
+                      type="radio" 
+                      name="accessType" 
+                      checked={newVideoForm.isFree} 
+                      onChange={() => setNewVideoForm({ ...newVideoForm, isFree: true })} 
+                      className="text-[#00873a] focus:ring-[#00873a]" 
+                    />
+                    <div>
+                      <div className="font-bold text-sm text-[#1f2e22]">🟢 Free Access</div>
+                      <div className="text-xs text-gray-500">Publicly available to all viewers</div>
+                    </div>
+                  </label>
+                  <label className={`cursor-pointer border rounded-xl p-3.5 flex items-center gap-3 transition-all ${!newVideoForm.isFree ? 'border-[#ea8125] bg-orange-50/60 ring-2 ring-[#ea8125]/30' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <input 
+                      type="radio" 
+                      name="accessType" 
+                      checked={!newVideoForm.isFree} 
+                      onChange={() => setNewVideoForm({ ...newVideoForm, isFree: false })} 
+                      className="text-[#ea8125] focus:ring-[#ea8125]" 
+                    />
+                    <div>
+                      <div className="font-bold text-sm text-[#1f2e22]">🔒 Pay-Per-View (PPV)</div>
+                      <div className="text-xs text-gray-500">30s preview then paywall</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Price input when PPV is selected */}
+              {!newVideoForm.isFree && (
+                <div className="bg-orange-50/80 border border-orange-200 rounded-xl p-4">
+                  <label className="block text-sm font-bold text-orange-950 mb-1.5">Set PPV Ticket Price (£ GBP)</label>
+                  <div className="relative max-w-xs">
+                    <span className="absolute left-3.5 top-2 font-bold text-gray-500">£</span>
+                    <input 
+                      required 
+                      type="number" 
+                      step="0.01" 
+                      min="0.50" 
+                      placeholder="4.99" 
+                      value={newVideoForm.price} 
+                      onChange={e => setNewVideoForm({ ...newVideoForm, price: e.target.value })} 
+                      className="w-full pl-8 pr-4 py-2 border border-orange-300 bg-white rounded-lg focus:ring-2 focus:ring-[#ea8125] outline-none font-bold text-gray-900" 
+                    />
+                  </div>
+                  <p className="text-xs text-orange-800 mt-2">
+                    💡 Viewers can watch a <strong>30-second teaser</strong> before the in-player paywall prompts them to unlock the full session.
+                  </p>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
-                  <input required type="text" placeholder="e.g. Longevity, Nutrition" value={newVideoForm.category} onChange={e => setNewVideoForm({...newVideoForm, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                  <input required type="text" placeholder="e.g. Longevity, Nutrition" value={newVideoForm.category} onChange={e => setNewVideoForm({...newVideoForm, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Thumbnail URL</label>
-                  <input type="text" placeholder="https://..." value={newVideoForm.thumbnailUrl} onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                  <input type="text" placeholder="https://..." value={newVideoForm.thumbnailUrl} onChange={e => setNewVideoForm({...newVideoForm, thumbnailUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Direct Video URL (.mp4)</label>
-                <input required type="text" placeholder="https://..." value={newVideoForm.videoUrl} onChange={e => setNewVideoForm({...newVideoForm, videoUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Direct Video URL (.mp4 or Embed)</label>
+                <input required type="text" placeholder="https://..." value={newVideoForm.videoUrl} onChange={e => setNewVideoForm({...newVideoForm, videoUrl: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#00873a] outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                <textarea rows={3} value={newVideoForm.description} onChange={e => setNewVideoForm({...newVideoForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none"></textarea>
+                <textarea rows={3} value={newVideoForm.description} onChange={e => setNewVideoForm({...newVideoForm, description: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:ring-1 focus:ring-[#00873a] outline-none"></textarea>
               </div>
-              <div className="pt-4 flex justify-end gap-3">
+              <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
                 <button type="button" onClick={() => {setIsVideoModalOpen(false); setEditingVideoId(null);}} className="px-4 py-2 text-gray-600 font-bold hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-[#00873a] text-white font-bold rounded-lg hover:bg-[#00682d]">{editingVideoId ? 'Save Changes' : 'Submit for Moderation'}</button>
+                <button type="submit" className="px-5 py-2.5 bg-[#00873a] text-white font-bold rounded-lg hover:bg-[#00682d] shadow-sm transition-colors">{editingVideoId ? 'Save Changes' : 'Submit for Moderation'}</button>
               </div>
             </form>
           </div>

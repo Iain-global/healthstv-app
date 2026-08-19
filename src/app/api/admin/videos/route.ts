@@ -25,11 +25,14 @@ export async function POST(request: Request) {
     
     // Otherwise it's a create
     if (!data.id) {
+      const isFree = data.isFree !== undefined ? Boolean(data.isFree) : true;
+      const price = !isFree && data.price ? parseFloat(data.price) : 0;
       const video = await prisma.video.create({
         data: {
           title: data.title,
           category: data.category,
-          isFree: data.isFree,
+          isFree,
+          price,
           videoUrl: data.videoUrl,
           thumbnailUrl: data.thumbnailUrl,
           description: data.description || "",
@@ -54,12 +57,15 @@ export async function PUT(request: Request) {
     const data = await request.json();
     
     if (data.id) {
+      const isFree = data.isFree !== undefined ? Boolean(data.isFree) : undefined;
+      const price = data.price !== undefined ? (isFree === false ? parseFloat(data.price) : 0) : undefined;
       const video = await prisma.video.update({
         where: { id: data.id },
         data: {
           title: data.title,
           category: data.category,
-          isFree: data.isFree,
+          ...(isFree !== undefined ? { isFree } : {}),
+          ...(price !== undefined ? { price } : {}),
           videoUrl: data.videoUrl,
           thumbnailUrl: data.thumbnailUrl,
           description: data.description,

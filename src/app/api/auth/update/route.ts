@@ -63,6 +63,12 @@ export async function GET(req: Request) {
         city: true,
         postcode: true,
         country: true,
+        isSubscriber: true,
+        videoPurchases: {
+          select: {
+            videoId: true,
+          }
+        }
       }
     });
 
@@ -70,7 +76,15 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, user });
+    const purchasedVideoIds = user.videoPurchases.map(vp => vp.videoId);
+
+    return NextResponse.json({ 
+      success: true, 
+      user: {
+        ...user,
+        purchasedVideoIds
+      } 
+    });
   } catch (error) {
     console.error('Fetch User Error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
