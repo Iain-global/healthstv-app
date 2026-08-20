@@ -69,12 +69,6 @@ export default function Header() {
               <Link href="/events" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 🇬🇧 UK Events & Tickets
               </Link>
-              <Link href="/player" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                🎟️ Live Event Player (PIN)
-              </Link>
-              <Link href="/summit" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                🎬 Human Garage Summit Menu
-              </Link>
               <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 👥 Organisers - Suppliers - Speakers
               </Link>
@@ -170,8 +164,6 @@ export default function Header() {
               {mobileViewersOpen && (
                 <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
                   <Link onClick={() => setMobileMenuOpen(false)} href="/events" className="text-[0.95rem] text-[#1f2e22]">🇬🇧 UK Events & Tickets</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="text-[0.95rem] text-[#1f2e22]">🎟️ Live Event Player</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/summit" className="text-[0.95rem] text-[#1f2e22]">🎬 Human Garage Summit Menu</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">👥 Organisers - Suppliers - Speakers</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/free-videos" className="text-[0.95rem] text-[#1f2e22]">📺 Free Video Vault</Link>
                 </div>
