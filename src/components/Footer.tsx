@@ -59,6 +59,7 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-[1.1rem] text-[#0c1c10] mb-5">For Organisers</h4>
             <ul className="space-y-3">
+              <li><Link href="/founder-members" className="text-[#ea8125] font-bold hover:text-[#d3701a] transition-colors">Founder Members Offer (£0)</Link></li>
               <li><Link href="/organiser-register" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Become an Organiser</Link></li>
               <li><Link href="/organiser-register#roadmap" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Roadmap</Link></li>
               <li><Link href="/organiser-register#packages" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Livestream Packages</Link></li>
