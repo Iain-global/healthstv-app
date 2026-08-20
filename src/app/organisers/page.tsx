@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Summit Organisers & Portals | HealthSummits.tv",
-  description: "Browse verified wellness summit organisers, view upcoming virtual summits, and access interactive video menus."
+  title: "Organisers - Suppliers - Speakers | HealthSummits.tv",
+  description: "Browse verified wellness summit organisers, industry suppliers, and keynote speakers."
 };
 
 export default async function OrganisersIndexPage() {
@@ -61,64 +61,30 @@ export default async function OrganisersIndexPage() {
       <div className="bg-[#1f2e22] text-white py-16 px-4">
         <div className="container mx-auto max-w-6xl text-center">
           <span className="bg-[#00873a] text-white text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider inline-block mb-3">
-            Platform Organisers
+            Platform Directory
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-4">
-            Summit Organisers & Delegate Portals
+            Organisers - Suppliers - Speakers
           </h1>
           <p className="text-gray-300 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-            Explore dedicated portals for each summit organiser. Access delegate interactive video menus, upcoming virtual events, and free video vault lectures.
+            Explore dedicated portals for organisers, industry suppliers, and keynote speakers. Access delegate interactive video menus, upcoming virtual events, and free video vault lectures.
           </p>
         </div>
       </div>
 
       <div className="container mx-auto max-w-6xl px-4 mt-12">
-        {/* Featured Human Garage Interactive Presentation Banner */}
-        <div className="bg-gradient-to-br from-[#0c1a11] via-[#132c1c] to-[#0a1f13] border-2 border-[#00873a]/40 rounded-3xl p-8 md:p-10 text-white shadow-[0_15px_40px_rgba(0,104,24,0.18)] mb-12 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#00873a]/15 rounded-full blur-3xl pointer-events-none"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 bg-[#00873a]/30 border border-[#00873a]/50 text-[#86efac] text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider mb-4">
-                <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse"></span>
-                Featured Delegate Summit Experience
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black mb-3 text-white">
-                Human Garage 5-Day Summit Portal
-              </h2>
-              <p className="text-slate-300 text-base leading-relaxed mb-6">
-                Launch the interactive video presentation allowing delegates to browse scene selections, keynote lectures, hands-on fascia therapy workshops, and cinematic 4K player.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/summit"
-                  className="inline-flex items-center gap-3 bg-[#ea8125] hover:bg-[#d3701a] text-white px-8 py-4 rounded-xl text-lg font-black shadow-[0_6px_25px_rgba(234,129,37,0.45)] transition-all hover:scale-[1.02] active:scale-[0.98] border border-orange-300/30"
-                >
-                  <span>🎬</span>
-                  <span>Human Garage</span>
-                  <span className="text-xs bg-black/30 px-2 py-0.5 rounded font-bold ml-1">Launch Menu</span>
-                </Link>
-                <Link
-                  href="/organiser/human-garage"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-4 rounded-xl text-base font-bold border border-white/20 transition-all"
-                >
-                  <span>👤 View Organiser Page</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="hidden lg:flex flex-col items-center justify-center p-6 bg-white/5 border border-white/10 rounded-2xl text-center">
-              <div className="text-5xl mb-2">⚡</div>
-              <div className="text-lg font-black text-white">Interactive Menu</div>
-              <div className="text-xs text-slate-400 mt-1">Delegates Scene Selection</div>
-            </div>
+        {/* All Organisers Grid */}
+        <div className="flex items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black text-[#1f2e22] flex items-center gap-2.5">
+              <span>👥</span>
+              <span>Verified Hosts, Suppliers & Speakers</span>
+            </h2>
+            <p className="text-gray-500 text-sm mt-1">
+              Select any profile below to access their official delegate portal and video sessions.
+            </p>
           </div>
         </div>
-
-        {/* All Organisers Grid */}
-        <h2 className="text-2xl font-black text-[#1f2e22] mb-6 flex items-center gap-2">
-          <span>👥</span> Verified Summit Hosts & Organisers
-        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {organisers.map((org) => (

@@ -76,7 +76,7 @@ export default function Header() {
                 🎬 Human Garage Summit Menu
               </Link>
               <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                👥 Summit Organisers & Portals
+                👥 Organisers - Suppliers - Speakers
               </Link>
               <Link href="/free-videos" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 📺 Free Video Vault
@@ -102,7 +102,7 @@ export default function Header() {
                 Organiser Dashboard
               </Link>
               <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                Organisers Directory
+                Organisers, Suppliers & Speakers
               </Link>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function Header() {
                   <Link onClick={() => setMobileMenuOpen(false)} href="/events" className="text-[0.95rem] text-[#1f2e22]">🇬🇧 UK Events & Tickets</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="text-[0.95rem] text-[#1f2e22]">🎟️ Live Event Player</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/summit" className="text-[0.95rem] text-[#1f2e22]">🎬 Human Garage Summit Menu</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">👥 Summit Organisers & Portals</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">👥 Organisers - Suppliers - Speakers</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/free-videos" className="text-[0.95rem] text-[#1f2e22]">📺 Free Video Vault</Link>
                 </div>
               )}
@@ -194,7 +194,7 @@ export default function Header() {
                 <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-register" className="text-[0.95rem] text-[#1f2e22]">Register as Organiser</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-hub" className="text-[0.95rem] text-[#1f2e22]">Organiser Dashboard</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">Organisers Directory</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">Organisers, Suppliers & Speakers</Link>
                 </div>
               )}
             </div>
