@@ -65,15 +65,21 @@ export default function Header() {
             <div className="font-semibold text-[0.95rem] text-[#1f2e22] hover:text-[#006818] transition-colors py-2 flex items-center gap-1">
               For Viewers <span className="text-[0.7rem]">▼</span>
             </div>
-            <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[#e0e8e2] rounded-lg shadow-[0_12px_35px_rgba(0,30,10,0.14)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50 py-2">
+            <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-[#e0e8e2] rounded-lg shadow-[0_12px_35px_rgba(0,30,10,0.14)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50 py-2">
               <Link href="/events" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 🇬🇧 UK Events & Tickets
               </Link>
               <Link href="/player" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 🎟️ Live Event Player (PIN)
               </Link>
+              <Link href="/summit" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
+                🎬 Human Garage Summit Menu
+              </Link>
+              <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
+                👥 Summit Organisers & Portals
+              </Link>
               <Link href="/free-videos" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                🎬 Free Video Vault
+                📺 Free Video Vault
               </Link>
             </div>
           </div>
@@ -88,12 +94,15 @@ export default function Header() {
             <div className="font-semibold text-[0.95rem] text-[#1f2e22] hover:text-[#006818] transition-colors py-2 flex items-center gap-1">
               For Organisers <span className="text-[0.7rem]">▼</span>
             </div>
-            <div className="absolute top-full left-0 mt-2 w-60 bg-white border border-[#e0e8e2] rounded-lg shadow-[0_12px_35px_rgba(0,30,10,0.14)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50 py-2">
+            <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[#e0e8e2] rounded-lg shadow-[0_12px_35px_rgba(0,30,10,0.14)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50 py-2">
               <Link href="/organiser-register" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 Register as Organiser
               </Link>
               <Link href="/organiser-hub" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 Organiser Dashboard
+              </Link>
+              <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
+                Organisers Directory
               </Link>
             </div>
           </div>
@@ -162,7 +171,9 @@ export default function Header() {
                 <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
                   <Link onClick={() => setMobileMenuOpen(false)} href="/events" className="text-[0.95rem] text-[#1f2e22]">🇬🇧 UK Events & Tickets</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="text-[0.95rem] text-[#1f2e22]">🎟️ Live Event Player</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/free-videos" className="text-[0.95rem] text-[#1f2e22]">🎬 Free Video Vault</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/summit" className="text-[0.95rem] text-[#1f2e22]">🎬 Human Garage Summit Menu</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">👥 Summit Organisers & Portals</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/free-videos" className="text-[0.95rem] text-[#1f2e22]">📺 Free Video Vault</Link>
                 </div>
               )}
             </div>
@@ -183,6 +194,7 @@ export default function Header() {
                 <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-register" className="text-[0.95rem] text-[#1f2e22]">Register as Organiser</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-hub" className="text-[0.95rem] text-[#1f2e22]">Organiser Dashboard</Link>
+                  <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">Organisers Directory</Link>
                 </div>
               )}
             </div>
