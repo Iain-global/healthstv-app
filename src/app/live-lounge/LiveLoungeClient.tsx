@@ -408,7 +408,9 @@ export default function LiveLoungeClient() {
       // Add local media tracks if available
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach((track) => {
-          pc.addTrack(track, localStreamRef.current!);
+          try {
+            pc.addTrack(track, localStreamRef.current!);
+          } catch (e) {}
         });
       }
 
@@ -419,6 +421,12 @@ export default function LiveLoungeClient() {
           setPeerStreams((prev) => ({
             ...prev,
             [remoteSocketId]: event.streams[0],
+          }));
+        } else if (event.track) {
+          const fallbackStream = new MediaStream([event.track]);
+          setPeerStreams((prev) => ({
+            ...prev,
+            [remoteSocketId]: fallbackStream,
           }));
         }
       };
@@ -677,41 +685,67 @@ export default function LiveLoungeClient() {
   const [newTableTopic, setNewTableTopic] = useState("");
   const [newTableCapacity, setNewTableCapacity] = useState<2 | 4 | 6 | 8>(6);
 
+  // Dynamic attachment of local video stream when modal mounts or camera state updates
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+      localVideoRef.current
+        .play()
+        .catch((e) => console.warn("Local video play catch:", e));
+    }
+  }, [localStream, joinedTableId, isCamMuted]);
+
   // Start Camera & Mic
   const startCamera = async () => {
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        let stream: MediaStream;
+        let stream: MediaStream | null = null;
         try {
           stream = await navigator.mediaDevices.getUserMedia({
             video: { width: { ideal: 1280 }, height: { ideal: 720 } },
             audio: true,
           });
-        } catch (mediaErr) {
-          console.warn("Falling back to video or audio:", mediaErr);
+        } catch (err1) {
+          console.warn("Retrying standard video/audio...", err1);
           try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          } catch (vErr) {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          } catch (err2) {
+            console.warn("Retrying video only...", err2);
+            try {
+              stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            } catch (err3) {
+              console.warn("Retrying audio only...", err3);
+              stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
           }
         }
 
-        setLocalStream(stream);
-        localStreamRef.current = stream;
-        setHasPermission(true);
+        if (stream) {
+          const hasVideo = stream.getVideoTracks().length > 0;
+          const hasAudio = stream.getAudioTracks().length > 0;
 
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
+          setLocalStream(stream);
+          localStreamRef.current = stream;
+          setIsCamMuted(!hasVideo);
+          setIsMicMuted(!hasAudio);
+          setHasPermission(true);
 
-        // Add tracks to any existing peer connections
-        Object.values(peerConnections.current).forEach((pc) => {
-          stream.getTracks().forEach((track) => {
-            pc.addTrack(track, stream);
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
+            localVideoRef.current.play().catch(() => {});
+          }
+
+          // Add tracks to any existing peer connections
+          Object.values(peerConnections.current).forEach((pc) => {
+            stream!.getTracks().forEach((track) => {
+              try {
+                pc.addTrack(track, stream!);
+              } catch (e) {}
+            });
           });
-        });
 
-        return stream;
+          return stream;
+        }
       }
     } catch (err: any) {
       console.warn("Could not access webcam/mic", err);
@@ -742,13 +776,49 @@ export default function LiveLoungeClient() {
   };
 
   // Toggle Cam
-  const toggleCam = () => {
-    if (localStream) {
-      localStream.getVideoTracks().forEach((track) => {
-        track.enabled = isCamMuted;
-      });
+  const toggleCam = async () => {
+    if (!localStream || localStream.getVideoTracks().length === 0) {
+      // If no video track exists yet, request webcam track
+      try {
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const videoTrack = videoStream.getVideoTracks()[0];
+
+        let newStream: MediaStream;
+        if (localStream) {
+          localStream.addTrack(videoTrack);
+          newStream = localStream;
+        } else {
+          newStream = videoStream;
+        }
+
+        setLocalStream(newStream);
+        localStreamRef.current = newStream;
+        setIsCamMuted(false);
+
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = newStream;
+          localVideoRef.current.play().catch(() => {});
+        }
+
+        // Add track to existing peer connections
+        Object.values(peerConnections.current).forEach((pc) => {
+          try {
+            pc.addTrack(videoTrack, newStream);
+          } catch (e) {}
+        });
+      } catch (e) {
+        console.warn("Could not start camera on toggle:", e);
+        alert("Camera permission denied or camera device in use by another app.");
+      }
+      return;
     }
-    setIsCamMuted(!isCamMuted);
+
+    const videoTracks = localStream.getVideoTracks();
+    const willBeMuted = !isCamMuted;
+    videoTracks.forEach((track) => {
+      track.enabled = !willBeMuted;
+    });
+    setIsCamMuted(willBeMuted);
   };
 
   // Screen Share
@@ -1565,20 +1635,31 @@ export default function LiveLoungeClient() {
                     autoPlay
                     muted
                     playsInline
-                    className={`w-full h-full object-cover ${isCamMuted ? "hidden" : "block"}`}
+                    className={`w-full h-full object-cover ${isCamMuted || !localStream ? "hidden" : "block"}`}
                   />
-                  {isCamMuted && (
-                    <div className="w-16 h-16 rounded-full bg-emerald-700/60 border-2 border-emerald-400 flex items-center justify-center text-white text-xl font-bold">
-                      ME
+                  {(isCamMuted || !localStream) && (
+                    <div className="flex flex-col items-center justify-center text-center p-4">
+                      <div className="w-14 h-14 rounded-full bg-emerald-800/80 border-2 border-emerald-400 flex items-center justify-center text-white text-lg font-bold mb-2 shadow-lg">
+                        ME
+                      </div>
+                      <span className="text-xs font-bold text-slate-300">Camera is Muted</span>
+                      <button
+                        onClick={toggleCam}
+                        className="mt-2 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[0.7rem] font-bold rounded-lg transition-colors cursor-pointer shadow"
+                      >
+                        Turn Camera On
+                      </button>
                     </div>
                   )}
 
-                  <div className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1.5">
+                  <div className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1.5 z-10">
                     <span className="text-xs font-bold text-white">You</span>
-                    <span className="text-[0.65rem] text-emerald-400 font-semibold">• Live Cam</span>
+                    <span className="text-[0.65rem] text-emerald-400 font-semibold">
+                      {isCamMuted || !localStream ? "• Cam Muted" : "• Live Cam"}
+                    </span>
                   </div>
 
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
                     {isMicMuted && (
                       <span className="p-1 rounded bg-red-500/80 text-white text-xs">
                         <MicOff className="w-3.5 h-3.5" />
