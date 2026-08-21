@@ -132,12 +132,12 @@ const INITIAL_TABLES: LoungeTable[] = [
     id: 1,
     floor: 1,
     number: "01",
-    title: "Cellular Longevity & NAD+ Therapy",
-    topic: "Mitochondrial regeneration, rapamycin protocols & fasting windows",
+    title: "The Live Lounge",
+    topic: "Open interactive video networking for health specialists & delegates",
     capacity: 6,
-    tag: "Clinical Discussion",
+    tag: "Live Lounge",
     tagColor: "emerald",
-    hostName: "Dr. Sarah Jenkins",
+    hostName: "HSTV",
     seatedUsers: [],
   },
   {
@@ -1467,12 +1467,12 @@ export default function LiveLoungeClient() {
           {/* In-Table Top Bar */}
           <div className="h-16 px-6 bg-[#0c1419] border-b border-white/10 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-black uppercase bg-[#00a86b] text-white px-2.5 py-1 rounded">
+              <span className="text-xs font-black uppercase bg-red-600 text-white px-2.5 py-1 rounded shadow">
                 TABLE {currentJoinedTable.number}
               </span>
               <div>
-                <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
-                  {currentJoinedTable.title}
+                <h2 className="text-sm sm:text-base font-black text-red-500 tracking-wide leading-tight">
+                  The Live Lounge
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[0.7rem] text-slate-400 hidden sm:inline">

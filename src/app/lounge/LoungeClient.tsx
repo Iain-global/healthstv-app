@@ -335,11 +335,11 @@ export default function LoungeClient() {
         <div className={`lounge-table-card ${activeTableId === 1 ? 'border-[#00a469] shadow-[0_0_20px_rgba(0,164,105,0.1)]' : ''}`} id="table-1">
           <div className="table-card-header">
             <div className="table-info">
-              <span className="table-number">TABLE 01</span>
-              <h3 className="table-title">Cellular Longevity & NAD+</h3>
-              <span className="table-topic">Mitochondrial Health & Fasting</span>
+              <span className="table-number bg-red-600 text-white">TABLE 01</span>
+              <h3 className="table-title text-red-500 font-bold">The Live Lounge</h3>
+              <span className="table-topic">Live interactive video networking</span>
             </div>
-            <div className="table-capacity">👥 {activeTableId === 1 ? `${Object.keys(peerStreams).length + 1}/6` : '2/6'}</div>
+            <div className="table-capacity">👥 {activeTableId === 1 ? `${Object.keys(peerStreams).length + 1}/6` : '0/6'}</div>
           </div>
           
           <div className="table-arena">
