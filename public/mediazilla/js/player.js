@@ -22,25 +22,31 @@ export function renderVideoPlayer(container, options) {
       title: video.title || '' 
     });
     container.innerHTML = `
-      <div class="cinema-player-wrapper" id="player-wrapper" style="position: absolute; inset: 0; background: #000000; z-index: 100;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 120; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); pointer-events: none;">
-          <button id="btn-back-menu" class="back-to-menu-btn" style="pointer-events: auto;">
-            ${getIcon('arrowLeft', 16)}
+      <div class="cinema-player-wrapper" id="player-wrapper" style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1rem;">
+        
+        <!-- Header Controls (Max width matching player) -->
+        <div style="width: 100%; max-width: 820px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; z-index: 120;">
+          <button id="btn-back-menu" class="back-to-menu-btn" style="pointer-events: auto; cursor: pointer; padding: 0.5rem 1rem; font-size: 0.8rem;">
+            ${getIcon('arrowLeft', 15)}
             <span>Back to Menu</span>
           </button>
-          <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.35rem 0.85rem; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.18); font-size: 0.75rem; color: #fbbf24; font-weight: 700;">
-            <span>StreamingVideoProvider • ${video.title}</span>
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.35rem 0.9rem; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.18); font-size: 0.8rem; color: #fbbf24; font-weight: 700;">
+            <span>${video.title}</span>
           </div>
         </div>
-        <iframe
-          src="${svpSrc}"
-          width="100%"
-          height="100%"
-          frameborder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-          style="width: 100%; height: 100%; border: none; background: #000000;"
-        ></iframe>
+
+        <!-- Sized Cinema Screen Container (16:9 widescreen, compact 820px) -->
+        <div class="compact-video-frame" style="width: 100%; max-width: 820px; aspect-ratio: 16 / 9; max-height: calc(100vh - 140px); background: #000000; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.15); position: relative;">
+          <iframe
+            src="${svpSrc}"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowfullscreen
+            style="width: 100%; height: 100%; border: none; background: #000000; display: block;"
+          ></iframe>
+        </div>
       </div>
     `;
 

@@ -84,28 +84,25 @@ function applyTheme(presetId) {
 
 function renderBackground() {
   const p = getCurrentPresentation();
-  if (viewState === 'player') {
-    bgContainer.innerHTML = '';
-    stopAmbientMenuMusic();
-    return;
-  }
 
-  const blurStyle = p.backgroundBlur ? `blur(${p.backgroundBlur}px)` : 'none';
-  const darkness = p.backgroundDarkness !== undefined ? p.backgroundDarkness : 0.25;
+  const isPlayer = viewState === 'player';
+  const blurVal = isPlayer ? (p.backgroundBlur || 14) : (p.backgroundBlur || 0);
+  const blurStyle = blurVal ? `blur(${blurVal}px)` : 'none';
+  const darkness = isPlayer ? 0.75 : (p.backgroundDarkness !== undefined ? p.backgroundDarkness : 0.25);
 
   bgContainer.innerHTML = `
     <div class="menu-background-container">
       <img src="${p.coverImage}" alt="${p.title}" class="menu-background-image" style="filter: ${blurStyle}; opacity: 1;" />
-      ${p.backgroundVideo ? `
+      ${p.backgroundVideo && !isPlayer ? `
         <video id="bg-video-loop" src="${p.backgroundVideo}" autoplay loop muted playsinline class="menu-background-video" style="filter: ${blurStyle}; opacity: 0.85;"></video>
       ` : ''}
       <div class="menu-background-overlay" style="background: rgba(0, 0, 0, ${darkness});"></div>
       <div class="menu-vignette"></div>
-      <canvas id="ambient-canvas" class="ambient-canvas"></canvas>
+      ${!isPlayer ? '<canvas id="ambient-canvas" class="ambient-canvas"></canvas>' : ''}
     </div>
   `;
 
-  if (p.enableAmbientSound && !isAmbientMuted) {
+  if (p.enableAmbientSound && !isAmbientMuted && !isPlayer) {
     startAmbientMenuMusic(0.18);
   } else {
     stopAmbientMenuMusic();

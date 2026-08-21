@@ -42,6 +42,10 @@ export function getSvpEmbedUrl(rawInput, options = {}) {
         const cleanTitle = title.replace(/[\u2013\u2014]/g, '-').trim();
         url.searchParams.set('title', cleanTitle);
       }
+      // Force hide playlist sidebar so ONLY the single referenced clip is displayed & played
+      url.searchParams.set('hide_playlist', '1');
+      url.searchParams.set('hide_description', '1');
+      url.searchParams.set('hide_live_chat', '1');
       return url.toString();
     } catch {
       return input;
