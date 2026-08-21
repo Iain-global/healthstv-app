@@ -1186,31 +1186,28 @@ export default function LiveLoungeClient() {
                   }`}
                 >
                   {/* Top Header info */}
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black tracking-widest text-[#00a86b] bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded">
-                          TABLE {table.number}
-                        </span>
-                        {table.isVip && (
-                          <span className="text-[0.65rem] font-bold text-amber-300 bg-amber-950/50 border border-amber-800/50 px-2 py-0.5 rounded flex items-center gap-1">
-                            <Sparkles className="w-3 h-3" /> VIP
-                          </span>
-                        )}
-                      </div>
-
-                      <span className="text-xs font-semibold text-slate-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5 flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-slate-400" />
-                        {liveCount}/{table.capacity}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`text-xl sm:text-2xl font-black tracking-wide px-3.5 py-1 rounded-xl border shadow-md ${
+                          table.id === 1
+                            ? "text-red-400 bg-red-950/40 border-red-500/40 ring-1 ring-red-500/30"
+                            : "text-white bg-white/10 border-white/15"
+                        }`}
+                      >
+                        TABLE {table.number}
                       </span>
+                      {table.isVip && (
+                        <span className="text-xs font-bold text-amber-300 bg-amber-950/50 border border-amber-800/50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                          <Sparkles className="w-3.5 h-3.5" /> VIP
+                        </span>
+                      )}
                     </div>
 
-                    <h3 className={`font-bold text-base sm:text-lg leading-snug mb-1 line-clamp-1 ${table.id === 1 ? 'text-red-500 font-black' : 'text-white'}`}>
-                      {table.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2 min-h-[2rem]">
-                      {table.topic}
-                    </p>
+                    <span className="text-xs sm:text-sm font-bold text-slate-300 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-1.5 shadow-sm">
+                      <Users className="w-4 h-4 text-emerald-400" />
+                      <span>{liveCount}/{table.capacity}</span>
+                    </span>
                   </div>
 
                   {/* AIRMEET CIRCULAR TABLE ARENA */}
