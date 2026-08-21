@@ -49,7 +49,12 @@ export default function Footer() {
             <h4 className="font-bold text-[1.1rem] text-[#0c1c10] mb-5">For Viewers</h4>
             <ul className="space-y-3">
               <li><Link href="/events" className="text-[#5e6d62] hover:text-[#006818] transition-colors">UK Events</Link></li>
-              <li><Link href="/player" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Live Event Player</Link></li>
+              <li>
+                <Link href="/player" className="text-[#00873a] font-bold hover:text-[#006818] transition-colors flex items-center gap-2">
+                  <span className="w-2 h-2 bg-red-500 rounded-full inline-block animate-pulse"></span>
+                  Live Player
+                </Link>
+              </li>
               <li><Link href="/free-videos" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Free Video Vault</Link></li>
               <li><Link href="/contact" className="text-[#5e6d62] hover:text-[#006818] transition-colors">Contact Support</Link></li>
             </ul>
