@@ -21,21 +21,8 @@ let isShareOpen = false;
 let isBgModalOpen = false;
 let isAmbientMuted = false;
 
-// Check localStorage for previously uploaded/custom background & summit video data
+// Check URL parameters first for organiser / presentation
 try {
-  const savedBg = localStorage.getItem('mediazilla_custom_bg');
-  if (savedBg) {
-    presentations[0].coverImage = savedBg;
-  }
-  const savedSummitData = localStorage.getItem('mediazilla_summit_data');
-  if (savedSummitData) {
-    const parsedDays = JSON.parse(savedSummitData);
-    if (Array.isArray(parsedDays) && parsedDays.length > 0) {
-      presentations[0].days = parsedDays;
-    }
-  }
-
-  // URL parameters check for organiser
   const urlParams = new URLSearchParams(window.location.search);
   const orgParam = urlParams.get('organiser') || urlParams.get('pres') || urlParams.get('slug');
   if (orgParam) {

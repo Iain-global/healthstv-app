@@ -134,7 +134,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2520,
             durationFormatted: '42:00',
             thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
             chapters: [
               { id: 'c1-1', title: 'Welcome & Breath Alignment', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
               { id: 'c1-2', title: 'Pelvic & Diaphragm Unwinding', time: 720, timeFormatted: '12:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
@@ -148,7 +148,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2880,
             durationFormatted: '48:00',
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
             chapters: [
               { id: 'c1-4', title: 'Ribcage & Shoulder Mechanics', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' },
               { id: 'c1-5', title: 'Deep Fascial Torque & Twist', time: 900, timeFormatted: '15:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' }
@@ -161,7 +161,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2100,
             durationFormatted: '35:00',
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
             chapters: []
           },
           {
@@ -171,7 +171,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2400,
             durationFormatted: '40:00',
             thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
             chapters: []
           }
         ]
@@ -186,40 +186,40 @@ export const DEFAULT_PRESENTATIONS = [
             id: 'd2-s1',
             title: 'Day Two - Session 1',
             subtitle: 'Morning Activation & Mineral Water Protocol',
-            duration: 3891,
-            durationFormatted: '1:04:51',
+            duration: 2400,
+            durationFormatted: '40:00',
             thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
             chapters: []
           },
           {
             id: 'd2-s2',
             title: 'Day Two - Session 2',
             subtitle: 'Visceral Manipulation & Psoas Decompression',
-            duration: 2994,
-            durationFormatted: '49:54',
+            duration: 3120,
+            durationFormatted: '52:00',
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
             chapters: []
           },
           {
             id: 'd2-s3',
             title: 'Day Two - Session 3',
             subtitle: 'Somatic Emotional Release Workshop',
-            duration: 3612,
-            durationFormatted: '1:00:12',
+            duration: 2700,
+            durationFormatted: '45:00',
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
             chapters: []
           },
           {
             id: 'd2-s4',
             title: 'Day Two - Session 4',
             subtitle: 'Biomarkers, Hydration Metrics & Expert Panel',
-            duration: 2172,
-            durationFormatted: '36:12',
+            duration: 2700,
+            durationFormatted: '45:00',
             thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
             chapters: []
           }
         ]
@@ -234,40 +234,40 @@ export const DEFAULT_PRESENTATIONS = [
             id: 'd3-s1',
             title: 'Day Three - Session 1',
             subtitle: 'Jaw (TMJ) & Neck Tension Release',
-            duration: 2520,
-            durationFormatted: '42:00',
+            duration: 2280,
+            durationFormatted: '38:00',
             thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
             chapters: []
           },
           {
             id: 'd3-s2',
             title: 'Day Three - Session 2',
             subtitle: 'Cranial Decompression & Eye Track Exercises',
-            duration: 2880,
-            durationFormatted: '48:00',
+            duration: 2940,
+            durationFormatted: '49:00',
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
             chapters: []
           },
           {
             id: 'd3-s3',
             title: 'Day Three - Session 3',
-            subtitle: 'Upper Body: How You Carry Yourself',
-            duration: 3141,
-            durationFormatted: '52:21',
+            subtitle: 'Partner Maneuvers & Assisted Unwinding',
+            duration: 2520,
+            durationFormatted: '42:00',
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
             chapters: []
           },
           {
             id: 'd3-s4',
             title: 'Day Three - Session 4',
             subtitle: 'Parasympathetic Reset & Guided Sound Therapy',
-            duration: 2837,
-            durationFormatted: '47:17',
+            duration: 2280,
+            durationFormatted: '38:00',
             thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
             chapters: []
           }
         ]
@@ -285,7 +285,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2640,
             durationFormatted: '44:00',
             thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
             chapters: []
           },
           {
@@ -295,7 +295,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 3000,
             durationFormatted: '50:00',
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
             chapters: []
           },
           {
@@ -305,7 +305,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2220,
             durationFormatted: '37:00',
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
             chapters: []
           },
           {
@@ -315,7 +315,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 3000,
             durationFormatted: '50:00',
             thumbnail: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
             chapters: []
           }
         ]
@@ -333,7 +333,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2790,
             durationFormatted: '46:30',
             thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
             chapters: [
               { id: 'c5-1', title: 'Opening Remarks & Full Body Assessment', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
               { id: 'c5-2', title: 'The Core 4 Fascial Maneuvers', time: 780, timeFormatted: '13:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
@@ -348,7 +348,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2175,
             durationFormatted: '36:15',
             thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
             chapters: [
               { id: 'c5-5', title: 'Lower Back & Sciatica Relief', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' },
               { id: 'c5-6', title: 'Frozen Shoulder & Neck Impingement', time: 840, timeFormatted: '14:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
@@ -362,7 +362,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 3300,
             durationFormatted: '55:00',
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
             chapters: [
               { id: 'c5-8', title: 'Building Your Habit Stack', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
               { id: 'c5-9', title: 'Closing Breathwork & Gratitude Circle', time: 1800, timeFormatted: '30:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
@@ -375,7 +375,7 @@ export const DEFAULT_PRESENTATIONS = [
             duration: 2880,
             durationFormatted: '48:00',
             thumbnail: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
-            videoUrl: SVP_PLAYLIST_URL,
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
             chapters: []
           }
         ]
@@ -390,7 +390,7 @@ export const DEFAULT_PRESENTATIONS = [
         duration: 2790,
         durationFormatted: '46:30',
         thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
-        videoUrl: SVP_PLAYLIST_URL,
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
         badge: 'Session 1',
         chapters: [
           { id: 'c5-1', title: 'Opening Remarks & Assessment', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
@@ -406,7 +406,7 @@ export const DEFAULT_PRESENTATIONS = [
         duration: 2175,
         durationFormatted: '36:15',
         thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
-        videoUrl: SVP_PLAYLIST_URL,
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
         badge: 'Session 2',
         chapters: []
       },
@@ -417,7 +417,7 @@ export const DEFAULT_PRESENTATIONS = [
         duration: 3300,
         durationFormatted: '55:00',
         thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
-        videoUrl: SVP_PLAYLIST_URL,
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
         badge: 'Session 3',
         chapters: []
       },
@@ -428,7 +428,7 @@ export const DEFAULT_PRESENTATIONS = [
         duration: 2880,
         durationFormatted: '48:00',
         thumbnail: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
-        videoUrl: SVP_PLAYLIST_URL,
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
         badge: 'Session 4',
         chapters: []
       }
@@ -439,11 +439,11 @@ export const DEFAULT_PRESENTATIONS = [
   },
   {
     id: 'steve-pollard-summit',
-    title: 'Steve Pollard',
+    title: 'The Good Food Project',
     subtitle: '5-DAY SUMMIT',
     badgeText: '5-DAY SUMMIT',
-    dateLocation: 'Integrative Health & Longevity Series',
-    filmmaker: 'Steve Pollard Productions',
+    dateLocation: 'Regenerative Agriculture & Cellular Longevity',
+    filmmaker: 'The Good Food Media',
     coverImage: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&auto=format&fit=crop&q=85',
     backgroundVideo: '',
     themePreset: 'summit-estate',
