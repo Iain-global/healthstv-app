@@ -39,7 +39,7 @@ export default function Header() {
     };
   }, [pathname]);
 
-  if (pathname === "/lounge") {
+  if (pathname === "/lounge" || pathname === "/live-lounge") {
     return null;
   }
 
@@ -69,6 +69,9 @@ export default function Header() {
               <Link href="/events" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 🇬🇧 UK Events & Tickets
               </Link>
+              <Link href="/live-lounge" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#006818] hover:bg-[#eaf5eb] hover:pl-6 transition-all">
+                🍹 Live Social Lounge
+              </Link>
               <Link href="/organisers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 👥 Organisers - Suppliers - Speakers
               </Link>
@@ -81,6 +84,11 @@ export default function Header() {
           <Link href="/player" className="font-bold text-[0.95rem] text-[#00873a] flex items-center gap-1.5 transition-colors py-2">
             <span className="w-2 h-2 bg-red-500 rounded-full inline-block animate-pulse"></span>
             Live Player
+          </Link>
+
+          <Link href="/live-lounge" className="font-bold text-[0.95rem] text-[#006818] flex items-center gap-1.5 transition-colors py-2">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-ping"></span>
+            Live Lounge
           </Link>
 
           {/* For Organisers Dropdown */}
@@ -172,6 +180,10 @@ export default function Header() {
 
             <Link onClick={() => setMobileMenuOpen(false)} href="/player" className="font-bold text-[#00873a] py-2 border-b border-gray-100 flex items-center gap-2">
               <span className="w-2 h-2 bg-red-500 rounded-full"></span> Live Player
+            </Link>
+
+            <Link onClick={() => setMobileMenuOpen(false)} href="/live-lounge" className="font-bold text-[#006818] py-2 border-b border-gray-100 flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span> Live Lounge
             </Link>
 
             {/* For Organisers Mobile Dropdown */}
