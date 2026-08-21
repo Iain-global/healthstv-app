@@ -1014,7 +1014,7 @@ export default function LiveLoungeClient() {
     <div className="flex flex-col min-h-screen bg-[#090f14] text-slate-100 font-sans selection:bg-[#00a86b] selection:text-white">
       {/* 1. TOP AIRMEET-STYLE LOUNGE HEADER */}
       <header className="sticky top-0 z-40 bg-[#0c141a]/95 backdrop-blur-md border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between shadow-md">
-        {/* Left: Branding & Event Badge */}
+        {/* Left: Branding */}
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="text-xl font-black tracking-tight text-white group-hover:text-[#00a86b] transition-colors">
@@ -1024,11 +1024,6 @@ export default function LiveLoungeClient() {
               LIVE LOUNGE
             </span>
           </Link>
-
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-            <span className="font-semibold text-white">Global Longevity & Health Summit 2026</span>
-          </div>
         </div>
 
         {/* Center: Navigation Modes */}
@@ -1068,9 +1063,11 @@ export default function LiveLoungeClient() {
 
         {/* Right: Online delegates & AV Status */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-3 py-1.5 rounded-full">
-            <Users className="w-3.5 h-3.5" />
-            <span>184 Delegates Online</span>
+          <div className="flex items-center gap-2 text-xs font-semibold bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 px-3 py-1.5 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>
+              {totalOnlineCount} {totalOnlineCount === 1 ? "Delegate" : "Delegates"} in Lounge
+            </span>
           </div>
 
           {/* User AV Controls Preview */}
@@ -1174,8 +1171,10 @@ export default function LiveLoungeClient() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pt-2">
             {filteredTables.map((table) => {
               const isUserAtThisTable = joinedTableId === table.id;
-              const occupiedSeatsCount = table.seatedUsers.length;
-              const isFull = occupiedSeatsCount >= table.capacity;
+              const liveCount = isUserAtThisTable
+                ? 1 + activePeerEntries.length
+                : tableOccupancy[table.id] || 0;
+              const isFull = liveCount >= table.capacity;
 
               return (
                 <div
@@ -1202,11 +1201,11 @@ export default function LiveLoungeClient() {
 
                       <span className="text-xs font-semibold text-slate-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5 flex items-center gap-1">
                         <Users className="w-3.5 h-3.5 text-slate-400" />
-                        {occupiedSeatsCount}/{table.capacity}
+                        {liveCount}/{table.capacity}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-base sm:text-lg text-white leading-snug mb-1 line-clamp-1">
+                    <h3 className={`font-bold text-base sm:text-lg leading-snug mb-1 line-clamp-1 ${table.id === 1 ? 'text-red-500 font-black' : 'text-white'}`}>
                       {table.title}
                     </h3>
                     <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2 min-h-[2rem]">
@@ -1235,46 +1234,40 @@ export default function LiveLoungeClient() {
                       <div className="w-2 h-2 rounded-full bg-[#00a86b] mt-1 animate-ping"></div>
                     </div>
 
-                    {/* Seated Avatars placed around table based on capacity */}
+                    {/* Seated Avatars placed around table based on real live count */}
                     {Array.from({ length: table.capacity }).map((_, index) => {
-                      const user = table.seatedUsers[index];
+                      const isSeatOccupied = index < liveCount;
+                      const isMySeat = isUserAtThisTable && index === 0;
                       const totalSeats = table.capacity;
                       const angle = (index * 360) / totalSeats - 90;
                       const radius = 80;
                       const x = Math.round(radius * Math.cos((angle * Math.PI) / 180));
                       const y = Math.round(radius * Math.sin((angle * Math.PI) / 180));
 
-                      if (user) {
+                      if (isSeatOccupied) {
                         return (
                           <div
-                            key={`seat-${user.id}-${index}`}
+                            key={`seat-${table.id}-${index}`}
                             style={{
                               transform: `translate(${x}px, ${y}px)`,
                             }}
                             className="absolute z-20 group/seat cursor-pointer"
-                            title={`${user.name} (${user.role} - ${user.company})`}
+                            title={isMySeat ? "You (Live)" : `Live Delegate #${index + 1}`}
                           >
                             <div className="relative">
-                              <img
-                                src={user.avatar}
-                                alt={user.name}
-                                className={`w-10 h-10 rounded-full object-cover border-2 shadow-lg transition-transform group-hover/seat:scale-110 ${
-                                  user.id === "me"
-                                    ? "border-emerald-400 ring-2 ring-emerald-500/40"
-                                    : user.isSpeaking
-                                    ? "border-amber-400 ring-2 ring-amber-400/50 animate-pulse"
-                                    : "border-white/30"
+                              <div
+                                className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 ${
+                                  isMySeat
+                                    ? "bg-emerald-600 border-emerald-400 ring-2 ring-emerald-500/40"
+                                    : "bg-teal-700 border-emerald-400 ring-2 ring-teal-400/50 animate-pulse"
                                 }`}
-                              />
-                              {user.isHost && (
-                                <span className="absolute -bottom-1 -right-1 bg-amber-500 text-black text-[0.6rem] font-black rounded-full w-4 h-4 flex items-center justify-center shadow">
-                                  ★
-                                </span>
-                              )}
+                              >
+                                {isMySeat ? "ME" : `P${index + 1}`}
+                              </div>
                             </div>
 
                             <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 bg-black/90 text-white text-[0.65rem] font-bold px-2 py-0.5 rounded shadow-lg opacity-0 group-hover/seat:opacity-100 pointer-events-none whitespace-nowrap z-30 transition-opacity">
-                              {user.name}
+                              {isMySeat ? "You (Live)" : `Live Delegate #${index + 1}`}
                             </div>
                           </div>
                         );
@@ -1283,7 +1276,7 @@ export default function LiveLoungeClient() {
                       // Empty Seat (+)
                       return (
                         <button
-                          key={`empty-seat-${index}`}
+                          key={`empty-seat-${table.id}-${index}`}
                           type="button"
                           onClick={() => handleJoinTable(table.id)}
                           style={{
