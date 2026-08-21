@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   Star,
@@ -33,6 +33,7 @@ import {
   CreditCard,
   Layers,
   Share2,
+  X,
 } from "lucide-react";
 
 type OfferCategory = "all" | "organisers" | "companies" | "speakers";
@@ -150,6 +151,26 @@ function OfferCard({
 export default function FoundingOffersClient() {
   const [selectedCategory, setSelectedCategory] = useState<OfferCategory>("all");
   const [targetTier, setTargetTier] = useState<string>("Event Organisers (Founder 1–5 - FREE)");
+  const [showReasonsModal, setShowReasonsModal] = useState(false);
+  const [showCompanyReasonsModal, setShowCompanyReasonsModal] = useState(false);
+  const [showSpeakersReasonsModal, setShowSpeakersReasonsModal] = useState(false);
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowReasonsModal(false);
+        setShowCompanyReasonsModal(false);
+        setShowSpeakersReasonsModal(false);
+      }
+    };
+    if (showReasonsModal || showCompanyReasonsModal || showSpeakersReasonsModal) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showReasonsModal, showCompanyReasonsModal, showSpeakersReasonsModal]);
 
   // Application Form State
   const [formData, setFormData] = useState({
@@ -526,7 +547,160 @@ export default function FoundingOffersClient() {
                 onSelect={() => scrollToApply("Event Organisers (Tier 6–10 - 50% Off)")}
               />
             </div>
+
+            {/* Pop-up Box Trigger */}
+            <div className="mt-8 max-w-4xl mx-auto text-center">
+              <button
+                type="button"
+                onClick={() => setShowReasonsModal(true)}
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-100/70 border-2 border-[#00873a]/30 hover:border-[#00873a] text-[#006818] font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#00873a] text-white flex items-center justify-center shadow-sm text-sm group-hover:scale-110 transition-transform shrink-0">
+                  <HelpCircle className="w-4 h-4" />
+                </span>
+                <span>Why should event organisers use HealthSummits.tv?</span>
+                <span className="text-xs font-black uppercase tracking-wider bg-[#00873a] text-white px-2.5 py-1 rounded-full">
+                  5 Key Reasons
+                </span>
+                <ArrowRight className="w-4 h-4 text-[#00873a] group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+            </div>
           </section>
+        )}
+
+        {/* 5 Reasons Pop-up Box Modal */}
+        {showReasonsModal && (
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setShowReasonsModal(false)}
+          >
+            <div
+              className="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 sm:p-8 animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setShowReasonsModal(false)}
+                className="absolute top-5 right-5 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+                aria-label="Close popup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="mb-6 pr-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#00873a] text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-200">
+                  <Sparkles className="w-3.5 h-3.5 text-[#f6821f]" />
+                  Event Organiser Benefits
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#1f2e22] tracking-tight leading-snug">
+                  Here are five strong reasons event organisers should use{" "}
+                  <span className="text-[#00873a]">HealthSummits.tv (HSTV):</span>
+                </h3>
+              </div>
+
+              {/* 5 Reasons List */}
+              <div className="space-y-4">
+                {/* Reason 1 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Reach a Bigger Audience
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Take your event beyond the venue by offering livestream and on-demand access to people across the UK and internationally.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 2 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Create Additional Revenue
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Sell virtual tickets, event replays and recorded sessions, turning one event into an ongoing source of income.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 3 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Give Your Event a Longer Life
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Instead of your content disappearing when the event finishes, HSTV can keep sessions available for viewers to discover afterwards.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 4 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Promote Your Organisation and Speakers
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Showcase your organisation, forthcoming events, speakers and expert content to an audience specifically interested in health and wellbeing.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 5 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    5
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Everything in One Place
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      HSTV can support event promotion, virtual ticket sales, livestreaming, video hosting and on-demand viewing — making it easier for organisers to reach and manage an online audience.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReasonsModal(false);
+                    scrollToApply("Event Organisers (Founder 1–5 - FREE)");
+                  }}
+                  className="flex-1 py-3 px-5 rounded-xl bg-[#00873a] hover:bg-[#006e2e] text-white font-bold text-sm sm:text-base text-center transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Claim Free Event Organiser Tier</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowReasonsModal(false)}
+                  className="py-3 px-5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm transition-colors cursor-pointer text-center"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Section 2: Company Profile */}
@@ -566,7 +740,160 @@ export default function FoundingOffersClient() {
                 onSelect={() => scrollToApply("Company Profile (Tier 6–10 - 50% Off)")}
               />
             </div>
+
+            {/* Pop-up Box Trigger for Company Profile */}
+            <div className="mt-8 max-w-4xl mx-auto text-center">
+              <button
+                type="button"
+                onClick={() => setShowCompanyReasonsModal(true)}
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-100/70 border-2 border-[#00873a]/30 hover:border-[#00873a] text-[#006818] font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#00873a] text-white flex items-center justify-center shadow-sm text-sm group-hover:scale-110 transition-transform shrink-0">
+                  <HelpCircle className="w-4 h-4" />
+                </span>
+                <span>Why should businesses list their Company Profile?</span>
+                <span className="text-xs font-black uppercase tracking-wider bg-[#00873a] text-white px-2.5 py-1 rounded-full">
+                  5 Key Reasons
+                </span>
+                <ArrowRight className="w-4 h-4 text-[#00873a] group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+            </div>
           </section>
+        )}
+
+        {/* 5 Reasons Pop-up Box Modal for Company Profile */}
+        {showCompanyReasonsModal && (
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setShowCompanyReasonsModal(false)}
+          >
+            <div
+              className="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 sm:p-8 animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setShowCompanyReasonsModal(false)}
+                className="absolute top-5 right-5 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+                aria-label="Close popup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="mb-6 pr-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#00873a] text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-200">
+                  <Sparkles className="w-3.5 h-3.5 text-[#f6821f]" />
+                  Company Profile Benefits
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#1f2e22] tracking-tight leading-snug">
+                  Here are five key reasons why businesses should list their{" "}
+                  <span className="text-[#00873a]">Company Profile on HealthSummits.tv:</span>
+                </h3>
+              </div>
+
+              {/* 5 Reasons List */}
+              <div className="space-y-4">
+                {/* Reason 1 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Increase Your Visibility
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Put your business in front of a targeted audience interested in health, wellbeing and related services.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 2 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Showcase What You Offer
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Highlight your products, services, expertise, website, contact details and video content all in one place.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 3 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Build Trust and Credibility
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      A professional company profile helps potential customers understand who you are, what you do and why they should choose you.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 4 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Generate New Enquiries
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Make it easier for viewers, event organisers, speakers and potential partners to discover and contact your business.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 5 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    5
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Connect With the Health & Wellbeing Community
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Position your company alongside events, experts and organisations already active within the health and wellbeing sector.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCompanyReasonsModal(false);
+                    scrollToApply("Company Profile (Founder 1–5 - FREE)");
+                  }}
+                  className="flex-1 py-3 px-5 rounded-xl bg-[#00873a] hover:bg-[#006e2e] text-white font-bold text-sm sm:text-base text-center transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Claim Free Company Profile Tier</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCompanyReasonsModal(false)}
+                  className="py-3 px-5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm transition-colors cursor-pointer text-center"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Section 3: Keynote Speakers */}
@@ -606,7 +933,160 @@ export default function FoundingOffersClient() {
                 onSelect={() => scrollToApply("Keynote Speaker (Tier 6–10 - 50% Off)")}
               />
             </div>
+
+            {/* Pop-up Box Trigger for Keynote Speakers */}
+            <div className="mt-8 max-w-4xl mx-auto text-center">
+              <button
+                type="button"
+                onClick={() => setShowSpeakersReasonsModal(true)}
+                className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-100/70 border-2 border-[#00873a]/30 hover:border-[#00873a] text-[#006818] font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group"
+              >
+                <span className="w-8 h-8 rounded-full bg-[#00873a] text-white flex items-center justify-center shadow-sm text-sm group-hover:scale-110 transition-transform shrink-0">
+                  <HelpCircle className="w-4 h-4" />
+                </span>
+                <span>Why should Keynote Speakers join HealthSummits.tv?</span>
+                <span className="text-xs font-black uppercase tracking-wider bg-[#00873a] text-white px-2.5 py-1 rounded-full">
+                  5 Key Reasons
+                </span>
+                <ArrowRight className="w-4 h-4 text-[#00873a] group-hover:translate-x-1 transition-transform shrink-0" />
+              </button>
+            </div>
           </section>
+        )}
+
+        {/* 5 Reasons Pop-up Box Modal for Keynote Speakers */}
+        {showSpeakersReasonsModal && (
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setShowSpeakersReasonsModal(false)}
+          >
+            <div
+              className="relative bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100 p-6 sm:p-8 animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setShowSpeakersReasonsModal(false)}
+                className="absolute top-5 right-5 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
+                aria-label="Close popup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Modal Header */}
+              <div className="mb-6 pr-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#00873a] text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-200">
+                  <Sparkles className="w-3.5 h-3.5 text-[#f6821f]" />
+                  Keynote Speaker Benefits
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-[#1f2e22] tracking-tight leading-snug">
+                  Here are five strong reasons <span className="text-[#00873a]">Keynote Speakers</span> should join{" "}
+                  <span className="text-[#00873a]">HealthSummits.tv (HSTV):</span>
+                </h3>
+              </div>
+
+              {/* 5 Reasons List */}
+              <div className="space-y-4">
+                {/* Reason 1 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Build Your Profile
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Create a dedicated presence on HSTV showcasing your expertise, experience, topics and speaking credentials.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 2 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Reach New Audiences
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Put your talks and expertise in front of event organisers, businesses and viewers interested specifically in health and wellbeing.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 3 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Generate More Speaking Opportunities
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Make it easier for event organisers to discover you and contact you for conferences, summits, webinars and other events.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 4 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#f6821f]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#f6821f] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    4
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Showcase Your Expertise on Video
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Feature interviews, keynote clips, presentations and expert videos so potential clients can see you in action before booking you.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reason 5 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#f8faf8] border border-[#e5ebe7] hover:border-[#00873a]/40 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-[#00873a] text-white flex items-center justify-center font-black shrink-0 text-sm shadow-sm">
+                    5
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base sm:text-lg text-[#1f2e22] mb-1">
+                      Promote Your Events and Services
+                    </h4>
+                    <p className="text-sm sm:text-base text-[#526357] leading-relaxed">
+                      Use HSTV to highlight forthcoming appearances, programmes, books, courses or other services connected with your expertise.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="mt-6 pt-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSpeakersReasonsModal(false);
+                    scrollToApply("Keynote Speaker (Founder 1–5 - FREE)");
+                  }}
+                  className="flex-1 py-3 px-5 rounded-xl bg-[#00873a] hover:bg-[#006e2e] text-white font-bold text-sm sm:text-base text-center transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                >
+                  <span>Claim Free Keynote Speaker Tier</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSpeakersReasonsModal(false)}
+                  className="py-3 px-5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm transition-colors cursor-pointer text-center"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* What's Included For Founding Members (15 Feature Cards to FREE VIDEO PRODUCTION) */}
