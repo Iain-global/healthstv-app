@@ -96,9 +96,9 @@ export default async function OrganisersIndexPage() {
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-[#00873a]/10 border border-[#00873a]/20 flex items-center justify-center text-xl font-black text-[#00873a] shrink-0 overflow-hidden relative">
                     {org.profilePhotoUrl ? (
-                      <Image src={org.profilePhotoUrl} alt={org.name} fill className="object-cover" />
+                      <Image src={org.profilePhotoUrl} alt={org.organization || org.name} fill className="object-cover" />
                     ) : (
-                      org.avatarInitials || org.name.substring(0, 2).toUpperCase()
+                      org.avatarInitials || (org.organization || org.name).substring(0, 2).toUpperCase()
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-1">
@@ -116,11 +116,11 @@ export default async function OrganisersIndexPage() {
                 </div>
 
                 <h3 className="text-xl font-black text-[#1f2e22] group-hover:text-[#00873a] transition-colors mb-1">
-                  {org.name}
+                  {org.organization || org.name}
                 </h3>
-                {org.organization && (
+                {org.organization && org.name && (
                   <div className="text-xs font-bold text-[#00873a] mb-3">
-                    {org.organization}
+                    {org.name}
                   </div>
                 )}
                 <p className="text-gray-500 text-sm line-clamp-3 leading-relaxed mb-4">
