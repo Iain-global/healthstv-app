@@ -138,24 +138,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     tag: "Clinical Discussion",
     tagColor: "emerald",
     hostName: "Dr. Sarah Jenkins",
-    seatedUsers: [
-      {
-        id: "u1",
-        name: "Dr. Sarah Jenkins",
-        role: "Keynote Speaker",
-        company: "Longevity Institute UK",
-        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&fit=crop",
-        isSpeaking: true,
-        isHost: true,
-      },
-      {
-        id: "u2",
-        name: "Marcus Vance",
-        role: "Health Clinic Director",
-        company: "Vance Cellular Health",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 2,
@@ -167,25 +150,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     tag: "Expert Circle",
     tagColor: "orange",
     hostName: "Dr. Jonathan Hayes",
-    seatedUsers: [
-      {
-        id: "u4",
-        name: "Dr. Jonathan Hayes",
-        role: "Gastroenterologist",
-        company: "GutHealth Medical",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&fit=crop",
-        isSpeaking: false,
-        isHost: true,
-      },
-      {
-        id: "u5",
-        name: "Rachel Davies",
-        role: "Clinical Nutritionist",
-        company: "PureBiome UK",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&h=200&fit=crop",
-        isSpeaking: true,
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 3,
@@ -196,15 +161,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 6,
     tag: "Open Networking",
     tagColor: "blue",
-    seatedUsers: [
-      {
-        id: "u6",
-        name: "David Chen",
-        role: "Sleep Scientist",
-        company: "SomnaTech Research",
-        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 4,
@@ -215,15 +172,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 8,
     tag: "Tech & Innovation",
     tagColor: "purple",
-    seatedUsers: [
-      {
-        id: "u7",
-        name: "Sophia Martinez",
-        role: "AI Health Lead",
-        company: "MedTech Pulse",
-        avatar: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 5,
@@ -234,15 +183,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 4,
     tag: "Organisers & Clinics",
     tagColor: "emerald",
-    seatedUsers: [
-      {
-        id: "u9",
-        name: "Dr. Alistair Ross",
-        role: "Clinic Founder",
-        company: "London Integrative Care",
-        avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 6,
@@ -266,17 +207,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     tag: "Speaker VIP Lounge",
     tagColor: "purple",
     isVip: true,
-    seatedUsers: [
-      {
-        id: "u13",
-        name: "Prof. Arthur Pendelton",
-        role: "Keynote Speaker",
-        company: "Imperial Health Oncology",
-        avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&h=200&fit=crop",
-        isHost: true,
-        isSpeaking: true,
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 8,
@@ -1620,8 +1551,18 @@ export default function LiveLoungeClient() {
                 </div>
               )}
 
-              {/* Dynamic Video Tiles Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 items-center justify-center">
+              {/* Dynamic Video Tiles Grid (Live Cameras Only) */}
+              <div
+                className={`flex-1 items-center justify-center gap-4 ${
+                  activePeerEntries.length === 0
+                    ? "grid grid-cols-1 max-w-4xl mx-auto w-full"
+                    : activePeerEntries.length === 1
+                    ? "grid grid-cols-1 md:grid-cols-2 max-w-6xl mx-auto w-full"
+                    : activePeerEntries.length <= 3
+                    ? "grid grid-cols-1 sm:grid-cols-2 max-w-6xl mx-auto w-full"
+                    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full"
+                }`}
+              >
                 {/* 1. Local User Live Video Tile */}
                 <div className="relative aspect-video bg-[#152028] rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-xl flex items-center justify-center group">
                   <video
@@ -1675,61 +1616,6 @@ export default function LiveLoungeClient() {
                     stream={stream}
                     index={index}
                   />
-                ))}
-
-                {/* 3. Demo / Mock Seated Participants */}
-                {currentJoinedTable.seatedUsers
-                  .filter((u) => u.id !== "me")
-                  .map((user) => (
-                    <div
-                      key={user.id}
-                      className={`relative aspect-video bg-[#152028] rounded-2xl overflow-hidden border shadow-xl flex items-center justify-center group ${
-                        user.isSpeaking ? "border-amber-400 ring-2 ring-amber-400/30" : "border-white/10"
-                      }`}
-                    >
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="w-full h-full object-cover"
-                      />
-
-                      <div className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 text-left max-w-[80%]">
-                        <div className="text-xs font-bold text-white truncate">{user.name}</div>
-                        <div className="text-[0.65rem] text-slate-300 truncate">{user.company}</div>
-                      </div>
-
-                      <div className="absolute top-3 right-3 flex items-center gap-1">
-                        {user.isSpeaking && (
-                          <div className="flex items-center gap-1 bg-amber-500/90 text-black px-2 py-0.5 rounded text-[0.65rem] font-bold">
-                            <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping"></span>
-                            Speaking
-                          </div>
-                        )}
-                        {user.isHost && (
-                          <div className="bg-emerald-600 text-white px-2 py-0.5 rounded text-[0.65rem] font-bold">
-                            Host
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                {/* Fill empty seats representation */}
-                {Array.from({
-                  length: Math.max(
-                    0,
-                    currentJoinedTable.capacity - (1 + activePeerEntries.length + currentJoinedTable.seatedUsers.filter((u) => u.id !== "me").length)
-                  ),
-                }).map((_, i) => (
-                  <div
-                    key={`empty-grid-${i}`}
-                    onClick={copyTableLink}
-                    className="aspect-video bg-white/5 hover:bg-white/10 transition-colors rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 p-4 text-center cursor-pointer group"
-                  >
-                    <Users className="w-8 h-8 opacity-30 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-semibold text-slate-400 group-hover:text-emerald-400">Seat Open</span>
-                    <span className="text-[0.65rem] opacity-60">Click to invite another live camera</span>
-                  </div>
                 ))}
               </div>
 
