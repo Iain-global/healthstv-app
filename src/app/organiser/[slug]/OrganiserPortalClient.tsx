@@ -48,7 +48,12 @@ type OrganiserType = {
 };
 
 export default function OrganiserPortalClient({ organiser }: { organiser: OrganiserType }) {
-  const [activeTab, setActiveTab] = useState<"past-summits" | "events" | "free-videos" | "pay-to-view">("past-summits");
+  const isGoodFoodPortal = organiser.slug === "steve-pollard" || organiser.slug === "stevepollard";
+  const hasPastSummit = isGoodFoodPortal;
+
+  const [activeTab, setActiveTab] = useState<"past-summits" | "events" | "free-videos" | "pay-to-view">(
+    hasPastSummit ? "past-summits" : "events"
+  );
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -142,27 +147,29 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
 
                 <p className="text-sm text-gray-300 max-w-3xl leading-relaxed">
                   {organiser.bio ||
-                    "Official delegate portal on HealthSummits.tv. Explore past summit masterclasses, upcoming workshops, free video vault lectures, and premium passes."}
+                    "Official delegate portal on HealthSummits.tv. Explore upcoming workshops, free video vault lectures, and premium passes."}
                 </p>
               </div>
             </div>
 
             {/* Quick Stats Banner */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full md:w-auto shrink-0 bg-white/5 border border-white/10 p-3.5 rounded-2xl">
-              <div className="text-center px-2">
-                <div className="text-xl font-black text-amber-400">5-Day</div>
-                <div className="text-[10px] text-gray-400 uppercase font-semibold">Summit Archive</div>
-              </div>
-              <div className="text-center px-2 border-l border-white/10">
-                <div className="text-xl font-black text-emerald-400">{organiser.events.length || 3}</div>
+            <div className={`grid ${hasPastSummit ? "grid-cols-2 md:grid-cols-4" : "grid-cols-3"} gap-3 w-full md:w-auto shrink-0 bg-white/5 border border-white/10 p-3.5 rounded-2xl`}>
+              {hasPastSummit && (
+                <div className="text-center px-2">
+                  <div className="text-xl font-black text-amber-400">5-Day</div>
+                  <div className="text-[10px] text-gray-400 uppercase font-semibold">Summit Archive</div>
+                </div>
+              )}
+              <div className={`text-center px-2 ${hasPastSummit ? "border-l border-white/10" : ""}`}>
+                <div className="text-xl font-black text-emerald-400">{organiser.events.length}</div>
                 <div className="text-[10px] text-gray-400 uppercase font-semibold">Upcoming Events</div>
               </div>
               <div className="text-center px-2 border-l border-white/10">
-                <div className="text-xl font-black text-blue-400">{freeVideos.length || 2}</div>
+                <div className="text-xl font-black text-blue-400">{freeVideos.length}</div>
                 <div className="text-[10px] text-gray-400 uppercase font-semibold">Free Lectures</div>
               </div>
               <div className="text-center px-2 border-l border-white/10">
-                <div className="text-xl font-black text-purple-400">{premiumVideos.length || 2}</div>
+                <div className="text-xl font-black text-purple-400">{premiumVideos.length}</div>
                 <div className="text-[10px] text-gray-400 uppercase font-semibold">Pay to View</div>
               </div>
             </div>
@@ -170,24 +177,26 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
 
           {/* Navigation Category Tabs */}
           <div className="flex items-center gap-2 mt-8 overflow-x-auto pb-2 border-b border-white/10 scrollbar-none">
-            <button
-              onClick={() => setActiveTab("past-summits")}
-              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 ${
-                activeTab === "past-summits"
-                  ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
-                  : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10"
-              }`}
-            >
-              <span>🏛️</span>
-              <span>Past Summits</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
-                  activeTab === "past-summits" ? "bg-black/20 text-black" : "bg-white/10 text-gray-300"
+            {hasPastSummit && (
+              <button
+                onClick={() => setActiveTab("past-summits")}
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shrink-0 ${
+                  activeTab === "past-summits"
+                    ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+                    : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10"
                 }`}
               >
-                5-Day Series
-              </span>
-            </button>
+                <span>🏛️</span>
+                <span>Past Summits</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
+                    activeTab === "past-summits" ? "bg-black/20 text-black" : "bg-white/10 text-gray-300"
+                  }`}
+                >
+                  5-Day Series
+                </span>
+              </button>
+            )}
 
             <button
               onClick={() => setActiveTab("events")}
@@ -548,12 +557,27 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
             </div>
 
             <div className="w-full aspect-video bg-black relative">
-              <iframe
-                src={`/mediazilla/index.html?organiser=${organiser.slug || "steve-pollard"}`}
-                className="w-full h-full border-none"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-              />
+              {isGoodFoodPortal ? (
+                <iframe
+                  src={`/mediazilla/index.html?organiser=${organiser.slug}`}
+                  className="w-full h-full border-none"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[#0e141b]">
+                  <div className="w-16 h-16 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-2xl mb-3">
+                    ▶
+                  </div>
+                  <h4 className="text-lg font-bold text-white mb-1">{selectedVideo.title}</h4>
+                  <p className="text-xs text-gray-400 max-w-md mb-4">
+                    {selectedVideo.description || "Video playback stream from organiser video archive."}
+                  </p>
+                  <span className="text-xs font-semibold px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                    Complimentary Lecture Stream
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="p-4 bg-white/5">

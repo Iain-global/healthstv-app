@@ -1,7 +1,6 @@
 import { getIcon } from './icons.js';
 import { formatTime } from './timeFormatters.js';
 import { getSvpEmbedUrl, isSvpVideo } from './svpIntegration.js';
-import { SVP_PLAYLIST_URL } from './data.js';
 
 export function renderVideoPlayer(container, options) {
   const {
@@ -13,7 +12,7 @@ export function renderVideoPlayer(container, options) {
     onPlayNextVideo
   } = options;
 
-  const effectiveVideoUrl = video.svpEmbedUrl || video.videoUrl || SVP_PLAYLIST_URL;
+  const effectiveVideoUrl = video.svpEmbedUrl || video.videoUrl || '';
   const isSvp = isSvpVideo({ ...video, videoUrl: effectiveVideoUrl });
 
   if (isSvp) {

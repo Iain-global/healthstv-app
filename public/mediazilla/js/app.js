@@ -21,6 +21,11 @@ let isShareOpen = false;
 let isBgModalOpen = false;
 let isAmbientMuted = false;
 
+// Clear any stale legacy localStorage override that was saved during previous edits
+try {
+  localStorage.removeItem('mediazilla_summit_data');
+} catch {}
+
 // Check URL parameters first for organiser / presentation
 try {
   const urlParams = new URLSearchParams(window.location.search);
