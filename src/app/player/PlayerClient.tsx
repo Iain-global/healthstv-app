@@ -18,12 +18,76 @@ type EventType = {
   ticketUrl?: string | null;
 };
 
+const SUMMIT_SCHEDULE = [
+  {
+    day: 1,
+    name: "Day 1",
+    theme: "Cellular Health & Longevity Foundations",
+    sessions: [
+      { id: "s1-1", number: 1, time: "09:00 - 10:30", title: "Keynote: Mitochondrial Biology & Cellular Renewal", speaker: "Dr. Sarah Jenkins", status: "Completed" },
+      { id: "s1-2", number: 2, time: "11:00 - 12:30", title: "Clinical Protocols: NAD+, Peptides & Fasting Windows", speaker: "Prof. Liam Vance", status: "Live Broadcast" },
+      { id: "s1-3", number: 3, time: "14:00 - 15:30", title: "Masterclass: Autophagy Induction & Biomarker Testing", speaker: "Dr. Jonathan Hayes", status: "Upcoming" },
+      { id: "s1-4", number: 4, time: "16:00 - 17:30", title: "Interactive Panel & Live Audience Q&A", speaker: "All Keynote Speakers", status: "Upcoming" },
+    ]
+  },
+  {
+    day: 2,
+    name: "Day 2",
+    theme: "Microbiome, Gut-Brain Axis & Inflammation",
+    sessions: [
+      { id: "s2-1", number: 1, time: "09:00 - 10:30", title: "Keynote: The Microbiome as a Master Regulator", speaker: "Dr. Alistair Ross", status: "Upcoming" },
+      { id: "s2-2", number: 2, time: "11:00 - 12:30", title: "Clinical Protocols: Dysbiosis, SIBO & Psychobiotics", speaker: "Rachel Davies", status: "Upcoming" },
+      { id: "s2-3", number: 3, time: "14:00 - 15:30", title: "Workshop: Vagus Nerve Stimulation & Gut Motility", speaker: "Dr. Elena Rostova", status: "Upcoming" },
+      { id: "s2-4", number: 4, time: "16:00 - 17:30", title: "Case Studies: Reversing Chronic Gut Inflammation", speaker: "Clinical Panel", status: "Upcoming" },
+    ]
+  },
+  {
+    day: 3,
+    name: "Day 3",
+    theme: "Hormone Optimization & Metabolic Precision",
+    sessions: [
+      { id: "s3-1", number: 1, time: "09:00 - 10:30", title: "Keynote: Endocrine Reset & Metabolic Flexibility", speaker: "Dr. Marcus Thorne", status: "Upcoming" },
+      { id: "s3-2", number: 2, time: "11:00 - 12:30", title: "Bio-Identical Hormones & Thyroid Mastery", speaker: "Dr. Rebecca Sterling", status: "Upcoming" },
+      { id: "s3-3", number: 3, time: "14:00 - 15:30", title: "Continuous Glucose Monitoring & Insulin Sensitivity", speaker: "Sophia Martinez", status: "Upcoming" },
+      { id: "s3-4", number: 4, time: "16:00 - 17:30", title: "Evening Roundtable: Personalized Hormone Therapies", speaker: "Expert Roundtable", status: "Upcoming" },
+    ]
+  },
+  {
+    day: 4,
+    name: "Day 4",
+    theme: "Neuroplasticity, Sleep Architecture & Mental Wellness",
+    sessions: [
+      { id: "s4-1", number: 1, time: "09:00 - 10:30", title: "Keynote: Sleep Architecture, Glymphatic Clearance & REM", speaker: "David Chen", status: "Upcoming" },
+      { id: "s4-2", number: 2, time: "11:00 - 12:30", title: "Cognitive Longevity: Nootropics, BDNF & Focus", speaker: "Dr. Arthur Pendelton", status: "Upcoming" },
+      { id: "s4-3", number: 3, time: "14:00 - 15:30", title: "Heart Rate Variability (HRV) & Stress Resilience", speaker: "Dr. Sarah Jenkins", status: "Upcoming" },
+      { id: "s4-4", number: 4, time: "16:00 - 17:30", title: "Sound Frequencies, Light Hygiene & Evening Reset", speaker: "Wellness Team", status: "Upcoming" },
+    ]
+  },
+  {
+    day: 5,
+    name: "Day 5",
+    theme: "Integrative Protocols, Longevity & Future of Health",
+    sessions: [
+      { id: "s5-1", number: 1, time: "09:00 - 10:30", title: "Keynote: The 15-Minute Daily Longevity Protocol", speaker: "Dr. Sarah Jenkins", status: "Upcoming" },
+      { id: "s5-2", number: 2, time: "11:00 - 12:30", title: "Biohacking & Regenerative Medicine in Clinical Practice", speaker: "Prof. Liam Vance", status: "Upcoming" },
+      { id: "s5-3", number: 3, time: "14:00 - 15:30", title: "Action Plan: Integrating Multi-Day Summit Protocols", speaker: "Dr. Jonathan Hayes", status: "Upcoming" },
+      { id: "s5-4", number: 4, time: "16:00 - 17:30", title: "Grand Closing Summit Keynote & Certificate Awards", speaker: "All Founders & Speakers", status: "Upcoming" },
+    ]
+  }
+];
+
 export default function PlayerClient({ event }: { event: EventType }) {
   const [isUnlocked, setIsUnlocked] = useState(true);
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
   const [pinError, setPinError] = useState(false);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
   
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedSessionId, setSelectedSessionId] = useState("s1-2");
+
+  const currentDayData = SUMMIT_SCHEDULE.find((d) => d.day === selectedDay) || SUMMIT_SCHEDULE[0];
+  const currentSession = currentDayData.sessions.find((s) => s.id === selectedSessionId) || currentDayData.sessions[0];
+
   const [activeTab, setActiveTab] = useState<"chat" | "qa" | "notes">("chat");
   const [chatMessages, setChatMessages] = useState<{sender: string, text: string, isMe: boolean}[]>([
     { sender: "System", text: "Welcome to the live chat!", isMe: false }
@@ -111,13 +175,18 @@ export default function PlayerClient({ event }: { event: EventType }) {
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-red-500 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 shadow-sm">
               <span className="w-1.5 h-1.5 bg-white rounded-full inline-block animate-pulse-custom"></span>
-              LIVE BROADCAST
+              {currentSession.status === "Live Broadcast" ? "LIVE BROADCAST" : currentSession.status.toUpperCase()}
             </span>
-            <span className="text-[#a7f3d0] text-sm font-bold">Main Stage • Session 1</span>
+            <span className="text-[#a7f3d0] text-sm font-bold">
+              {currentDayData.name} • Session {currentSession.number} ({currentSession.time})
+            </span>
           </div>
-          <h1 className="text-3xl font-black text-white m-0 leading-tight">
-            {event.title}
+          <h1 className="text-2xl sm:text-3xl font-black text-white m-0 leading-tight">
+            {currentSession.title}
           </h1>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1">
+            Speaker: <strong className="text-emerald-400">{currentSession.speaker}</strong> • {currentDayData.theme}
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -220,7 +289,7 @@ export default function PlayerClient({ event }: { event: EventType }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* Left Column: Video */}
+            {/* Left Column: Video & Multi-Day 4-Session Schedule Menu */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               <div className="relative w-full aspect-[4/3] md:aspect-video min-h-[520px] bg-black rounded-xl overflow-hidden border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                 <iframe 
@@ -230,6 +299,95 @@ export default function PlayerClient({ event }: { event: EventType }) {
                   allowFullScreen
                 ></iframe>
               </div>
+
+              {/* Multi-Day Tabs & 4 Sessions Menu */}
+              <div className="bg-[#101b22] border border-white/10 rounded-2xl p-5 shadow-xl">
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-4 pb-3 border-b border-white/10">
+                  <div>
+                    <h3 className="text-base font-black text-white flex items-center gap-2">
+                      <span>📅 Summit Schedule</span>
+                      <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2.5 py-0.5 rounded-full">
+                        4 Sessions Per Day
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Select any day and session below to switch broadcasts or view past session replays.
+                    </p>
+                  </div>
+
+                  {/* Day Tabs */}
+                  <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10">
+                    {SUMMIT_SCHEDULE.map((d) => (
+                      <button
+                        key={d.day}
+                        onClick={() => {
+                          setSelectedDay(d.day);
+                          setSelectedSessionId(d.sessions[0].id);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          selectedDay === d.day
+                            ? "bg-[#00a86b] text-white shadow-md"
+                            : "text-slate-400 hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        {d.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4 Sessions Grid / List for the selected day */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {currentDayData.sessions.map((session) => {
+                    const isCurrent = session.id === selectedSessionId;
+                    return (
+                      <button
+                        key={session.id}
+                        onClick={() => setSelectedSessionId(session.id)}
+                        className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
+                          isCurrent
+                            ? "bg-emerald-950/40 border-emerald-500 shadow-md ring-1 ring-emerald-400/40"
+                            : "bg-white/5 hover:bg-white/10 border-white/10"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className={`text-[0.7rem] font-black uppercase px-2 py-0.5 rounded ${
+                            isCurrent
+                              ? "bg-emerald-500 text-black font-black"
+                              : "bg-white/10 text-slate-300"
+                          }`}>
+                            Session {session.number}
+                          </span>
+                          <span className="text-[0.7rem] text-slate-400 font-semibold">
+                            {session.time}
+                          </span>
+                        </div>
+
+                        <h4 className={`text-xs sm:text-sm font-bold leading-snug mb-1 line-clamp-2 ${
+                          isCurrent ? "text-white" : "text-slate-200 group-hover:text-white"
+                        }`}>
+                          {session.title}
+                        </h4>
+
+                        <div className="flex items-center justify-between text-[0.7rem] text-slate-400 pt-2 border-t border-white/5 mt-auto">
+                          <span className="text-emerald-400 font-semibold truncate">{session.speaker}</span>
+                          <span className={`text-[0.65rem] font-bold ${
+                            session.status === "Live Broadcast"
+                              ? "text-red-400 font-black flex items-center gap-1"
+                              : session.status === "Completed"
+                              ? "text-slate-400"
+                              : "text-amber-400"
+                          }`}>
+                            {session.status === "Live Broadcast" && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>}
+                            {session.status}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <Link href="/lounge" className="bg-[#ea8125] hover:bg-[#d3701a] text-white py-3.5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(234,129,37,0.4)] transition-all w-full">
                 <span className="text-xl">⚄</span> Enter Virtual Social Lounge
               </Link>

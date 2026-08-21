@@ -122,7 +122,7 @@ export const DEFAULT_PRESENTATIONS = [
       {
         id: 'day-1',
         name: 'Day One',
-        badgeCount: 3,
+        badgeCount: 4,
         subtitle: 'Day One: Foundations of Fascial Maneuvers & Breath',
         sessions: [
           {
@@ -161,13 +161,23 @@ export const DEFAULT_PRESENTATIONS = [
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
             videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
             chapters: []
+          },
+          {
+            id: 'd1-s4',
+            title: 'Day One - Session 4',
+            subtitle: 'Clinical Case Studies & Live Delegate Q&A',
+            duration: 2400,
+            durationFormatted: '40:00',
+            thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+            chapters: []
           }
         ]
       },
       {
         id: 'day-2',
         name: 'Day Two',
-        badgeCount: 3,
+        badgeCount: 4,
         subtitle: 'Day Two: Deep Cellular Hydration & Organ Motility',
         sessions: [
           {
@@ -199,13 +209,23 @@ export const DEFAULT_PRESENTATIONS = [
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
             videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
             chapters: []
+          },
+          {
+            id: 'd2-s4',
+            title: 'Day Two - Session 4',
+            subtitle: 'Biomarkers, Hydration Metrics & Expert Panel',
+            duration: 2700,
+            durationFormatted: '45:00',
+            thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: []
           }
         ]
       },
       {
         id: 'day-3',
         name: 'Day Three',
-        badgeCount: 3,
+        badgeCount: 4,
         subtitle: 'Day Three: Cranial Unwinding & Nervous System Reset',
         sessions: [
           {
@@ -237,13 +257,23 @@ export const DEFAULT_PRESENTATIONS = [
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
             videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
             chapters: []
+          },
+          {
+            id: 'd3-s4',
+            title: 'Day Three - Session 4',
+            subtitle: 'Parasympathetic Reset & Guided Sound Therapy',
+            duration: 2280,
+            durationFormatted: '38:00',
+            thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            chapters: []
           }
         ]
       },
       {
         id: 'day-4',
         name: 'Day Four',
-        badgeCount: 3,
+        badgeCount: 4,
         subtitle: 'Day Four: Dynamic Biomechanics & Ground Force',
         sessions: [
           {
@@ -275,13 +305,23 @@ export const DEFAULT_PRESENTATIONS = [
             thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
             videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
             chapters: []
+          },
+          {
+            id: 'd4-s4',
+            title: 'Day Four - Session 4',
+            subtitle: 'Athletic Performance & Injury Prevention Protocols',
+            duration: 3000,
+            durationFormatted: '50:00',
+            thumbnail: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: []
           }
         ]
       },
       {
         id: 'day-5',
         name: 'Day Five',
-        badgeCount: 3,
+        badgeCount: 4,
         subtitle: 'Day Five: Integration & Daily Mastery',
         sessions: [
           {
@@ -325,6 +365,16 @@ export const DEFAULT_PRESENTATIONS = [
               { id: 'c5-8', title: 'Building Your Habit Stack', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
               { id: 'c5-9', title: 'Closing Breathwork & Gratitude Circle', time: 1800, timeFormatted: '30:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
             ]
+          },
+          {
+            id: 'd5-s4',
+            title: 'Day Five - Session 4',
+            subtitle: 'Master Trainer Certification & Integration Keynote',
+            duration: 2880,
+            durationFormatted: '48:00',
+            thumbnail: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+            chapters: []
           }
         ]
       }
@@ -367,6 +417,17 @@ export const DEFAULT_PRESENTATIONS = [
         thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
         videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
         badge: 'Session 3',
+        chapters: []
+      },
+      {
+        id: 'd5-s4',
+        title: 'Day Five - Session 4',
+        subtitle: 'Master Trainer Certification & Integration (48:00)',
+        duration: 2880,
+        durationFormatted: '48:00',
+        thumbnail: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        badge: 'Session 4',
         chapters: []
       }
     ],
