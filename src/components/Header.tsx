@@ -92,9 +92,6 @@ export default function Header() {
               <Link href="/founding-offers" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-bold text-[#ea8125] hover:bg-[#fff7ed] hover:pl-6 transition-all">
                 🎁 Founding Offers!
               </Link>
-              <Link href="/founder-members" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
-                🌟 Founder Members (£0)
-              </Link>
               <Link href="/organiser-register" className="flex items-center gap-2 px-4 py-2.5 text-[0.92rem] font-semibold text-[#1f2e22] hover:bg-[#eaf5eb] hover:text-[#006818] hover:pl-6 transition-all">
                 Register as Organiser
               </Link>
@@ -191,7 +188,6 @@ export default function Header() {
               {mobileOrganisersOpen && (
                 <div className="flex flex-col pl-4 pb-2 space-y-3 mt-2">
                   <Link onClick={() => setMobileMenuOpen(false)} href="/founding-offers" className="text-[0.95rem] font-bold text-[#ea8125]">🎁 Founding Offers!</Link>
-                  <Link onClick={() => setMobileMenuOpen(false)} href="/founder-members" className="text-[0.95rem] font-semibold text-[#1f2e22]">🌟 Founder Members Offer (£0)</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-register" className="text-[0.95rem] text-[#1f2e22]">Register as Organiser</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organiser-hub" className="text-[0.95rem] text-[#1f2e22]">Organiser Dashboard</Link>
                   <Link onClick={() => setMobileMenuOpen(false)} href="/organisers" className="text-[0.95rem] text-[#1f2e22]">Organisers, Suppliers & Speakers</Link>

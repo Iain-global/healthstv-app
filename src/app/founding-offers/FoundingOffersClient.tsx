@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Star,
   Calendar,
@@ -23,6 +22,17 @@ import {
   Radio,
   Clock,
   HelpCircle,
+  Gift,
+  RotateCcw,
+  Server,
+  Headphones,
+  BarChart3,
+  Mail,
+  Layout,
+  Mic,
+  CreditCard,
+  Layers,
+  Share2,
 } from "lucide-react";
 
 type OfferCategory = "all" | "organisers" | "companies" | "speakers";
@@ -163,9 +173,11 @@ export default function FoundingOffersClient() {
 
   const applyRef = useRef<HTMLDivElement>(null);
 
-  const scrollToApply = (tierText: string) => {
-    setTargetTier(tierText);
-    setFormData((prev) => ({ ...prev, selectedOffer: tierText }));
+  const scrollToApply = (tierText?: string) => {
+    if (tierText) {
+      setTargetTier(tierText);
+      setFormData((prev) => ({ ...prev, selectedOffer: tierText }));
+    }
     applyRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -208,6 +220,162 @@ export default function FoundingOffersClient() {
       });
     }
   };
+
+  // 15 Complete Benefits Data Array (from Founder Members page to FREE VIDEO PRODUCTION)
+  const benefits = [
+    {
+      id: 1,
+      title: "Registration & Payment Processing",
+      description:
+        "Seamless checkout in USD ($), GBP (£), and EUR (€) supporting all major cards, Apple Pay, and Google Pay with tax receipts.",
+      tag: "GLOBAL CURRENCIES",
+      icon: DollarSign,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 2,
+      title: "On-Demand Replay Access",
+      description:
+        "Instant cloud recording ingestion and chaptered replay access for registered delegates and ongoing post-event VOD sales.",
+      tag: "AUTOMATED REPLAYS",
+      icon: RotateCcw,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 3,
+      title: "Video Hosting & Content Delivery",
+      description:
+        "High-bandwidth, encrypted video infrastructure with zero third-party ads, no Vimeo/YouTube limits, and secure DRM options.",
+      tag: "ZERO ADS INFRASTRUCTURE",
+      icon: Server,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 4,
+      title: "Technical Support (Pre & Live)",
+      description:
+        "White-glove speaker AV tech checks, rehearsal run-throughs, and live real-time monitoring engineers during broadcast.",
+      tag: "DEDICATED ENGINEERS",
+      icon: Headphones,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 5,
+      title: "Audience Analytics & Reporting",
+      description:
+        "Detailed attendee retention curves, geographic viewer heatmaps, session engagement metrics, and one-click CSV export.",
+      tag: "CME & VIEWER LOGS",
+      icon: BarChart3,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 6,
+      title: "Mention in Our Newsletter",
+      description:
+        "Official welcoming announcement and ongoing promotions sent directly to our engaged medical & health professional subscriber database.",
+      tag: "EXCLUSIVE MARKETING",
+      icon: Mail,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 7,
+      title: "A Branded Landing Page",
+      description:
+        "Your own customized branded hub inside HSTV showcasing your organisation, speaker lineups, courses, and media.",
+      tag: "CUSTOM BRANDING",
+      icon: Layout,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 8,
+      title: "Sell Event Tickets",
+      description:
+        "Sell virtual, in-person, or hybrid tickets directly through our integrated multi-currency ticketing engine with zero hassle.",
+      tag: "TICKETING ENGINE",
+      icon: Ticket,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 9,
+      title: "Host Videos & Podcasts",
+      description:
+        "Upload and organise your educational video libraries, clinical keynote recordings, and audio podcast series in one centralized portal.",
+      tag: "VIDEO & AUDIO",
+      icon: Mic,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 10,
+      title: "Sell Videos via Pay-Per-Video",
+      description:
+        "Monetize single lectures, masterclasses, or entire series through secure pay-per-view paywalls with instant automated payouts.",
+      tag: "PAY-PER-VIDEO VOD",
+      icon: CreditCard,
+      isHighlight: false,
+      isOrangeIcon: true,
+    },
+    {
+      id: 11,
+      title: "Livestream Hosting & Delivery",
+      description:
+        "Broadcast-grade, multi-bitrate adaptive 4K & HD streaming powered by an enterprise low-latency CDN for global reach.",
+      tag: "4K / HD STREAMING",
+      icon: Radio,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 12,
+      title: "Virtual Ticket Sales Platform",
+      description:
+        "Tiered pricing structures (Standard, VIP, Group Institutional, Student passes) with automated attendee ticketing provisioning.",
+      tag: "TIERED PASSES",
+      icon: Layers,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 13,
+      title: "Listed as a Founding Member",
+      description:
+        "Permanent recognition with an official Founding Member badge on our platform directory and header partner spotlight.",
+      tag: "VIP RECOGNITION",
+      icon: Award,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 14,
+      title: "Social Mentions + 2 Annual Newsletter Posts",
+      description:
+        "Regular cross-promotion across our social channels plus two dedicated feature articles/posts per year inside our newsletter.",
+      boldSnippet: "two dedicated feature articles/posts per year",
+      tag: "MULTI-CHANNEL REACH",
+      icon: Share2,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 15,
+      title: 'One Free "Meet the Expert" Video',
+      description:
+        "A bespoke interview and video feature produced by HealthSummits.tv highlighting your founder, key clinical expert, or flagship methodology.",
+      tag: "FREE VIDEO PRODUCTION",
+      icon: Video,
+      isHighlight: true,
+      badgeText: "PREMIUM HIGHLIGHT",
+      isOrangeIcon: true,
+    },
+  ];
 
   const faqs = [
     {
@@ -441,80 +609,128 @@ export default function FoundingOffersClient() {
           </section>
         )}
 
-        {/* Benefits Grid / What You Get */}
-        <section className="bg-white rounded-3xl p-8 md:p-12 border border-[#e0e8e2] shadow-sm mb-20">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-black uppercase tracking-widest text-[#00873a] bg-green-50 px-3.5 py-1.5 rounded-full border border-green-200">
-              Platform Features
-            </span>
-            <h2 className="text-2xl md:text-4xl font-black text-[#1f2e22] mt-3">
-              Included in Every Founding Tier
+        {/* What's Included For Founding Members (15 Feature Cards to FREE VIDEO PRODUCTION) */}
+        <section className="mb-20">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#f0fdf4] border border-[#bbf7d0] text-[#006818] text-xs sm:text-sm font-bold uppercase tracking-wider mb-5">
+              <Gift className="w-4 h-4 text-[#ea8125]" />
+              COMPLETE BENEFITS PACKAGE
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#0c1c10] tracking-tight mb-4 font-heading">
+              What’s Included For Founding Members
             </h2>
-            <p className="text-gray-600 mt-2 text-sm md:text-base">
-              Everything you need to host, broadcast, monetize, and amplify your health events and professional presence.
+
+            <p className="text-base sm:text-lg md:text-xl text-[#5e6d62] font-normal leading-relaxed">
+              Everything you receive during your first year as an official HealthSummits.tv Founding Member.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#00873a]/10 text-[#00873a] flex items-center justify-center mb-4">
-                <Ticket className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">90% Revenue Share</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Retain 90% of ticket sales and pay-per-video lecture passes with direct Stripe settlements.
-              </p>
-            </div>
+          {/* 15 Feature Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {benefits.map((benefit) => {
+              const IconComponent = benefit.icon;
+              return (
+                <div
+                  key={benefit.id}
+                  className={`relative rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
+                    benefit.isHighlight
+                      ? "bg-white border-2 border-[#ea8125] shadow-[0_10px_30px_rgba(234,129,37,0.15)] ring-1 ring-[#ea8125]/20 hover:-translate-y-1"
+                      : "bg-white border border-[#e0e8e2] hover:border-[#bbf7d0] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,104,24,0.08)] hover:-translate-y-1"
+                  }`}
+                >
+                  {/* Premium Highlight Badge if applicable */}
+                  {benefit.badgeText && (
+                    <div className="absolute -top-3.5 right-6 bg-[#ea8125] text-white text-[0.7rem] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                      {benefit.badgeText}
+                    </div>
+                  )}
 
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#00873a]/10 text-[#00873a] flex items-center justify-center mb-4">
-                <Radio className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">Live & On-Demand Video</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Ultra-low latency adaptive streaming player with interactive scene chapters and replay vault.
-              </p>
-            </div>
+                  {/* Card Top / Body */}
+                  <div>
+                    {/* Icon in Rounded Box */}
+                    <div className="mb-5">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          benefit.isHighlight
+                            ? "bg-[#ea8125] text-white shadow-sm"
+                            : benefit.isOrangeIcon
+                            ? "bg-[#fff3eb] text-[#ea8125]"
+                            : "bg-[#eaf5eb] text-[#006818]"
+                        }`}
+                      >
+                        <IconComponent className="w-6 h-6 stroke-[2.2]" />
+                      </div>
+                    </div>
 
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#00873a]/10 text-[#00873a] flex items-center justify-center mb-4">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">Branded Portal Page</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Customized showcase page featuring your bio, company links, past talks, and upcoming tickets.
-              </p>
-            </div>
+                    {/* Title with Checkmark */}
+                    <div className="flex items-start gap-2.5 mb-3">
+                      <CheckCircle2
+                        className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                          benefit.isOrangeIcon || benefit.isHighlight
+                            ? "text-[#ea8125]"
+                            : "text-[#006818]"
+                        }`}
+                      />
+                      <h3 className="font-bold text-lg sm:text-xl text-[#0c1c10] leading-snug">
+                        {benefit.title}
+                      </h3>
+                    </div>
 
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#f6821f]/10 text-[#f6821f] flex items-center justify-center mb-4">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">Founding Badge & Spotlight</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Official Founding Member badge displayed permanently across directory rankings and featured rows.
-              </p>
-            </div>
+                    {/* Description */}
+                    <p className="text-[#5e6d62] text-[0.92rem] leading-relaxed mb-6">
+                      {benefit.boldSnippet ? (
+                        <>
+                          Regular cross-promotion across our social channels plus{" "}
+                          <strong className="text-[#0c1c10] font-bold">
+                            {benefit.boldSnippet}
+                          </strong>{" "}
+                          inside our newsletter.
+                        </>
+                      ) : (
+                        benefit.description
+                      )}
+                    </p>
+                  </div>
 
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#00873a]/10 text-[#00873a] flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">Subscriber Pool Royalties</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Publish free or premium video vault content and earn monthly watch-time royalties from platform subscribers.
-              </p>
-            </div>
+                  {/* Bottom Uppercase Tag */}
+                  <div className="pt-4 border-t border-gray-100 mt-auto">
+                    <span
+                      className={`text-xs font-black tracking-wider uppercase ${
+                        benefit.isOrangeIcon || benefit.isHighlight
+                          ? "text-[#ea8125]"
+                          : "text-[#006818]"
+                      }`}
+                    >
+                      {benefit.tag}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-            <div className="p-6 rounded-2xl bg-[#fafcfb] border border-gray-100 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-[#00873a]/10 text-[#00873a] flex items-center justify-center mb-4">
-                <ShieldCheck className="w-6 h-6" />
+          {/* Bottom Offer Callout Bar */}
+          <div className="mt-14 p-6 md:p-8 rounded-2xl bg-[#eaf5eb] border border-[#bbf7d0] flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-[#006818] text-white flex items-center justify-center flex-shrink-0 font-bold text-xl">
+                ✓
               </div>
-              <h3 className="font-bold text-lg text-[#1f2e22] mb-2">Priority Tech Support</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Direct onboarding support, speaker AV tech checks, and dedicated engineer assistance during broadcasts.
-              </p>
+              <div>
+                <h4 className="font-bold text-lg text-[#0c1c10]">
+                  Ready to activate all 15 Founding Member privileges?
+                </h4>
+                <p className="text-sm text-[#5e6d62]">
+                  Join hundreds of medical experts and health organisations broadcasting on HSTV.
+                </p>
+              </div>
             </div>
+            <button
+              onClick={() => scrollToApply("Event Organisers (Founder 1–5 - FREE)")}
+              className="px-6 py-3 bg-[#ea8125] hover:bg-[#d9731b] text-white font-bold text-sm md:text-base rounded-xl shadow-md hover:shadow-lg transition-all whitespace-nowrap cursor-pointer"
+            >
+              Claim Your Founding Offer
+            </button>
           </div>
         </section>
 
