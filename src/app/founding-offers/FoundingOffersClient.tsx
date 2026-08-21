@@ -225,66 +225,6 @@ export default function FoundingOffersClient() {
   const benefits = [
     {
       id: 1,
-      title: "Registration & Payment Processing",
-      description:
-        "Seamless checkout in USD ($), GBP (£), and EUR (€) supporting all major cards, Apple Pay, and Google Pay with tax receipts.",
-      tag: "GLOBAL CURRENCIES",
-      icon: DollarSign,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 2,
-      title: "On-Demand Replay Access",
-      description:
-        "Instant cloud recording ingestion and chaptered replay access for registered delegates and ongoing post-event VOD sales.",
-      tag: "AUTOMATED REPLAYS",
-      icon: RotateCcw,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 3,
-      title: "Video Hosting & Content Delivery",
-      description:
-        "High-bandwidth, encrypted video infrastructure with zero third-party ads, no Vimeo/YouTube limits, and secure DRM options.",
-      tag: "ZERO ADS INFRASTRUCTURE",
-      icon: Server,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 4,
-      title: "Technical Support (Pre & Live)",
-      description:
-        "White-glove speaker AV tech checks, rehearsal run-throughs, and live real-time monitoring engineers during broadcast.",
-      tag: "DEDICATED ENGINEERS",
-      icon: Headphones,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 5,
-      title: "Audience Analytics & Reporting",
-      description:
-        "Detailed attendee retention curves, geographic viewer heatmaps, session engagement metrics, and one-click CSV export.",
-      tag: "CME & VIEWER LOGS",
-      icon: BarChart3,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 6,
-      title: "Mention in Our Newsletter",
-      description:
-        "Official welcoming announcement and ongoing promotions sent directly to our engaged medical & health professional subscriber database.",
-      tag: "EXCLUSIVE MARKETING",
-      icon: Mail,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 7,
       title: "A Branded Landing Page",
       description:
         "Your own customized branded hub inside HSTV showcasing your organisation, speaker lineups, courses, and media.",
@@ -294,7 +234,7 @@ export default function FoundingOffersClient() {
       isOrangeIcon: false,
     },
     {
-      id: 8,
+      id: 2,
       title: "Sell Event Tickets",
       description:
         "Sell virtual, in-person, or hybrid tickets directly through our integrated multi-currency ticketing engine with zero hassle.",
@@ -304,12 +244,72 @@ export default function FoundingOffersClient() {
       isOrangeIcon: false,
     },
     {
-      id: 9,
+      id: 3,
       title: "Host Videos & Podcasts",
       description:
         "Upload and organise your educational video libraries, clinical keynote recordings, and audio podcast series in one centralized portal.",
       tag: "VIDEO & AUDIO",
       icon: Mic,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 4,
+      title: "Registration & Payment Processing",
+      description:
+        "Seamless checkout in USD ($), GBP (£), and EUR (€) supporting all major cards, Apple Pay, and Google Pay with tax receipts.",
+      tag: "GLOBAL CURRENCIES",
+      icon: DollarSign,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 5,
+      title: "On-Demand Replay Access",
+      description:
+        "Instant cloud recording ingestion and chaptered replay access for registered delegates and ongoing post-event VOD sales.",
+      tag: "AUTOMATED REPLAYS",
+      icon: RotateCcw,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 6,
+      title: "Video Hosting & Content Delivery",
+      description:
+        "High-bandwidth, encrypted video infrastructure with zero third-party ads, no Vimeo/YouTube limits, and secure DRM options.",
+      tag: "ZERO ADS INFRASTRUCTURE",
+      icon: Server,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 7,
+      title: "Technical Support (Pre & Live)",
+      description:
+        "White-glove speaker AV tech checks, rehearsal run-throughs, and live real-time monitoring engineers during broadcast.",
+      tag: "DEDICATED ENGINEERS",
+      icon: Headphones,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 8,
+      title: "Audience Analytics & Reporting",
+      description:
+        "Detailed attendee retention curves, geographic viewer heatmaps, session engagement metrics, and one-click CSV export.",
+      tag: "CME & VIEWER LOGS",
+      icon: BarChart3,
+      isHighlight: false,
+      isOrangeIcon: false,
+    },
+    {
+      id: 9,
+      title: "Mention in Our Newsletter",
+      description:
+        "Official welcoming announcement and ongoing promotions sent directly to our engaged medical & health professional subscriber database.",
+      tag: "EXCLUSIVE MARKETING",
+      icon: Mail,
       isHighlight: false,
       isOrangeIcon: false,
     },
@@ -355,17 +355,6 @@ export default function FoundingOffersClient() {
     },
     {
       id: 14,
-      title: "Social Mentions + 2 Annual Newsletter Posts",
-      description:
-        "Regular cross-promotion across our social channels plus two dedicated feature articles/posts per year inside our newsletter.",
-      boldSnippet: "two dedicated feature articles/posts per year",
-      tag: "MULTI-CHANNEL REACH",
-      icon: Share2,
-      isHighlight: false,
-      isOrangeIcon: false,
-    },
-    {
-      id: 15,
       title: 'One Free "Meet the Expert" Video',
       description:
         "A bespoke interview and video feature produced by HealthSummits.tv highlighting your founder, key clinical expert, or flagship methodology.",
@@ -374,6 +363,17 @@ export default function FoundingOffersClient() {
       isHighlight: true,
       badgeText: "PREMIUM HIGHLIGHT",
       isOrangeIcon: true,
+    },
+    {
+      id: 15,
+      title: "Social Mentions + 2 Annual Newsletter Posts",
+      description:
+        "Regular cross-promotion across our social channels plus two dedicated feature articles/posts per year inside our newsletter.",
+      boldSnippet: "two dedicated feature articles/posts per year",
+      tag: "MULTI-CHANNEL REACH",
+      icon: Share2,
+      isHighlight: false,
+      isOrangeIcon: false,
     },
   ];
 
