@@ -1,10 +1,11 @@
 import { getIcon } from './icons.js';
 import { formatTime } from './timeFormatters.js';
-import { getSvpEmbedUrl } from './svpIntegration.js';
+import { getSvpEmbedUrl, isSvpVideo } from './svpIntegration.js';
+import { SVP_PLAYLIST_URL } from './data.js';
 
 export function renderVideoPlayer(container, options) {
   const {
-    video,
+    video = {},
     initialTime = 0,
     isPlayAllMode = false,
     allVideos = [],
@@ -12,11 +13,11 @@ export function renderVideoPlayer(container, options) {
     onPlayNextVideo
   } = options;
 
-  // Check if video uses StreamingVideoProvider embed or clip ID
-  const isSvp = isSvpVideo(video);
+  const effectiveVideoUrl = video.svpEmbedUrl || video.videoUrl || SVP_PLAYLIST_URL;
+  const isSvp = isSvpVideo({ ...video, videoUrl: effectiveVideoUrl });
 
   if (isSvp) {
-    const svpSrc = getSvpEmbedUrl(video.svpClipId || video.svpEmbedUrl || video.videoUrl, { autoplay: true });
+    const svpSrc = getSvpEmbedUrl(video.svpClipId || video.svpEmbedUrl || effectiveVideoUrl, { autoplay: true });
     container.innerHTML = `
       <div class="cinema-player-wrapper" id="player-wrapper" style="position: absolute; inset: 0; background: #000000; z-index: 100;">
         <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 120; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); pointer-events: none;">
