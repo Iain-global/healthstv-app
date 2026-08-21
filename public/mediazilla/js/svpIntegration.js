@@ -17,7 +17,7 @@ export function getSvpEmbedUrl(rawInput, options = {}) {
   if (!rawInput || typeof rawInput !== 'string') return '';
 
   let input = rawInput.trim();
-  const { autoplay = true } = options;
+  const { autoplay = true, title = '' } = options;
 
   // 1. If it's an <iframe> HTML snippet, extract the src URL
   if (input.includes('<iframe') && input.includes('src=')) {
@@ -33,8 +33,14 @@ export function getSvpEmbedUrl(rawInput, options = {}) {
 
     try {
       const url = new URL(input);
-      if (autoplay && !url.searchParams.has('autoplay')) {
+      if (autoplay) {
         url.searchParams.set('autoplay', '1');
+        url.searchParams.set('auto_play', '1');
+        url.searchParams.set('auto_play_next', '1');
+      }
+      if (title) {
+        const cleanTitle = title.replace(/[\u2013\u2014]/g, '-').trim();
+        url.searchParams.set('title', cleanTitle);
       }
       return url.toString();
     } catch {

@@ -17,7 +17,10 @@ export function renderVideoPlayer(container, options) {
   const isSvp = isSvpVideo({ ...video, videoUrl: effectiveVideoUrl });
 
   if (isSvp) {
-    const svpSrc = getSvpEmbedUrl(video.svpClipId || video.svpEmbedUrl || effectiveVideoUrl, { autoplay: true });
+    const svpSrc = getSvpEmbedUrl(video.svpClipId || video.svpEmbedUrl || effectiveVideoUrl, { 
+      autoplay: true, 
+      title: video.title || '' 
+    });
     container.innerHTML = `
       <div class="cinema-player-wrapper" id="player-wrapper" style="position: absolute; inset: 0; background: #000000; z-index: 100;">
         <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 120; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); pointer-events: none;">

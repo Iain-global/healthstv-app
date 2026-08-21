@@ -61,7 +61,12 @@ export function renderInteractiveMenu(container, presentation, onAction, state =
           <div class="summit-sessions-stack">
             ${currentDay.sessions.map(session => `
               <div class="summit-session-card" data-session-id="${session.id}">
-                <h3 class="session-card-title">${session.title}</h3>
+                <div class="session-card-left">
+                  <div class="session-play-btn" title="Play ${session.title}">
+                    ${getIcon('play', 13)}
+                  </div>
+                  <h3 class="session-card-title">${session.title}</h3>
+                </div>
                 <span class="session-time-pill">${session.durationFormatted}</span>
               </div>
             `).join('')}
