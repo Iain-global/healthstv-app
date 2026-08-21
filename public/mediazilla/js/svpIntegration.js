@@ -61,6 +61,12 @@ export function isSvpVideo(video) {
   if (!video) return false;
   if (video.svpClipId && video.svpClipId.trim().length > 0) return true;
   if (video.svpEmbedUrl && video.svpEmbedUrl.trim().length > 0) return true;
-  if (video.videoUrl && (video.videoUrl.includes('streamingvideoprovider') || video.videoUrl.includes('svp'))) return true;
+  if (video.videoUrl && (
+    video.videoUrl.includes('streamingvideoprovider') || 
+    video.videoUrl.includes('webvideocore') || 
+    video.videoUrl.includes('popapp') || 
+    video.videoUrl.includes('popplayer') || 
+    video.videoUrl.includes('svp')
+  )) return true;
   return false;
 }

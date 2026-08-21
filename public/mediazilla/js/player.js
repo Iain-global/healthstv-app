@@ -13,7 +13,7 @@ export function renderVideoPlayer(container, options) {
   } = options;
 
   // Check if video uses StreamingVideoProvider embed or clip ID
-  const isSvp = Boolean(video.svpClipId || video.svpEmbedUrl || (video.videoUrl && (video.videoUrl.includes('streamingvideoprovider') || video.videoUrl.includes('svp'))));
+  const isSvp = isSvpVideo(video);
 
   if (isSvp) {
     const svpSrc = getSvpEmbedUrl(video.svpClipId || video.svpEmbedUrl || video.videoUrl, { autoplay: true });
