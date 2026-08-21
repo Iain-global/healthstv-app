@@ -9,22 +9,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
     }
 
-    // Clean up stale participants (no heartbeat in 15 seconds)
-    const staleThreshold = new Date(Date.now() - 15000);
+    const numericTableId = Number(tableId);
+
+    // Clean up stale participants (no heartbeat in 45 seconds)
+    const staleThreshold = new Date(Date.now() - 45000);
     await prisma.loungeParticipant.deleteMany({
       where: { updatedAt: { lt: staleThreshold } }
     });
 
     // Upsert participant
-    const participant = await prisma.loungeParticipant.upsert({
+    await prisma.loungeParticipant.upsert({
       where: { socketId },
-      update: { tableId, updatedAt: new Date() },
-      create: { tableId, socketId }
+      update: { tableId: numericTableId, updatedAt: new Date() },
+      create: { tableId: numericTableId, socketId, updatedAt: new Date() }
     });
 
     // Fetch existing participants at the table to initiate connections
     const peers = await prisma.loungeParticipant.findMany({
-      where: { tableId, socketId: { not: socketId } }
+      where: { tableId: numericTableId, socketId: { not: socketId } }
     });
 
     return NextResponse.json({ success: true, peers: peers.map(p => p.socketId) });
@@ -33,3 +35,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+

@@ -15,7 +15,6 @@ import {
   Sparkles,
   Search,
   Plus,
-  Radio,
   Tv,
   Layers,
   Zap,
@@ -28,20 +27,11 @@ import {
   Share2,
   Check,
   Copy,
+  Activity,
 } from "lucide-react";
 
-// Load SimplePeer safely on the client
-let Peer: any = null;
-if (typeof window !== "undefined") {
-  try {
-    Peer = require("simple-peer");
-  } catch (e) {
-    console.warn("Simple-peer load error:", e);
-  }
-}
-
-// Google and global public STUN servers for reliable NAT traversal
-const ICE_SERVERS = {
+// Standard STUN servers for native WebRTC
+const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
@@ -63,15 +53,23 @@ function RemoteVideoTile({
   index: number;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
+      videoRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          console.warn("Autoplay remote video catch:", err);
+          setIsPlaying(true);
+        });
     }
   }, [stream]);
 
   return (
-    <div className="relative aspect-video bg-[#121d25] rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-2xl flex items-center justify-center group animate-in fade-in zoom-in-95 duration-300">
+    <div className="relative aspect-video bg-[#101b22] rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-2xl flex items-center justify-center group animate-in fade-in zoom-in-95 duration-300">
       <video
         ref={videoRef}
         autoPlay
@@ -85,15 +83,18 @@ function RemoteVideoTile({
         <div>
           <div className="text-xs font-bold text-white flex items-center gap-1">
             <span>Live Delegate #{index + 1}</span>
-            <span className="text-[0.65rem] text-slate-400">({peerId.slice(0, 4)})</span>
+            <span className="text-[0.65rem] text-slate-400">({peerId.slice(0, 5)})</span>
           </div>
-          <div className="text-[0.65rem] text-emerald-400 font-semibold">Broadcasting Live Camera</div>
+          <div className="text-[0.65rem] text-emerald-400 font-semibold flex items-center gap-1">
+            <Activity className="w-3 h-3 animate-pulse" />
+            <span>Live WebRTC Stream</span>
+          </div>
         </div>
       </div>
 
       <div className="absolute top-3 right-3 bg-emerald-600/90 text-white text-[0.65rem] font-bold px-2 py-0.5 rounded-md shadow z-10 flex items-center gap-1">
         <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-        Live Connected
+        LIVE CAMERA
       </div>
     </div>
   );
@@ -361,119 +362,237 @@ export default function LiveLoungeClient() {
   const screenVideoRef = useRef<HTMLVideoElement>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
-  // WebRTC Real-Time Signaling & Peer Connections
+  // Native WebRTC State
   const [socketId, setSocketId] = useState("");
-  const [peers, setPeers] = useState<{ [id: string]: any }>({});
-  const [peerStreams, setPeerStreams] = useState<{ [id: string]: MediaStream }>({});
-  const peersRef = useRef(peers);
-  useEffect(() => {
-    peersRef.current = peers;
-  }, [peers]);
+  const [peerStreams, setPeerStreams] = useState<{ [remoteId: string]: MediaStream }>({});
+  
+  // Keep peer connections & candidate queues in refs to avoid stale closures
+  const peerConnections = useRef<{ [remoteId: string]: RTCPeerConnection }>({});
+  const candidateQueues = useRef<{ [remoteId: string]: RTCIceCandidateInit[] }>({});
+  const localStreamRef = useRef<MediaStream | null>(null);
+  localStreamRef.current = localStream;
 
-  // Generate unique socketId on mount
+  // Initialize socket ID once per session
   useEffect(() => {
     const id = "hstv_" + Math.random().toString(36).substring(2, 11);
     setSocketId(id);
   }, []);
 
-  // Remove Peer handler
-  const removePeer = useCallback((peerId: string) => {
-    setPeers((prev) => {
-      const newPeers = { ...prev };
-      if (newPeers[peerId]) {
-        try {
-          newPeers[peerId].destroy();
-        } catch (e) {}
-        delete newPeers[peerId];
-      }
-      return newPeers;
-    });
-
+  // Close peer connection cleanly
+  const closePeer = useCallback((peerId: string) => {
+    if (peerConnections.current[peerId]) {
+      try {
+        peerConnections.current[peerId].close();
+      } catch (e) {}
+      delete peerConnections.current[peerId];
+    }
+    delete candidateQueues.current[peerId];
     setPeerStreams((prev) => {
-      const newStreams = { ...prev };
-      delete newStreams[peerId];
-      return newStreams;
+      const updated = { ...prev };
+      delete updated[peerId];
+      return updated;
     });
   }, []);
 
-  // Create Peer Connection (SimplePeer)
-  const createPeer = useCallback(
-    (peerId: string, initiator: boolean, myStream: MediaStream, myCurrentSocketId: string) => {
-      if (peersRef.current[peerId]) {
-        return peersRef.current[peerId];
-      }
-      if (!Peer) {
-        console.warn("SimplePeer library not loaded yet.");
-        return null;
+  // Create Native RTCPeerConnection
+  const getOrCreatePeerConnection = useCallback(
+    (remoteSocketId: string, currentMySocketId: string) => {
+      if (peerConnections.current[remoteSocketId]) {
+        return peerConnections.current[remoteSocketId];
       }
 
-      const peer = new Peer({
-        initiator,
-        stream: myStream,
-        trickle: false,
-        config: ICE_SERVERS,
-      });
+      console.log("🔗 [WebRTC] Creating new RTCPeerConnection with:", remoteSocketId);
+      const pc = new RTCPeerConnection(ICE_SERVERS);
+      peerConnections.current[remoteSocketId] = pc;
 
-      peer.on("signal", (signal: any) => {
-        fetch("/api/lounge/signal", {
+      // Add local media tracks if available
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach((track) => {
+          pc.addTrack(track, localStreamRef.current!);
+        });
+      }
+
+      // Handle incoming remote media stream
+      pc.ontrack = (event) => {
+        console.log("🎥 [WebRTC] Remote camera track received from:", remoteSocketId, event);
+        if (event.streams && event.streams[0]) {
+          setPeerStreams((prev) => ({
+            ...prev,
+            [remoteSocketId]: event.streams[0],
+          }));
+        }
+      };
+
+      // Handle local ICE candidates
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          fetch("/api/lounge/signal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              senderId: currentMySocketId,
+              receiverId: remoteSocketId,
+              type: "candidate",
+              payload: event.candidate,
+            }),
+          }).catch((err) => console.error("Send candidate error:", err));
+        }
+      };
+
+      pc.onconnectionstatechange = () => {
+        console.log(`[WebRTC] Connection state with ${remoteSocketId}:`, pc.connectionState);
+        if (
+          pc.connectionState === "disconnected" ||
+          pc.connectionState === "failed" ||
+          pc.connectionState === "closed"
+        ) {
+          closePeer(remoteSocketId);
+        }
+      };
+
+      return pc;
+    },
+    [closePeer]
+  );
+
+  // Initiate call to remote peer (send offer)
+  const initiateCall = useCallback(
+    async (remoteSocketId: string, currentMySocketId: string) => {
+      try {
+        const pc = getOrCreatePeerConnection(remoteSocketId, currentMySocketId);
+        
+        // Guard against calling createOffer when not in stable state
+        if (pc.signalingState !== "stable") {
+          console.log(`[WebRTC] Skipping offer creation with ${remoteSocketId} because state is '${pc.signalingState}'`);
+          return;
+        }
+
+        console.log("📤 [WebRTC] Initiating call / creating offer for:", remoteSocketId);
+        const offer = await pc.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: true,
+        });
+
+        if (pc.signalingState !== "stable") return;
+        await pc.setLocalDescription(offer);
+
+        await fetch("/api/lounge/signal", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            senderId: myCurrentSocketId,
-            receiverId: peerId,
-            type: signal.type || "signal",
-            payload: signal,
+            senderId: currentMySocketId,
+            receiverId: remoteSocketId,
+            type: "offer",
+            payload: offer,
           }),
-        }).catch((err) => console.error("Signal send error:", err));
-      });
-
-      peer.on("stream", (remoteStream: MediaStream) => {
-        console.log("WebRTC Live Camera Stream Received from:", peerId);
-        setPeerStreams((prev) => ({ ...prev, [peerId]: remoteStream }));
-      });
-
-      peer.on("close", () => removePeer(peerId));
-      peer.on("error", (err: any) => {
-        console.warn("Peer error with", peerId, err);
-        removePeer(peerId);
-      });
-
-      setPeers((prev) => ({ ...prev, [peerId]: peer }));
-      peersRef.current[peerId] = peer;
-      return peer;
-    },
-    [removePeer]
-  );
-
-  // Handle incoming WebRTC signals
-  const handleIncomingSignal = useCallback(
-    (senderId: string, type: string, payload: any, myStream: MediaStream, myCurrentSocketId: string) => {
-      let peer = peersRef.current[senderId];
-
-      if (type === "offer") {
-        if (!peer) {
-          peer = createPeer(senderId, false, myStream, myCurrentSocketId);
-        }
-        if (peer) {
-          peer.signal(payload);
-        }
-      } else if (type === "answer") {
-        if (peer) {
-          peer.signal(payload);
-        }
-      } else if (peer) {
-        peer.signal(payload);
+        });
+      } catch (err) {
+        console.error("Initiate call error:", err);
       }
     },
-    [createPeer]
+    [getOrCreatePeerConnection]
   );
 
-  // Join table API & start polling loop
+  // Handle incoming signal (offer, answer, candidate)
+  const handleIncomingSignal = useCallback(
+    async (senderId: string, type: string, payload: any, currentMySocketId: string) => {
+      try {
+        let pc = peerConnections.current[senderId];
+
+        if (type === "offer") {
+          console.log("📥 [WebRTC] Received offer from:", senderId, "Current state:", pc?.signalingState);
+          if (!pc) {
+            pc = getOrCreatePeerConnection(senderId, currentMySocketId);
+          }
+
+          // Handle offer collision (glare)
+          const isOfferCollision = pc.signalingState !== "stable";
+          if (isOfferCollision) {
+            if (currentMySocketId < senderId) {
+              console.log("[WebRTC] Rolling back local offer to accept incoming remote offer");
+              try {
+                await pc.setRemoteDescription({ type: "rollback" } as any);
+              } catch (e) {
+                console.warn("Rollback failed:", e);
+              }
+            } else {
+              console.log("[WebRTC] Impolite peer ignoring offer collision from:", senderId);
+              return;
+            }
+          }
+
+          await pc.setRemoteDescription(new RTCSessionDescription(payload));
+
+          // Apply any buffered candidates
+          if (candidateQueues.current[senderId]) {
+            for (const cand of candidateQueues.current[senderId]) {
+              try {
+                await pc.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (e) {}
+            }
+            delete candidateQueues.current[senderId];
+          }
+
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+
+          console.log("📤 [WebRTC] Sending answer to:", senderId);
+          await fetch("/api/lounge/signal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              senderId: currentMySocketId,
+              receiverId: senderId,
+              type: "answer",
+              payload: answer,
+            }),
+          });
+        } else if (type === "answer") {
+          console.log("📥 [WebRTC] Received answer from:", senderId, "Current state:", pc?.signalingState);
+          if (pc) {
+            // Guard: ONLY set remote description if we have a pending local offer
+            if (pc.signalingState !== "have-local-offer") {
+              console.warn(`[WebRTC] Ignoring duplicate/stale answer from ${senderId} because state is '${pc.signalingState}' (expected 'have-local-offer')`);
+              return;
+            }
+
+            await pc.setRemoteDescription(new RTCSessionDescription(payload));
+
+            // Apply any buffered candidates
+            if (candidateQueues.current[senderId]) {
+              for (const cand of candidateQueues.current[senderId]) {
+                try {
+                  await pc.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (e) {}
+              }
+              delete candidateQueues.current[senderId];
+            }
+          }
+        } else if (type === "candidate") {
+          if (pc && pc.remoteDescription && pc.remoteDescription.type) {
+            try {
+              await pc.addIceCandidate(new RTCIceCandidate(payload));
+            } catch (e) {}
+          } else {
+            if (!candidateQueues.current[senderId]) {
+              candidateQueues.current[senderId] = [];
+            }
+            candidateQueues.current[senderId].push(payload);
+          }
+        }
+      } catch (err) {
+        console.error("Signal handling error:", err);
+      }
+    },
+    [getOrCreatePeerConnection]
+  );
+
+  // Polling loop for active room & WebRTC signals
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
 
-    if (joinedTableId && socketId && localStream) {
-      // 1. Register with backend room
+    if (joinedTableId && socketId) {
+      // 1. Join room & connect deterministically
       fetch("/api/lounge/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -482,16 +601,21 @@ export default function LiveLoungeClient() {
         .then((res) => res.json())
         .then((data) => {
           if (data.peers && Array.isArray(data.peers)) {
-            data.peers.forEach((remotePeerId: string) => {
-              if (remotePeerId !== socketId) {
-                createPeer(remotePeerId, true, localStream, socketId);
+            data.peers.forEach((peerId: string) => {
+              if (peerId !== socketId) {
+                // Deterministic initiator: only peer with higher socketId initiates offer
+                if (socketId > peerId) {
+                  initiateCall(peerId, socketId);
+                } else {
+                  getOrCreatePeerConnection(peerId, socketId);
+                }
               }
             });
           }
         })
         .catch((err) => console.error("Join Table Error:", err));
 
-      // 2. Poll for incoming WebRTC signals & active participants
+      // 2. Poll signals every 1.2 seconds
       pollInterval = setInterval(async () => {
         try {
           const res = await fetch("/api/lounge/poll", {
@@ -502,29 +626,33 @@ export default function LiveLoungeClient() {
           const data = await res.json();
 
           if (data.signals && Array.isArray(data.signals)) {
-            data.signals.forEach((sig: any) => {
-              handleIncomingSignal(sig.senderId, sig.type, sig.payload, localStream, socketId);
-            });
+            for (const sig of data.signals) {
+              await handleIncomingSignal(sig.senderId, sig.type, sig.payload, socketId);
+            }
           }
 
-          // If there are peers at table that we haven't connected to yet, initiate
+          // Check if any peer is at table that we haven't connected to yet
           if (data.peers && Array.isArray(data.peers)) {
             data.peers.forEach((peerId: string) => {
-              if (peerId !== socketId && !peersRef.current[peerId]) {
-                createPeer(peerId, true, localStream, socketId);
+              if (peerId !== socketId && !peerConnections.current[peerId]) {
+                if (socketId > peerId) {
+                  initiateCall(peerId, socketId);
+                } else {
+                  getOrCreatePeerConnection(peerId, socketId);
+                }
               }
             });
           }
         } catch (e) {
-          console.error("Lounge Poll Error:", e);
+          console.error("Poll Error:", e);
         }
-      }, 1500); // 1.5s interval
+      }, 1200);
     }
 
     return () => {
       if (pollInterval) clearInterval(pollInterval);
     };
-  }, [joinedTableId, socketId, localStream, createPeer, handleIncomingSignal]);
+  }, [joinedTableId, socketId, initiateCall, handleIncomingSignal, getOrCreatePeerConnection]);
 
   // Chat in Table
   const [tableMessages, setTableMessages] = useState<ChatMessage[]>([
@@ -560,7 +688,7 @@ export default function LiveLoungeClient() {
             audio: true,
           });
         } catch (mediaErr) {
-          console.warn("Falling back to video only or audio only:", mediaErr);
+          console.warn("Falling back to video or audio:", mediaErr);
           try {
             stream = await navigator.mediaDevices.getUserMedia({ video: true });
           } catch (vErr) {
@@ -569,10 +697,20 @@ export default function LiveLoungeClient() {
         }
 
         setLocalStream(stream);
+        localStreamRef.current = stream;
         setHasPermission(true);
+
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
+
+        // Add tracks to any existing peer connections
+        Object.values(peerConnections.current).forEach((pc) => {
+          stream.getTracks().forEach((track) => {
+            pc.addTrack(track, stream);
+          });
+        });
+
         return stream;
       }
     } catch (err: any) {
@@ -586,6 +724,7 @@ export default function LiveLoungeClient() {
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
       setLocalStream(null);
+      localStreamRef.current = null;
     }
     if (localVideoRef.current) {
       localVideoRef.current.srcObject = null;
@@ -657,7 +796,7 @@ export default function LiveLoungeClient() {
     setIsMinimized(false);
     await startCamera();
 
-    // Add local user to table if not already
+    // Add local user to table
     setTables((prev) =>
       prev.map((tbl) => {
         if (tbl.id === tableId) {
@@ -691,13 +830,10 @@ export default function LiveLoungeClient() {
 
   // Leave Table
   const handleLeaveTable = () => {
-    // 1. Disconnect all WebRTC peer connections
-    Object.values(peersRef.current).forEach((p: any) => {
-      try {
-        p.destroy();
-      } catch (e) {}
+    // 1. Close all RTCPeerConnections
+    Object.keys(peerConnections.current).forEach((pId) => {
+      closePeer(pId);
     });
-    setPeers({});
     setPeerStreams({});
 
     // 2. Notify backend
@@ -1054,7 +1190,6 @@ export default function LiveLoungeClient() {
 
                   {/* AIRMEET CIRCULAR TABLE ARENA */}
                   <div className="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto my-4 flex items-center justify-center">
-                    {/* Outer Orbit / Seating Ring */}
                     <div className="absolute inset-0 rounded-full border-2 border-dashed border-white/10"></div>
 
                     {/* Central Physical Table Surface */}
@@ -1112,7 +1247,6 @@ export default function LiveLoungeClient() {
                               )}
                             </div>
 
-                            {/* Name Tooltip */}
                             <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 bg-black/90 text-white text-[0.65rem] font-bold px-2 py-0.5 rounded shadow-lg opacity-0 group-hover/seat:opacity-100 pointer-events-none whitespace-nowrap z-30 transition-opacity">
                               {user.name}
                             </div>
@@ -1179,7 +1313,7 @@ export default function LiveLoungeClient() {
         </main>
       )}
 
-      {/* 3. SPEED 1-ON-1 NETWORKING TAB (AIRMEET SIGNATURE) */}
+      {/* 3. SPEED 1-ON-1 NETWORKING TAB */}
       {activeTab === "speed" && (
         <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
           <div className="w-full bg-[#121c24] border border-white/10 rounded-3xl p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden">
@@ -1401,7 +1535,7 @@ export default function LiveLoungeClient() {
                 <div className="mb-4 bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/30 rounded-2xl p-3 text-center flex flex-col sm:flex-row items-center justify-between gap-2 shadow-sm">
                   <div className="flex items-center gap-2 text-xs text-emerald-200">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>Your camera is live at <strong>Table {currentJoinedTable.number}</strong>. To see another live camera, open this page in another browser tab, device or window!</span>
+                    <span>Your camera is live at <strong>Table {currentJoinedTable.number}</strong>. Open this page in a second browser window/device to see 2-way live video!</span>
                   </div>
                   <button
                     onClick={copyTableLink}

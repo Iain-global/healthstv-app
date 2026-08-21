@@ -9,7 +9,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
     }
 
-    // Verify receiver is still active
+    // Ensure sender exists in DB
+    await prisma.loungeParticipant.upsert({
+      where: { socketId: senderId },
+      update: { updatedAt: new Date() },
+      create: { socketId: senderId, tableId: 1, updatedAt: new Date() }
+    });
+
+    // Ensure receiver exists in DB
     const receiver = await prisma.loungeParticipant.findUnique({
       where: { socketId: receiverId }
     });
@@ -23,7 +30,7 @@ export async function POST(req: Request) {
         senderId,
         receiverId,
         type: type || 'signal',
-        payload: JSON.stringify(payload)
+        payload: typeof payload === 'string' ? payload : JSON.stringify(payload)
       }
     });
 
@@ -33,3 +40,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+

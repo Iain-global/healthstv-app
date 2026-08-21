@@ -9,10 +9,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
     }
 
-    // Heartbeat update
-    await prisma.loungeParticipant.updateMany({
+    const numericTableId = Number(tableId);
+
+    // Heartbeat upsert to ensure participant is always alive in DB
+    await prisma.loungeParticipant.upsert({
       where: { socketId },
-      data: { updatedAt: new Date() }
+      update: { tableId: numericTableId, updatedAt: new Date() },
+      create: { tableId: numericTableId, socketId, updatedAt: new Date() }
     });
 
     // Check for incoming signals
@@ -21,7 +24,7 @@ export async function POST(req: Request) {
       orderBy: { createdAt: 'asc' }
     });
 
-    // If we received them, delete them so we don't process them again
+    // Delete processed signals
     if (incomingSignals.length > 0) {
       const signalIds = incomingSignals.map(s => s.id);
       await prisma.loungeSignal.deleteMany({
@@ -29,10 +32,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // Also get current peers at table just in case someone new joined
-    // (though new peers will usually send an offer directly)
+    // Get current active peers at this table
     const peers = await prisma.loungeParticipant.findMany({
-      where: { tableId, socketId: { not: socketId } }
+      where: { tableId: numericTableId, socketId: { not: socketId } }
     });
 
     return NextResponse.json({ 
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
       signals: incomingSignals.map(s => ({
         senderId: s.senderId,
         type: s.type,
-        payload: JSON.parse(s.payload)
+        payload: typeof s.payload === 'string' ? JSON.parse(s.payload) : s.payload
       })),
       peers: peers.map(p => p.socketId)
     });
@@ -49,3 +51,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
