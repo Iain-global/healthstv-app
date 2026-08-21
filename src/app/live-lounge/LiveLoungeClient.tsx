@@ -856,12 +856,6 @@ export default function LiveLoungeClient() {
 
   // Join Table
   const handleJoinTable = async (tableId: number) => {
-    if (!hasPermission) {
-      setShowPermissionModal(true);
-      setJoinedTableId(tableId);
-      return;
-    }
-
     setJoinedTableId(tableId);
     setIsMinimized(false);
     await startCamera();
@@ -2041,43 +2035,6 @@ export default function LiveLoungeClient() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* 7. CAMERA & MIC PERMISSION / ONBOARDING MODAL */}
-      {showPermissionModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#121c24] border border-white/15 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl">
-              📹
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">
-              Ready to Join the Table?
-            </h3>
-            <p className="text-sm text-slate-300 leading-relaxed mb-6">
-              Connect with fellow health specialists face-to-face. You can mute your microphone or disable your camera at any moment.
-            </p>
-
-            <button
-              onClick={() => {
-                setShowPermissionModal(false);
-                setHasPermission(true);
-                if (joinedTableId) {
-                  handleJoinTable(joinedTableId);
-                }
-              }}
-              className="w-full py-3.5 bg-[#00a86b] hover:bg-[#008f5b] text-white font-bold text-base rounded-xl shadow-lg transition-colors cursor-pointer mb-3"
-            >
-              Allow Camera & Mic
-            </button>
-
-            <button
-              onClick={() => setShowPermissionModal(false)}
-              className="text-xs text-slate-400 hover:text-white"
-            >
-              Browse Tables as Spectator
-            </button>
           </div>
         </div>
       )}
