@@ -1,6 +1,29 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export async function GET() {
+  try {
+    const staleThreshold = new Date(Date.now() - 45000);
+    const activeParticipants = await prisma.loungeParticipant.findMany({
+      where: { updatedAt: { gte: staleThreshold } }
+    });
+
+    const tableCounts: Record<number, number> = {};
+    for (const p of activeParticipants) {
+      tableCounts[p.tableId] = (tableCounts[p.tableId] || 0) + 1;
+    }
+
+    return NextResponse.json({
+      success: true,
+      totalOnline: activeParticipants.length,
+      tableCounts,
+    });
+  } catch (error) {
+    console.error('Lounge Stats Error:', error);
+    return NextResponse.json({ success: true, totalOnline: 0, tableCounts: {} });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { tableId, socketId } = await req.json();
@@ -32,10 +55,21 @@ export async function POST(req: Request) {
       });
     }
 
-    // Get current active peers at this table
-    const peers = await prisma.loungeParticipant.findMany({
-      where: { tableId: numericTableId, socketId: { not: socketId } }
+    // Get all active participants across the lounge
+    const staleThreshold = new Date(Date.now() - 45000);
+    const activeParticipants = await prisma.loungeParticipant.findMany({
+      where: { updatedAt: { gte: staleThreshold } }
     });
+
+    const tableCounts: Record<number, number> = {};
+    for (const p of activeParticipants) {
+      tableCounts[p.tableId] = (tableCounts[p.tableId] || 0) + 1;
+    }
+
+    // Get current active peers at this table
+    const peers = activeParticipants
+      .filter(p => p.tableId === numericTableId && p.socketId !== socketId)
+      .map(p => p.socketId);
 
     return NextResponse.json({ 
       success: true, 
@@ -44,7 +78,9 @@ export async function POST(req: Request) {
         type: s.type,
         payload: typeof s.payload === 'string' ? JSON.parse(s.payload) : s.payload
       })),
-      peers: peers.map(p => p.socketId)
+      peers,
+      totalOnline: activeParticipants.length,
+      tableCounts,
     });
   } catch (error) {
     console.error('Lounge Poll Error:', error);

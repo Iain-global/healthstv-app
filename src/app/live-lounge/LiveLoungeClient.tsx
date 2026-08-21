@@ -293,6 +293,30 @@ export default function LiveLoungeClient() {
   const screenVideoRef = useRef<HTMLVideoElement>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
+  // Live Attendance & Occupancy Tracking
+  const [totalOnlineCount, setTotalOnlineCount] = useState<number>(0);
+  const [tableOccupancy, setTableOccupancy] = useState<Record<number, number>>({});
+
+  // Background stats polling for lounge floor
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/lounge/poll");
+        const data = await res.json();
+        if (data.success) {
+          setTotalOnlineCount(data.totalOnline || 0);
+          if (data.tableCounts) {
+            setTableOccupancy(data.tableCounts);
+          }
+        }
+      } catch (e) {}
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
   // Native WebRTC State
   const [socketId, setSocketId] = useState("");
   const [peerStreams, setPeerStreams] = useState<{ [remoteId: string]: MediaStream }>({});
@@ -563,6 +587,13 @@ export default function LiveLoungeClient() {
             body: JSON.stringify({ tableId: joinedTableId, socketId }),
           });
           const data = await res.json();
+
+          if (typeof data.totalOnline === "number") {
+            setTotalOnlineCount(data.totalOnline);
+          }
+          if (data.tableCounts) {
+            setTableOccupancy(data.tableCounts);
+          }
 
           if (data.signals && Array.isArray(data.signals)) {
             for (const sig of data.signals) {
