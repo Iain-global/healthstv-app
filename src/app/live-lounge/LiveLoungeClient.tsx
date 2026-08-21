@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Mic,
   MicOff,
@@ -10,7 +9,6 @@ import {
   VideoOff,
   MonitorUp,
   Hand,
-  Smile,
   LogOut,
   Users,
   MessageSquare,
@@ -22,27 +20,84 @@ import {
   Layers,
   Zap,
   Clock,
-  ShieldCheck,
-  Award,
   ChevronRight,
   Maximize2,
   Minimize2,
-  Volume2,
-  VolumeX,
   X,
   Send,
-  ExternalLink,
   Share2,
-  Settings,
-  HelpCircle,
-  Lock,
-  Compass,
-  Flame,
-  Heart,
-  ThumbsUp,
-  PartyPopper,
-  Lightbulb,
+  Check,
+  Copy,
 } from "lucide-react";
+
+// Load SimplePeer safely on the client
+let Peer: any = null;
+if (typeof window !== "undefined") {
+  try {
+    Peer = require("simple-peer");
+  } catch (e) {
+    console.warn("Simple-peer load error:", e);
+  }
+}
+
+// Google and global public STUN servers for reliable NAT traversal
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
+    { urls: "stun:global.stun.twilio.com:3478" },
+  ],
+};
+
+// Remote Live Video Player Component
+function RemoteVideoTile({
+  stream,
+  peerId,
+  index,
+}: {
+  stream: MediaStream;
+  peerId: string;
+  index: number;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  return (
+    <div className="relative aspect-video bg-[#121d25] rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-2xl flex items-center justify-center group animate-in fade-in zoom-in-95 duration-300">
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        className="w-full h-full object-cover"
+      />
+
+      {/* Delegate Info Tag */}
+      <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 z-10">
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <div>
+          <div className="text-xs font-bold text-white flex items-center gap-1">
+            <span>Live Delegate #{index + 1}</span>
+            <span className="text-[0.65rem] text-slate-400">({peerId.slice(0, 4)})</span>
+          </div>
+          <div className="text-[0.65rem] text-emerald-400 font-semibold">Broadcasting Live Camera</div>
+        </div>
+      </div>
+
+      <div className="absolute top-3 right-3 bg-emerald-600/90 text-white text-[0.65rem] font-bold px-2 py-0.5 rounded-md shadow z-10 flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+        Live Connected
+      </div>
+    </div>
+  );
+}
 
 // Table Data Structure
 interface SeatedUser {
@@ -98,13 +153,6 @@ const INITIAL_TABLES: LoungeTable[] = [
         role: "Health Clinic Director",
         company: "Vance Cellular Health",
         avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop",
-      },
-      {
-        id: "u3",
-        name: "Elena Rostova",
-        role: "Biochemist & Author",
-        company: "NutriGen Labs",
-        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&h=200&fit=crop",
       },
     ],
   },
@@ -174,13 +222,6 @@ const INITIAL_TABLES: LoungeTable[] = [
         company: "MedTech Pulse",
         avatar: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=200&h=200&fit=crop",
       },
-      {
-        id: "u8",
-        name: "Tom Henderson",
-        role: "Founder & CEO",
-        company: "VitalTrack Systems",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&h=200&fit=crop",
-      },
     ],
   },
   {
@@ -200,20 +241,6 @@ const INITIAL_TABLES: LoungeTable[] = [
         company: "London Integrative Care",
         avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=200&h=200&fit=crop",
       },
-      {
-        id: "u10",
-        name: "Claire Thomson",
-        role: "Operations Director",
-        company: "Synergy Wellness Group",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&h=200&fit=crop",
-      },
-      {
-        id: "u11",
-        name: "Markus Bailey",
-        role: "Health Entrepreneur",
-        company: "Holistic Hub",
-        avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&h=200&fit=crop",
-      },
     ],
   },
   {
@@ -225,15 +252,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 2,
     tag: "1:1 Quick Chat",
     tagColor: "orange",
-    seatedUsers: [
-      {
-        id: "u12",
-        name: "Jessica White",
-        role: "Wellness Consultant",
-        company: "Vibrant Living Co.",
-        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
   // Floor 2 Tables (Speakers & Keynotes)
   {
@@ -256,13 +275,6 @@ const INITIAL_TABLES: LoungeTable[] = [
         isHost: true,
         isSpeaking: true,
       },
-      {
-        id: "u14",
-        name: "Dr. Maya Patel",
-        role: "Integrative Physician",
-        company: "Beacon Health UK",
-        avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&h=200&fit=crop",
-      },
     ],
   },
   {
@@ -275,16 +287,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     tag: "Book Signing & Q&A",
     tagColor: "emerald",
     isVip: true,
-    seatedUsers: [
-      {
-        id: "u15",
-        name: "Gemma Lawson",
-        role: "Best-Selling Author",
-        company: "Penguin Health Series",
-        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&h=200&fit=crop",
-        isHost: true,
-      },
-    ],
+    seatedUsers: [],
   },
   // Floor 3 Tables (Sponsor Expo)
   {
@@ -296,16 +299,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 6,
     tag: "Sponsor Pod",
     tagColor: "blue",
-    seatedUsers: [
-      {
-        id: "u16",
-        name: "Alexander Fox",
-        role: "Chief Product Officer",
-        company: "OxyHealth Systems",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop",
-        isHost: true,
-      },
-    ],
+    seatedUsers: [],
   },
   {
     id: 10,
@@ -328,22 +322,7 @@ const INITIAL_TABLES: LoungeTable[] = [
     capacity: 6,
     tag: "Peer Mastermind",
     tagColor: "emerald",
-    seatedUsers: [
-      {
-        id: "u17",
-        name: "Helen McGregor",
-        role: "BANT Registered Nutritionist",
-        company: "Edinburgh Holistic",
-        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=200&h=200&fit=crop",
-      },
-      {
-        id: "u18",
-        name: "James Thorne",
-        role: "Functional Health Coach",
-        company: "Thorne Performance",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&fit=crop",
-      },
-    ],
+    seatedUsers: [],
   },
 ];
 
@@ -366,6 +345,7 @@ export default function LiveLoungeClient() {
   const [joinedTableId, setJoinedTableId] = useState<number | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeDrawerTab, setActiveDrawerTab] = useState<"chat" | "members" | "info">("chat");
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Hardware AV State
   const [hasPermission, setHasPermission] = useState(false);
@@ -381,19 +361,178 @@ export default function LiveLoungeClient() {
   const screenVideoRef = useRef<HTMLVideoElement>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
+  // WebRTC Real-Time Signaling & Peer Connections
+  const [socketId, setSocketId] = useState("");
+  const [peers, setPeers] = useState<{ [id: string]: any }>({});
+  const [peerStreams, setPeerStreams] = useState<{ [id: string]: MediaStream }>({});
+  const peersRef = useRef(peers);
+  useEffect(() => {
+    peersRef.current = peers;
+  }, [peers]);
+
+  // Generate unique socketId on mount
+  useEffect(() => {
+    const id = "hstv_" + Math.random().toString(36).substring(2, 11);
+    setSocketId(id);
+  }, []);
+
+  // Remove Peer handler
+  const removePeer = useCallback((peerId: string) => {
+    setPeers((prev) => {
+      const newPeers = { ...prev };
+      if (newPeers[peerId]) {
+        try {
+          newPeers[peerId].destroy();
+        } catch (e) {}
+        delete newPeers[peerId];
+      }
+      return newPeers;
+    });
+
+    setPeerStreams((prev) => {
+      const newStreams = { ...prev };
+      delete newStreams[peerId];
+      return newStreams;
+    });
+  }, []);
+
+  // Create Peer Connection (SimplePeer)
+  const createPeer = useCallback(
+    (peerId: string, initiator: boolean, myStream: MediaStream, myCurrentSocketId: string) => {
+      if (peersRef.current[peerId]) {
+        return peersRef.current[peerId];
+      }
+      if (!Peer) {
+        console.warn("SimplePeer library not loaded yet.");
+        return null;
+      }
+
+      const peer = new Peer({
+        initiator,
+        stream: myStream,
+        trickle: false,
+        config: ICE_SERVERS,
+      });
+
+      peer.on("signal", (signal: any) => {
+        fetch("/api/lounge/signal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            senderId: myCurrentSocketId,
+            receiverId: peerId,
+            type: signal.type || "signal",
+            payload: signal,
+          }),
+        }).catch((err) => console.error("Signal send error:", err));
+      });
+
+      peer.on("stream", (remoteStream: MediaStream) => {
+        console.log("WebRTC Live Camera Stream Received from:", peerId);
+        setPeerStreams((prev) => ({ ...prev, [peerId]: remoteStream }));
+      });
+
+      peer.on("close", () => removePeer(peerId));
+      peer.on("error", (err: any) => {
+        console.warn("Peer error with", peerId, err);
+        removePeer(peerId);
+      });
+
+      setPeers((prev) => ({ ...prev, [peerId]: peer }));
+      peersRef.current[peerId] = peer;
+      return peer;
+    },
+    [removePeer]
+  );
+
+  // Handle incoming WebRTC signals
+  const handleIncomingSignal = useCallback(
+    (senderId: string, type: string, payload: any, myStream: MediaStream, myCurrentSocketId: string) => {
+      let peer = peersRef.current[senderId];
+
+      if (type === "offer") {
+        if (!peer) {
+          peer = createPeer(senderId, false, myStream, myCurrentSocketId);
+        }
+        if (peer) {
+          peer.signal(payload);
+        }
+      } else if (type === "answer") {
+        if (peer) {
+          peer.signal(payload);
+        }
+      } else if (peer) {
+        peer.signal(payload);
+      }
+    },
+    [createPeer]
+  );
+
+  // Join table API & start polling loop
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+
+    if (joinedTableId && socketId && localStream) {
+      // 1. Register with backend room
+      fetch("/api/lounge/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tableId: joinedTableId, socketId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.peers && Array.isArray(data.peers)) {
+            data.peers.forEach((remotePeerId: string) => {
+              if (remotePeerId !== socketId) {
+                createPeer(remotePeerId, true, localStream, socketId);
+              }
+            });
+          }
+        })
+        .catch((err) => console.error("Join Table Error:", err));
+
+      // 2. Poll for incoming WebRTC signals & active participants
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch("/api/lounge/poll", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tableId: joinedTableId, socketId }),
+          });
+          const data = await res.json();
+
+          if (data.signals && Array.isArray(data.signals)) {
+            data.signals.forEach((sig: any) => {
+              handleIncomingSignal(sig.senderId, sig.type, sig.payload, localStream, socketId);
+            });
+          }
+
+          // If there are peers at table that we haven't connected to yet, initiate
+          if (data.peers && Array.isArray(data.peers)) {
+            data.peers.forEach((peerId: string) => {
+              if (peerId !== socketId && !peersRef.current[peerId]) {
+                createPeer(peerId, true, localStream, socketId);
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Lounge Poll Error:", e);
+        }
+      }, 1500); // 1.5s interval
+    }
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [joinedTableId, socketId, localStream, createPeer, handleIncomingSignal]);
+
   // Chat in Table
   const [tableMessages, setTableMessages] = useState<ChatMessage[]>([
     {
       id: "m1",
       sender: "Dr. Sarah Jenkins",
-      text: "Welcome everyone! Feel free to ask about our recent NAD+ clinical trial protocol.",
+      text: "Welcome to the Live Lounge! Feel free to ask about our recent clinical trials.",
       time: "14:02",
-    },
-    {
-      id: "m2",
-      sender: "Marcus Vance",
-      text: "Thanks Dr. Jenkins! We're seeing great compliance in our London clinic with the subcutaneous doses.",
-      time: "14:04",
     },
   ]);
   const [chatInput, setChatInput] = useState("");
@@ -401,7 +540,7 @@ export default function LiveLoungeClient() {
 
   // Speed Networking State
   const [speedState, setSpeedState] = useState<"idle" | "searching" | "connected">("idle");
-  const [speedTimer, setSpeedTimer] = useState(180); // 3 minutes
+  const [speedTimer, setSpeedTimer] = useState(180);
   const [speedPartner, setSpeedPartner] = useState<SeatedUser | null>(null);
 
   // Custom Table Modal
@@ -410,26 +549,37 @@ export default function LiveLoungeClient() {
   const [newTableTopic, setNewTableTopic] = useState("");
   const [newTableCapacity, setNewTableCapacity] = useState<2 | 4 | 6 | 8>(6);
 
-  // Initialize Media Stream when joining
+  // Start Camera & Mic
   const startCamera = async () => {
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
+        let stream: MediaStream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: true,
+          });
+        } catch (mediaErr) {
+          console.warn("Falling back to video only or audio only:", mediaErr);
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          } catch (vErr) {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          }
+        }
+
         setLocalStream(stream);
         setHasPermission(true);
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
-      } else {
-        setHasPermission(true);
+        return stream;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn("Could not access webcam/mic", err);
       setHasPermission(true);
     }
+    return null;
   };
 
   const stopCamera = () => {
@@ -496,7 +646,7 @@ export default function LiveLoungeClient() {
   };
 
   // Join Table
-  const handleJoinTable = (tableId: number) => {
+  const handleJoinTable = async (tableId: number) => {
     if (!hasPermission) {
       setShowPermissionModal(true);
       setJoinedTableId(tableId);
@@ -505,7 +655,7 @@ export default function LiveLoungeClient() {
 
     setJoinedTableId(tableId);
     setIsMinimized(false);
-    startCamera();
+    await startCamera();
 
     // Add local user to table if not already
     setTables((prev) =>
@@ -529,7 +679,6 @@ export default function LiveLoungeClient() {
             };
           }
         } else {
-          // Remove from other tables
           return {
             ...tbl,
             seatedUsers: tbl.seatedUsers.filter((u) => u.id !== "me"),
@@ -542,6 +691,24 @@ export default function LiveLoungeClient() {
 
   // Leave Table
   const handleLeaveTable = () => {
+    // 1. Disconnect all WebRTC peer connections
+    Object.values(peersRef.current).forEach((p: any) => {
+      try {
+        p.destroy();
+      } catch (e) {}
+    });
+    setPeers({});
+    setPeerStreams({});
+
+    // 2. Notify backend
+    if (socketId) {
+      fetch("/api/lounge/leave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ socketId }),
+      }).catch(() => {});
+    }
+
     setJoinedTableId(null);
     setIsMinimized(false);
     setIsScreenSharing(false);
@@ -583,6 +750,15 @@ export default function LiveLoungeClient() {
     }, 100);
   };
 
+  // Copy Table Link
+  const copyTableLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 3000);
+    }
+  };
+
   // Start Speed Networking
   const handleStartSpeedNetworking = () => {
     setSpeedState("searching");
@@ -612,7 +788,7 @@ export default function LiveLoungeClient() {
     return () => clearInterval(interval);
   }, [speedState, speedTimer]);
 
-  // Create Table
+  // Create Custom Table
   const handleCreateCustomTable = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTableTitle.trim()) return;
@@ -647,6 +823,8 @@ export default function LiveLoungeClient() {
   };
 
   const currentJoinedTable = tables.find((t) => t.id === joinedTableId);
+  const activePeerEntries = Object.entries(peerStreams);
+  const totalLiveParticipants = 1 + activePeerEntries.length;
 
   // Filter tables by floor, search, and capacity
   const filteredTables = tables.filter((table) => {
@@ -900,8 +1078,8 @@ export default function LiveLoungeClient() {
                     {Array.from({ length: table.capacity }).map((_, index) => {
                       const user = table.seatedUsers[index];
                       const totalSeats = table.capacity;
-                      const angle = (index * 360) / totalSeats - 90; // Top starting
-                      const radius = 80; // Radius in pixels
+                      const angle = (index * 360) / totalSeats - 90;
+                      const radius = 80;
                       const x = Math.round(radius * Math.cos((angle * Math.PI) / 180));
                       const y = Math.round(radius * Math.sin((angle * Math.PI) / 180));
 
@@ -1005,7 +1183,6 @@ export default function LiveLoungeClient() {
       {activeTab === "speed" && (
         <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
           <div className="w-full bg-[#121c24] border border-white/10 rounded-3xl p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden">
-            {/* Background glowing shapes */}
             <div className="absolute top-0 right-1/4 w-72 h-72 bg-[#ea8125]/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-[#00a86b]/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -1168,13 +1345,28 @@ export default function LiveLoungeClient() {
                 <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
                   {currentJoinedTable.title}
                 </h2>
-                <p className="text-[0.7rem] text-slate-400 hidden sm:block">
-                  {currentJoinedTable.topic}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[0.7rem] text-slate-400 hidden sm:inline">
+                    {currentJoinedTable.topic}
+                  </span>
+                  <span className="text-[0.7rem] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.2 rounded-full">
+                    🟢 {totalLiveParticipants} Live Camera{totalLiveParticipants > 1 ? "s" : ""}
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Copy Invite Link */}
+              <button
+                onClick={copyTableLink}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
+                title="Share link to join this table with another delegate"
+              >
+                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedLink ? "Link Copied!" : "Invite 2nd Camera"}</span>
+              </button>
+
               <button
                 onClick={() => setIsMinimized(true)}
                 className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
@@ -1204,6 +1396,22 @@ export default function LiveLoungeClient() {
                 </div>
               )}
 
+              {/* Waiting for other live cameras notification banner if alone */}
+              {activePeerEntries.length === 0 && (
+                <div className="mb-4 bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/30 rounded-2xl p-3 text-center flex flex-col sm:flex-row items-center justify-between gap-2 shadow-sm">
+                  <div className="flex items-center gap-2 text-xs text-emerald-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Your camera is live at <strong>Table {currentJoinedTable.number}</strong>. To see another live camera, open this page in another browser tab, device or window!</span>
+                  </div>
+                  <button
+                    onClick={copyTableLink}
+                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0"
+                  >
+                    {copiedLink ? "Link Copied ✓" : "Copy Table Link"}
+                  </button>
+                </div>
+              )}
+
               {/* Screen Share Window if Active */}
               {isScreenSharing && (
                 <div className="mb-4 aspect-video bg-black rounded-2xl border-2 border-emerald-500 overflow-hidden shadow-2xl relative">
@@ -1216,7 +1424,7 @@ export default function LiveLoungeClient() {
 
               {/* Dynamic Video Tiles Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 items-center justify-center">
-                {/* 1. Local User Video Tile */}
+                {/* 1. Local User Live Video Tile */}
                 <div className="relative aspect-video bg-[#152028] rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-xl flex items-center justify-center group">
                   <video
                     ref={localVideoRef}
@@ -1233,7 +1441,7 @@ export default function LiveLoungeClient() {
 
                   <div className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1.5">
                     <span className="text-xs font-bold text-white">You</span>
-                    <span className="text-[0.65rem] text-emerald-400 font-semibold">• Speaking</span>
+                    <span className="text-[0.65rem] text-emerald-400 font-semibold">• Live Cam</span>
                   </div>
 
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
@@ -1250,7 +1458,17 @@ export default function LiveLoungeClient() {
                   </div>
                 </div>
 
-                {/* 2. Other Seated Participants */}
+                {/* 2. REAL WebRTC Remote Live Camera Tiles */}
+                {activePeerEntries.map(([peerId, stream], index) => (
+                  <RemoteVideoTile
+                    key={peerId}
+                    peerId={peerId}
+                    stream={stream}
+                    index={index}
+                  />
+                ))}
+
+                {/* 3. Demo / Mock Seated Participants */}
                 {currentJoinedTable.seatedUsers
                   .filter((u) => u.id !== "me")
                   .map((user) => (
@@ -1289,15 +1507,19 @@ export default function LiveLoungeClient() {
 
                 {/* Fill empty seats representation */}
                 {Array.from({
-                  length: Math.max(0, currentJoinedTable.capacity - currentJoinedTable.seatedUsers.length),
+                  length: Math.max(
+                    0,
+                    currentJoinedTable.capacity - (1 + activePeerEntries.length + currentJoinedTable.seatedUsers.filter((u) => u.id !== "me").length)
+                  ),
                 }).map((_, i) => (
                   <div
                     key={`empty-grid-${i}`}
-                    className="aspect-video bg-white/5 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 p-4 text-center"
+                    onClick={copyTableLink}
+                    className="aspect-video bg-white/5 hover:bg-white/10 transition-colors rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 p-4 text-center cursor-pointer group"
                   >
-                    <Users className="w-8 h-8 opacity-30 mb-2" />
-                    <span className="text-xs font-semibold">Seat Open</span>
-                    <span className="text-[0.65rem] opacity-60">Invite another delegate</span>
+                    <Users className="w-8 h-8 opacity-30 mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-semibold text-slate-400 group-hover:text-emerald-400">Seat Open</span>
+                    <span className="text-[0.65rem] opacity-60">Click to invite another live camera</span>
                   </div>
                 ))}
               </div>
@@ -1389,7 +1611,7 @@ export default function LiveLoungeClient() {
                       : "border-transparent text-slate-400 hover:text-white"
                   }`}
                 >
-                  👥 Members ({currentJoinedTable.seatedUsers.length})
+                  👥 Members ({totalLiveParticipants})
                 </button>
               </div>
 
@@ -1438,32 +1660,32 @@ export default function LiveLoungeClient() {
               {/* Members Panel Content */}
               {activeDrawerTab === "members" && (
                 <div className="flex-1 p-4 overflow-y-auto space-y-3">
-                  {currentJoinedTable.seatedUsers.map((user) => (
+                  <div className="p-3 bg-emerald-950/40 border border-emerald-800/40 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center">
+                        ME
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">You (Local User)</div>
+                        <div className="text-[0.7rem] text-emerald-400">Live Camera Active</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {activePeerEntries.map(([peerId], idx) => (
                     <div
-                      key={user.id}
+                      key={peerId}
                       className="p-3 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <img
-                          src={user.avatar}
-                          alt={user.name}
-                          className="w-10 h-10 rounded-full object-cover border border-white/20"
-                        />
+                        <div className="w-10 h-10 rounded-full bg-teal-700 text-white font-bold flex items-center justify-center">
+                          P{idx + 1}
+                        </div>
                         <div>
-                          <div className="text-xs font-bold text-white">{user.name}</div>
-                          <div className="text-[0.7rem] text-slate-400">{user.role}</div>
-                          <div className="text-[0.65rem] text-[#00a86b]">{user.company}</div>
+                          <div className="text-xs font-bold text-white">Live Peer #{idx + 1}</div>
+                          <div className="text-[0.7rem] text-slate-400">Connected ({peerId.slice(0, 5)})</div>
                         </div>
                       </div>
-
-                      {user.id !== "me" && (
-                        <button
-                          onClick={() => alert(`Connecting with ${user.name}...`)}
-                          className="text-[0.7rem] font-bold text-white bg-white/10 hover:bg-[#00a86b] px-2.5 py-1 rounded-lg transition-colors"
-                        >
-                          Connect
-                        </button>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -1504,7 +1726,7 @@ export default function LiveLoungeClient() {
           </p>
 
           <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-white/10">
-            <span>{currentJoinedTable.seatedUsers.length} Delegates</span>
+            <span>{totalLiveParticipants} Live Cameras</span>
             <button
               onClick={() => setIsMinimized(false)}
               className="text-[#00a86b] font-bold hover:underline"
