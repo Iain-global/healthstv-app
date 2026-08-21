@@ -436,6 +436,318 @@ export const DEFAULT_PRESENTATIONS = [
     ]
   },
   {
+    id: 'steve-pollard-summit',
+    title: 'Steve Pollard',
+    subtitle: '5-DAY SUMMIT',
+    badgeText: '5-DAY SUMMIT',
+    dateLocation: 'Integrative Health & Longevity Series',
+    filmmaker: 'Steve Pollard Productions',
+    coverImage: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&auto=format&fit=crop&q=85',
+    backgroundVideo: '',
+    themePreset: 'summit-estate',
+    layoutPreset: 'multi-day-tabs',
+    backgroundBlur: 0,
+    backgroundDarkness: 0.35,
+    enableAmbientSound: false,
+    sharePasscode: 'POLLARD2026',
+    downloadSize: '42.5 GB (4K Masterclass Collection)',
+    days: [
+      {
+        id: 'day-1',
+        name: 'Day One',
+        badgeCount: 4,
+        subtitle: 'Day One: Foundations of Longevity & Cellular Health',
+        sessions: [
+          {
+            id: 'sp-d1-s1',
+            title: 'Day One - Session 1',
+            subtitle: 'Keynote: Mitochondrial Biology & Cellular Renewal',
+            duration: 2520,
+            durationFormatted: '42:00',
+            thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: [
+              { id: 'sp-c1-1', title: 'Welcome & Summit Overview', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-2', title: 'Cellular Energy & ATP Pathways', time: 720, timeFormatted: '12:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-3', title: 'Mitochondrial Repair Protocols', time: 1500, timeFormatted: '25:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-4', title: 'Audience Q&A & Key Takeaways', time: 2100, timeFormatted: '35:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d1-s2',
+            title: 'Day One - Session 2',
+            subtitle: 'Clinical Protocols: NAD+, Peptides & Fasting',
+            duration: 2880,
+            durationFormatted: '48:00',
+            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+            chapters: [
+              { id: 'sp-c1-5', title: 'NAD+ Infusions vs Precursors', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-6', title: 'Therapeutic Peptide Stacks', time: 900, timeFormatted: '15:00', thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-7', title: 'Fasting Mimicking & Autophagy', time: 1800, timeFormatted: '30:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d1-s3',
+            title: 'Day One - Session 3',
+            subtitle: 'Masterclass: Autophagy & Biomarker Testing',
+            duration: 2280,
+            durationFormatted: '38:00',
+            thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            chapters: [
+              { id: 'sp-c1-8', title: 'Advanced Blood Chemistry Analysis', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-9', title: 'Continuous Glucose Tracking Nuances', time: 840, timeFormatted: '14:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d1-s4',
+            title: 'Day One - Session 4',
+            subtitle: 'Clinical Case Studies & Live Delegate Q&A',
+            duration: 2400,
+            durationFormatted: '40:00',
+            thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+            chapters: [
+              { id: 'sp-c1-10', title: 'Case Study: Chronic Fatigue Reversal', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c1-11', title: 'Delegate Round-Robin Questions', time: 1080, timeFormatted: '18:00', thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'day-2',
+        name: 'Day Two',
+        badgeCount: 4,
+        subtitle: 'Day Two: Gut-Brain Axis, Microbiome & Digestion',
+        sessions: [
+          {
+            id: 'sp-d2-s1',
+            title: 'Day Two - Session 1',
+            subtitle: 'Keynote: The Microbiome as Master Regulator',
+            duration: 2400,
+            durationFormatted: '40:00',
+            thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+            chapters: [
+              { id: 'sp-c2-1', title: 'The Intestinal Mucosal Barrier', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c2-2', title: 'Microbiome Diversity & SCFA Production', time: 900, timeFormatted: '15:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d2-s2',
+            title: 'Day Two - Session 2',
+            subtitle: 'Clinical Protocols: SIBO, Leaky Gut & Psychobiotics',
+            duration: 3120,
+            durationFormatted: '52:00',
+            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+            chapters: [
+              { id: 'sp-c2-3', title: 'SIBO Breath Testing & Antimicrobials', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c2-4', title: 'Targeted Strain-Specific Probiotics', time: 1200, timeFormatted: '20:00', thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d2-s3',
+            title: 'Day Two - Session 3',
+            subtitle: 'Workshop: Vagus Nerve & Motility Activation',
+            duration: 2700,
+            durationFormatted: '45:00',
+            thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+            chapters: [
+              { id: 'sp-c2-5', title: 'Vagal Tone Measurement (HRV)', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c2-6', title: 'Somatic Exercises for Migrating Motor Complex', time: 1080, timeFormatted: '18:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d2-s4',
+            title: 'Day Two - Session 4',
+            subtitle: 'Case Studies: Reversing Chronic Inflammation',
+            duration: 2700,
+            durationFormatted: '45:00',
+            thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: [
+              { id: 'sp-c2-7', title: 'Autoimmune & Food Sensitivity Panel', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&auto=format&fit=crop&q=80' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'day-3',
+        name: 'Day Three',
+        badgeCount: 4,
+        subtitle: 'Day Three: Hormone Optimization & Metabolic Health',
+        sessions: [
+          {
+            id: 'sp-d3-s1',
+            title: 'Day Three - Session 1',
+            subtitle: 'Endocrine Reset & Thyroid Mastery',
+            duration: 2280,
+            durationFormatted: '38:00',
+            thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+            chapters: [
+              { id: 'sp-c3-1', title: 'Complete Thyroid & Adrenal Assessment', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d3-s2',
+            title: 'Day Three - Session 2',
+            subtitle: 'Bio-Identical Hormones & Precision Dosing',
+            duration: 2940,
+            durationFormatted: '49:00',
+            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: [
+              { id: 'sp-c3-2', title: 'BHRT Protocols for Men & Women', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d3-s3',
+            title: 'Day Three - Session 3',
+            subtitle: 'Insulin Sensitivity & Metabolic Flexibility',
+            duration: 2520,
+            durationFormatted: '42:00',
+            thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d3-s4',
+            title: 'Day Three - Session 4',
+            subtitle: 'Personalized Hormone Therapy Roundtable',
+            duration: 2280,
+            durationFormatted: '38:00',
+            thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            chapters: []
+          }
+        ]
+      },
+      {
+        id: 'day-4',
+        name: 'Day Four',
+        badgeCount: 4,
+        subtitle: 'Day Four: Sleep Architecture & Neuroplasticity',
+        sessions: [
+          {
+            id: 'sp-d4-s1',
+            title: 'Day Four - Session 1',
+            subtitle: 'Sleep Stages, Glymphatic Clearance & REM',
+            duration: 2640,
+            durationFormatted: '44:00',
+            thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d4-s2',
+            title: 'Day Four - Session 2',
+            subtitle: 'Nootropics, BDNF & Cognitive Longevity',
+            duration: 3000,
+            durationFormatted: '50:00',
+            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d4-s3',
+            title: 'Day Four - Session 3',
+            subtitle: 'HRV Tracking & Stress Resilience Masterclass',
+            duration: 2220,
+            durationFormatted: '37:00',
+            thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d4-s4',
+            title: 'Day Four - Session 4',
+            subtitle: 'Sound Frequencies & Light Hygiene Protocols',
+            duration: 3000,
+            durationFormatted: '50:00',
+            thumbnail: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: []
+          }
+        ]
+      },
+      {
+        id: 'day-5',
+        name: 'Day Five',
+        badgeCount: 4,
+        subtitle: 'Day Five: Integration & Future of Integrative Care',
+        sessions: [
+          {
+            id: 'sp-d5-s1',
+            title: 'Day Five - Session 1',
+            subtitle: 'The Daily Health & Longevity Stack',
+            duration: 2790,
+            durationFormatted: '46:30',
+            thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            chapters: [
+              { id: 'sp-c5-1', title: 'Opening Remarks & Full Assessment', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c5-2', title: 'Daily Habit Stacking Formulation', time: 780, timeFormatted: '13:00', thumbnail: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=80' },
+              { id: 'sp-c5-3', title: 'Interactive Calibration & Live Demonstrations', time: 1680, timeFormatted: '28:00', thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&auto=format&fit=crop&q=80' }
+            ]
+          },
+          {
+            id: 'sp-d5-s2',
+            title: 'Day Five - Session 2',
+            subtitle: 'Biohacking in Clinical Practice',
+            duration: 2175,
+            durationFormatted: '36:15',
+            thumbnail: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d5-s3',
+            title: 'Day Five - Session 3',
+            subtitle: 'Action Plan: Integrating Summit Protocols',
+            duration: 3300,
+            durationFormatted: '55:00',
+            thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            chapters: []
+          },
+          {
+            id: 'sp-d5-s4',
+            title: 'Day Five - Session 4',
+            subtitle: 'Grand Closing Summit Keynote & Awards',
+            duration: 2880,
+            durationFormatted: '48:00',
+            thumbnail: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=80',
+            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+            chapters: []
+          }
+        ]
+      }
+    ],
+    videos: [
+      {
+        id: 'sp-d1-s1',
+        title: 'Day One - Session 1',
+        subtitle: 'Keynote: Mitochondrial Biology & Cellular Renewal',
+        duration: 2520,
+        durationFormatted: '42:00',
+        thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        badge: 'Session 1',
+        chapters: [
+          { id: 'sp-c1-1', title: 'Welcome & Summit Overview', time: 0, timeFormatted: '00:00', thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80' },
+          { id: 'sp-c1-2', title: 'Cellular Energy & ATP Pathways', time: 720, timeFormatted: '12:00', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&auto=format&fit=crop&q=80' }
+        ]
+      }
+    ],
+    menuButtons: [
+      { id: 'btn-sp-playall', type: 'play-all', title: 'Play All Day 1', icon: 'play', badge: 'Continuous' }
+    ]
+  },
+  {
     id: 'wedding-sophia-alexander',
     title: 'Sophia & Alexander',
     subtitle: 'The Wedding Celebration',

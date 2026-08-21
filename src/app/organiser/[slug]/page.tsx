@@ -52,6 +52,25 @@ export default async function OrganiserProfile({ params }: { params: { slug: str
     } as any;
   }
 
+  if (!organiser && (slug === 'steve-pollard' || slug === 'stevepollard')) {
+    organiser = {
+      id: 998,
+      userId: 998,
+      slug: 'steve-pollard',
+      name: 'Steve Pollard',
+      organization: 'Integrative Longevity & Health Summits',
+      bio: 'Pioneering holistic wellness, cellular medicine, and multi-day health conferences. Access the complete interactive video presentation series with structured days, sessions, and chapter markers.',
+      website: 'https://healthsummits.tv',
+      avatarInitials: 'SP',
+      profilePhotoUrl: null,
+      isVerified: true,
+      isFounding: true,
+      subscriptionPrice: 0,
+      events: [],
+      videos: []
+    } as any;
+  }
+
   if (!organiser) {
     notFound();
   }

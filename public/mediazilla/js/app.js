@@ -34,6 +34,23 @@ try {
       presentations[0].days = parsedDays;
     }
   }
+
+  // URL parameters check for organiser
+  const urlParams = new URLSearchParams(window.location.search);
+  const orgParam = urlParams.get('organiser') || urlParams.get('pres') || urlParams.get('slug');
+  if (orgParam) {
+    const matchedPres = presentations.find(p => 
+      p.id === orgParam || 
+      p.id.includes(orgParam) || 
+      p.title.toLowerCase().includes(orgParam.toLowerCase().replace(/-/g, ' '))
+    );
+    if (matchedPres) {
+      currentPresId = matchedPres.id;
+      if (matchedPres.days && matchedPres.days.length > 0) {
+        activeDayId = matchedPres.days[0].id;
+      }
+    }
+  }
 } catch {
   // Ignore
 }

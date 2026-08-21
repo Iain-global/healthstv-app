@@ -44,10 +44,276 @@ type OrganiserType = {
   }>;
 };
 
+const ORGANISER_SCHEDULE: Array<{
+  day: number;
+  name: string;
+  subtitle: string;
+  sessions: Array<{
+    id: string;
+    number: number;
+    title: string;
+    duration: string;
+    speaker: string;
+    chapters: Array<{ time: string; title: string }>;
+  }>;
+}> = [
+  {
+    day: 1,
+    name: "Day 1",
+    subtitle: "Foundations of Longevity & Cellular Health",
+    sessions: [
+      {
+        id: "d1-s1",
+        number: 1,
+        title: "Keynote: Mitochondrial Biology & Cellular Renewal",
+        duration: "42:00",
+        speaker: "Steve Pollard",
+        chapters: [
+          { time: "00:00", title: "Welcome & Summit Overview" },
+          { time: "12:00", title: "Cellular Energy & ATP Pathways" },
+          { time: "25:00", title: "Mitochondrial Repair Protocols" },
+          { time: "35:00", title: "Audience Q&A & Takeaways" }
+        ]
+      },
+      {
+        id: "d1-s2",
+        number: 2,
+        title: "Clinical Protocols: NAD+, Peptides & Fasting Windows",
+        duration: "48:00",
+        speaker: "Prof. Liam Vance",
+        chapters: [
+          { time: "00:00", title: "NAD+ Infusions vs Precursors" },
+          { time: "15:00", title: "Therapeutic Peptide Stacks" },
+          { time: "30:00", title: "Fasting Mimicking & Autophagy" }
+        ]
+      },
+      {
+        id: "d1-s3",
+        number: 3,
+        title: "Masterclass: Autophagy Induction & Biomarker Testing",
+        duration: "38:00",
+        speaker: "Dr. Jonathan Hayes",
+        chapters: [
+          { time: "00:00", title: "Advanced Blood Chemistry Analysis" },
+          { time: "14:00", title: "Continuous Glucose Tracking Nuances" },
+          { time: "28:00", title: "Live Audience Q&A" }
+        ]
+      },
+      {
+        id: "d1-s4",
+        number: 4,
+        title: "Clinical Case Studies & Live Delegate Q&A",
+        duration: "40:00",
+        speaker: "Panel Discussion",
+        chapters: [
+          { time: "00:00", title: "Case Study: Chronic Fatigue Reversal" },
+          { time: "18:00", title: "Delegate Round-Robin Questions" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 2,
+    name: "Day 2",
+    subtitle: "Gut-Brain Axis, Microbiome Solutions & Digestion",
+    sessions: [
+      {
+        id: "d2-s1",
+        number: 1,
+        title: "Keynote: The Microbiome as a Master Regulator",
+        duration: "40:00",
+        speaker: "Dr. Alistair Ross",
+        chapters: [
+          { time: "00:00", title: "The Intestinal Mucosal Barrier" },
+          { time: "15:00", title: "Microbiome Diversity & SCFA Production" }
+        ]
+      },
+      {
+        id: "d2-s2",
+        number: 2,
+        title: "Clinical Protocols: SIBO, Leaky Gut & Psychobiotics",
+        duration: "52:00",
+        speaker: "Rachel Davies",
+        chapters: [
+          { time: "00:00", title: "SIBO Breath Testing & Antimicrobials" },
+          { time: "20:00", title: "Targeted Strain-Specific Probiotics" }
+        ]
+      },
+      {
+        id: "d2-s3",
+        number: 3,
+        title: "Workshop: Vagus Nerve & Motility Activation",
+        duration: "45:00",
+        speaker: "Dr. Elena Rostova",
+        chapters: [
+          { time: "00:00", title: "Vagal Tone Measurement (HRV)" },
+          { time: "18:00", title: "Somatic Exercises for Migrating Motor Complex" }
+        ]
+      },
+      {
+        id: "d2-s4",
+        number: 4,
+        title: "Case Studies: Reversing Chronic Gut Inflammation",
+        duration: "45:00",
+        speaker: "Clinical Panel",
+        chapters: [
+          { time: "00:00", title: "Autoimmune & Food Sensitivity Panel" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 3,
+    name: "Day 3",
+    subtitle: "Hormone Optimization & Metabolic Precision",
+    sessions: [
+      {
+        id: "d3-s1",
+        number: 1,
+        title: "Endocrine Reset & Thyroid Mastery",
+        duration: "38:00",
+        speaker: "Dr. Marcus Thorne",
+        chapters: [
+          { time: "00:00", title: "Complete Thyroid & Adrenal Assessment" }
+        ]
+      },
+      {
+        id: "d3-s2",
+        number: 2,
+        title: "Bio-Identical Hormones & Precision Dosing",
+        duration: "49:00",
+        speaker: "Dr. Rebecca Sterling",
+        chapters: [
+          { time: "00:00", title: "BHRT Protocols for Men & Women" }
+        ]
+      },
+      {
+        id: "d3-s3",
+        number: 3,
+        title: "Insulin Sensitivity & Metabolic Flexibility",
+        duration: "42:00",
+        speaker: "Sophia Martinez",
+        chapters: [
+          { time: "00:00", title: "Continuous Glucose Monitoring (CGM) Calibration" }
+        ]
+      },
+      {
+        id: "d3-s4",
+        number: 4,
+        title: "Personalized Hormone Therapy Roundtable",
+        duration: "38:00",
+        speaker: "Expert Roundtable",
+        chapters: [
+          { time: "00:00", title: "Case Studies & Live Audience Q&A" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 4,
+    name: "Day 4",
+    subtitle: "Sleep Architecture & Neuroplasticity",
+    sessions: [
+      {
+        id: "d4-s1",
+        number: 1,
+        title: "Sleep Stages, Glymphatic Clearance & REM",
+        duration: "44:00",
+        speaker: "David Chen",
+        chapters: [
+          { time: "00:00", title: "Understanding Deep Sleep & Recovery" }
+        ]
+      },
+      {
+        id: "d4-s2",
+        number: 2,
+        title: "Nootropics, BDNF & Cognitive Longevity",
+        duration: "50:00",
+        speaker: "Dr. Arthur Pendelton",
+        chapters: [
+          { time: "00:00", title: "Brain Aging & Synaptic Plasticity" }
+        ]
+      },
+      {
+        id: "d4-s3",
+        number: 3,
+        title: "HRV Tracking & Stress Resilience Masterclass",
+        duration: "37:00",
+        speaker: "Dr. Sarah Jenkins",
+        chapters: [
+          { time: "00:00", title: "Autonomic Nervous System Regulation" }
+        ]
+      },
+      {
+        id: "d4-s4",
+        number: 4,
+        title: "Sound Frequencies & Light Hygiene Protocols",
+        duration: "50:00",
+        speaker: "Wellness Team",
+        chapters: [
+          { time: "00:00", title: "Circadian Lighting & Sound Therapy" }
+        ]
+      }
+    ]
+  },
+  {
+    day: 5,
+    name: "Day 5",
+    subtitle: "Integration & Future of Integrative Care",
+    sessions: [
+      {
+        id: "d5-s1",
+        number: 1,
+        title: "The Daily Health & Longevity Stack",
+        duration: "46:30",
+        speaker: "Steve Pollard & Guests",
+        chapters: [
+          { time: "00:00", title: "Opening Remarks & Assessment" },
+          { time: "13:00", title: "Daily Habit Stacking Formulation" },
+          { time: "28:00", title: "Interactive Calibration & Demos" }
+        ]
+      },
+      {
+        id: "d5-s2",
+        number: 2,
+        title: "Biohacking in Clinical Practice",
+        duration: "36:15",
+        speaker: "Prof. Liam Vance",
+        chapters: [
+          { time: "00:00", title: "Hyperbaric, Red Light & Cold Therapy" }
+        ]
+      },
+      {
+        id: "d5-s3",
+        number: 3,
+        title: "Action Plan: Integrating Summit Protocols",
+        duration: "55:00",
+        speaker: "Dr. Jonathan Hayes",
+        chapters: [
+          { time: "00:00", title: "Practical Patient Implementation" }
+        ]
+      },
+      {
+        id: "d5-s4",
+        number: 4,
+        title: "Grand Closing Summit Keynote & Awards",
+        duration: "48:00",
+        speaker: "All Founders & Speakers",
+        chapters: [
+          { time: "00:00", title: "Closing Remarks & Certificate Awards" }
+        ]
+      }
+    ]
+  }
+];
+
 export default function OrganiserPortalClient({ organiser }: { organiser: OrganiserType }) {
   const [showInteractivePlayer, setShowInteractivePlayer] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedScheduleDay, setSelectedScheduleDay] = useState(1);
   const playerRef = useRef<HTMLDivElement>(null);
+
+  const currentScheduleDay = ORGANISER_SCHEDULE.find((d) => d.day === selectedScheduleDay) || ORGANISER_SCHEDULE[0];
 
   const handleLaunchHumanGarage = () => {
     setShowInteractivePlayer(true);
@@ -138,10 +404,10 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
                 <div>
                   <h2 className="text-white font-black text-lg md:text-xl flex items-center gap-2">
                     <span>🎬</span>
-                    <span>Human Garage Delegate Video Menu</span>
+                    <span>{organiser.name} Delegate Video Menu</span>
                   </h2>
                   <p className="text-slate-400 text-xs font-medium">
-                    Interactive 5-Day Summit Presentation • Scene Selection • 4K Masterclass Player
+                    Interactive 5-Day Summit Presentation • 4 Sessions Per Day • Chapter Markers & Scene Selection
                   </p>
                 </div>
               </div>
@@ -175,7 +441,7 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
               )}
               
               <iframe
-                src="/mediazilla/index.html"
+                src={`/mediazilla/index.html?organiser=${organiser.slug}`}
                 className="w-full h-full border-none min-h-[560px] lg:min-h-[640px]"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
@@ -186,12 +452,128 @@ export default function OrganiserPortalClient({ organiser }: { organiser: Organi
             <div className="bg-[#121822] px-6 py-3 border-t border-white/10 text-xs text-slate-400 flex items-center justify-between flex-wrap gap-2">
               <span className="flex items-center gap-1.5">
                 <span className="text-emerald-400 font-bold">✓ Active:</span>
-                Delegates can click any chapter or workshop to stream directly.
+                Delegates can click any day, session, or chapter to stream directly.
               </span>
               <span className="text-slate-400">
                 Tip: Use <strong>❮ Menu</strong> inside the player to switch between chapters anytime.
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* INTERACTIVE PROGRAMME: DAYS & CHAPTERS MENU */}
+        {/* ========================================================================= */}
+        <section className="mb-14 bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-6 pb-4 border-b border-gray-100">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="bg-[#00873a] text-white text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Complete Summit Menu
+                </span>
+                <span className="text-xs font-bold text-gray-500">
+                  4 Sessions Per Day • Chapters with Timestamps
+                </span>
+              </div>
+              <h3 className="text-2xl font-black text-[#1f2e22]">
+                {organiser.name} — Interactive Summit Programme
+              </h3>
+            </div>
+
+            {/* Day Selector Pills */}
+            <div className="flex items-center gap-1.5 bg-gray-100 p-1.5 rounded-2xl">
+              {[1, 2, 3, 4, 5].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setSelectedScheduleDay(d)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    selectedScheduleDay === d
+                      ? "bg-[#00873a] text-white shadow-md"
+                      : "text-gray-600 hover:text-black hover:bg-gray-200"
+                  }`}
+                >
+                  Day {d}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Day Subtitle */}
+          <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-2xl p-4 mb-6 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <span className="text-xs font-black text-[#15803d] uppercase tracking-wider">
+                Day {selectedScheduleDay} Focus
+              </span>
+              <h4 className="text-base font-bold text-[#14532d]">
+                {currentScheduleDay.subtitle}
+              </h4>
+            </div>
+            <span className="text-xs font-bold bg-[#16a34a] text-white px-3 py-1 rounded-full">
+              4 Full Sessions • Interactive Chapters
+            </span>
+          </div>
+
+          {/* 4 Sessions Grid with Chapters */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {currentScheduleDay.sessions.map((session) => (
+              <div
+                key={session.id}
+                className="bg-[#fafcfb] border border-gray-200 hover:border-[#00873a]/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="bg-[#1f2e22] text-white text-[11px] font-black px-2.5 py-0.5 rounded-md uppercase">
+                      Session {session.number}
+                    </span>
+                    <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-md">
+                      ⏱ {session.duration}
+                    </span>
+                  </div>
+
+                  <h5 className="text-base font-bold text-[#1f2e22] mb-1.5 leading-snug">
+                    {session.title}
+                  </h5>
+
+                  <p className="text-xs text-gray-500 mb-4 font-medium">
+                    Speaker: <strong className="text-[#00873a]">{session.speaker}</strong>
+                  </p>
+
+                  {/* Chapters List */}
+                  {session.chapters.length > 0 && (
+                    <div className="mb-4 bg-white rounded-xl p-3 border border-gray-100">
+                      <div className="text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <span>📑 Chapters & Timestamps</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {session.chapters.map((ch, idx) => (
+                          <div
+                            key={idx}
+                            onClick={handleLaunchHumanGarage}
+                            className="flex items-center justify-between text-xs py-1 px-2 rounded-lg hover:bg-emerald-50 hover:text-[#00873a] cursor-pointer transition-colors group"
+                            title="Click to play from this chapter"
+                          >
+                            <span className="font-semibold text-gray-700 group-hover:text-[#00873a] truncate">
+                              {ch.title}
+                            </span>
+                            <span className="text-[11px] font-mono text-gray-400 group-hover:text-[#00873a] shrink-0 ml-2 font-bold">
+                              {ch.time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleLaunchHumanGarage}
+                  className="w-full mt-2 py-2.5 bg-[#00873a] hover:bg-[#007030] text-white text-xs font-black rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                >
+                  <span>▶ Play Session {session.number}</span>
+                  <span className="text-[11px] opacity-80 font-normal">({session.duration})</span>
+                </button>
+              </div>
+            ))}
           </div>
         </section>
 
